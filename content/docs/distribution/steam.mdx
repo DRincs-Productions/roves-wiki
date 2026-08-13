@@ -1,0 +1,40 @@
+---
+title: Steam integration
+description: Building Roves with Steamworks support and using it from your game.
+---
+
+Roves has a built-in, opt-in Steamworks integration — a full wrapper (achievements, stats,
+DLC, overlay, store) talking to its own dedicated `steam:` protocol handler in the engine.
+It's entirely off by default and adds zero overhead when unused.
+
+## Building it in
+
+```bash
+./mach build --release --features steam
+```
+
+Compile the flag in at build time — there's no runtime toggle. Every function in the
+JS-side wrapper degrades to a harmless default when Steam isn't compiled in, or isn't
+running, so you don't need a separate non-Steam build for players launching outside Steam.
+
+## Using it from your game
+
+```ts
+import { steam } from "@drincs/roves-api/steam";
+
+if (await steam.isAvailable()) {
+  await steam.unlockAchievement("ACH_COMPLETE_CH1");
+  await steam.openOverlay("achievements");
+}
+```
+
+See <DynamicLink href="/docs/roves-api/steam">roves-api → steam</DynamicLink> for the full
+API surface.
+
+<Callout title="No Tauri, no window.__TAURI_INTERNALS__" type="info">
+This isn't the same code path as the Tauri build's Steam integration — Roves has no Tauri
+runtime to inject `invoke()`, so `@drincs/roves-api/steam` is a real, independent
+implementation, just deliberately shaped to feel familiar if you already know Tauri's API.
+If your frontend needs to run under **both** shells, branch between this package and
+`@tauri-apps/api` per shell.
+</Callout>

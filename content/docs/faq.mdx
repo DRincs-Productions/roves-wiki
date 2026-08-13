@@ -1,0 +1,55 @@
+---
+title: FAQ
+description: Frequently asked questions.
+---
+
+<Accordions>
+
+<Accordion title="Is Roves a fork of Servo?" id="is-a-fork">
+
+No. It's a vendored, customized copy of Servo's tagged source — not a GitHub fork, not a
+submodule. See <DynamicLink href="/docs/getting-started">Getting Started</DynamicLink> for
+why, and the repo's `CUSTOMIZATIONS.md` for the full list of changes on top of upstream.
+
+</Accordion>
+
+<Accordion title="Do I need Tauri to use Roves?" id="need-tauri">
+
+No — that's the point. <DynamicLink href="/docs/roves-api">`@drincs/roves-api`</DynamicLink>
+is a real, independent bridge; Roves has no Tauri runtime and doesn't need one.
+
+</Accordion>
+
+<Accordion title="Where do I ask questions about how Servo itself renders things?" id="servo-questions">
+
+The [Servo wiki](https://servo.org) and Servo's own community — this documentation only
+covers what Roves specifically changes or adds on top of stock Servo. If it's about layout,
+rendering, or DOM/JS behavior that isn't touched by anything in `CUSTOMIZATIONS.md`, it's
+stock Servo behavior.
+
+</Accordion>
+
+<Accordion title="My bundled build doesn't start and shows nothing — what do I do?" id="silent-launch">
+
+See <DynamicLink href="/docs/distribution/diagnosing-a-silent-launch">Diagnosing a silent
+launch</DynamicLink> — check `roves.log` first.
+
+</Accordion>
+
+<Accordion title="Can I use Roves without Steam integration?" id="without-steam">
+
+Yes — Steam support is entirely opt-in, compiled in only with `--features steam`, and every
+function in <DynamicLink href="/docs/roves-api/steam">`@drincs/roves-api/steam`</DynamicLink>
+degrades to a harmless default when it isn't. A default build has none of it.
+
+</Accordion>
+
+<Accordion title="Does Roves support mobile (iOS/Android)?" id="mobile">
+
+Roves' `mach bundle` targets desktop: Windows, macOS, and Linux. If you need mobile
+alongside desktop from the same codebase, that's what Tauri's multi-device support is for —
+see <DynamicLink href="/docs/why">Why Roves?</DynamicLink>.
+
+</Accordion>
+
+</Accordions>

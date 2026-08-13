@@ -1,0 +1,53 @@
+---
+title: Content packing
+description: How --content-compress=auto packs your game and extracts it back at launch.
+---
+
+By default (`--content-compress=auto`), `mach bundle` doesn't ship your game's web content
+as loose, individually browsable files. It packs `--content-dir` into a handful of
+tar+zstd archives via `roves-content-packer` (built once, on the machine running
+`mach bundle` — never shipped in the final bundle), then the engine binary extracts them
+back to plain files **in-process**, at launch time, using that same crate linked in as a
+library.
+
+## Boot set vs. lazy extraction
+
+Packed files fall into two groups:
+
+- **Boot set** — the HTML entry file plus whatever it directly references (script/link/img
+  `src`/`href`), or anything matched by `--content-boot-include`. Extracted **eagerly**, in
+  full, before the engine opens anything — this is what the boot splash covers.
+- **Everything else** — stays compressed until something actually requests a file inside
+  it (the engine's own `file:` protocol handler triggers extraction on demand, one archive
+  at a time, the first time a request needs it).
+
+`--content-exclude <glob>` opts specific files out of packing entirely — they stay loose,
+uncompressed, next to the packs. Use this for anything that shouldn't sit inside a
+read-only archive, like a save-data or user-config subfolder.
+
+## Where extracted content lives
+
+Extraction targets the OS's real, disk-backed cache directory — never a RAM-backed `tmpfs`
+like `/tmp` often is on Linux, which matters once a project's assets reach the multi-GB
+range:
+
+- Windows: `%LOCALAPPDATA%\<game name>\cache\<hash>\`
+- macOS: `~/Library/Caches/<game name>/cache/<hash>/`
+- Linux: `~/.cache/<game name>/cache/<hash>/` (or `$XDG_CACHE_HOME` if set)
+
+`<game name>` comes from the manifest's `name` field (itself resolved from your game's
+`manifest.json`/`package.json` at bundle time) — sanitized to a filesystem-safe segment,
+falling back to `roves` if absent. `<hash>` is a short hash of the resolved `--content-dir`
+path, so repeat launches of the *same* install reuse the same destination, while different
+installs that happen to share a display name never collide.
+
+A hash marker records which manifest a destination was last built for — a mismatch (a
+newer build with different packed content) wipes and rebuilds the destination from
+scratch on next launch, rather than serving stale files.
+
+## Clearing it
+
+Your game's own code can wipe this cache (not save data) via
+<DynamicLink href="/docs/roves-api/cache">`@drincs/roves-api/cache`</DynamicLink>'s
+`clearContentCache()` — it also closes the game, since that cache is the live document root
+while running. The next launch re-extracts fresh from the shipped bundle.

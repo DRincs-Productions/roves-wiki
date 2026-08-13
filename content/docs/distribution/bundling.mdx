@@ -1,0 +1,58 @@
+---
+title: Bundling & distribution
+description: Every mach bundle flag, what each output format looks like, and how it fits the pixi-vn-react-template templates.
+---
+
+`mach bundle` turns a `./mach build` output plus your game's built web content into a
+single, double-click-runnable native bundle. Every platform's *portable* output is exactly
+one executable — no separate launcher process, and no `roves-content-packer` binary shipped
+alongside it (packed-content extraction happens in-process, inside the engine binary
+itself, which already links that crate as a library).
+
+## Platform outputs
+
+| Platform | Portable (default) | Installer |
+| --- | --- | --- |
+| Windows | `play.exe` + its DLLs, flat in the output folder | `--msi` |
+| macOS | `Roves.app`, whose `Contents/MacOS/Roves` *is* the engine binary | `--dmg` |
+| Linux | `play` | `--deb` |
+
+An installer flag (`--msi`/`--deb`/`--dmg`) wraps the exact same portable output the plain
+branch would have produced — the portable staging files aren't left behind once the
+installer is built.
+
+## Flags
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--content-dir <dir>` | — | Web content to copy/pack into the bundle. |
+| `--html-file <path>` | `dist/index.html` | Entry HTML file, relative to the bundle root. |
+| `--output`, `-o <dir>` | `<build dir>/bundle` | Where to write the bundle. |
+| `--window-size <WxH>` | `1280x720` | Initial window size in logical pixels. |
+| `--content-compress` | `auto` | `auto`: pack into a handful of tar+zstd archives (see <DynamicLink href="/docs/distribution/content-packing">Content packing</DynamicLink>). `none`: copy in as loose, individually browsable files. |
+| `--content-compression-level` | `1` | zstd level for `--content-compress=auto`. Low by default — speed over ratio. |
+| `--content-max-pack-size` | `500M` | Split archives so none exceeds this size. |
+| `--content-exclude <glob>` | — | Repeatable. Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
+| `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
+| `--deb` | off | Linux only: build a `.deb` instead of a plain `play` binary. |
+| `--msi` | off | Windows only: build an installable `.msi`. |
+| `--dmg` | off | macOS only: wrap `Roves.app` in an installable `.dmg`. |
+| `--package-name <name>` | `roves` | Package name for `--deb`/`--msi`/`--dmg`. |
+| `--package-version <ver>` | `0.0.0` | Package version for `--deb`/`--msi`/`--dmg`. |
+| *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
+
+## CI: `roves-action`
+
+[`roves-action`](https://github.com/DRincs-Productions/roves-action) is a GitHub Action
+wrapping `mach build` + `mach bundle` for any game's own CI — you don't need a full Roves
+checkout in your own repo to build a release. Its inputs are a near 1:1 forwarding layer
+over the flags above.
+
+## Using this from pixi-vn-react-template
+
+If your game started from the
+[pixi-vn-react-template](https://github.com/DRincs-Productions/pixi-vn-react-template)
+multi-target template, Roves is the second of its two desktop targets — the other being
+Tauri. See <DynamicLink href="/docs/why">Why Roves?</DynamicLink> for how to decide between
+the two, and <DynamicLink href="/docs/roves-api">roves-api</DynamicLink> for the JS bridge
+your game's own code talks to Roves through, once it's running inside it.

@@ -1,0 +1,47 @@
+---
+title: Diagnosing a silent launch
+description: What to check when a bundled Roves build starts and nothing visibly happens.
+---
+
+A double-clicked Roves build has no console — Windows builds set `#![windows_subsystem =
+"windows"]` specifically so it never flashes one — so a launch that fails early can look
+like literally nothing happened. There's a log file for exactly this.
+
+## Check `roves.log` first
+
+Every launch writes a fresh log (truncated on each run, so you're never looking at stale
+output from a previous launch) to the same per-game directory
+<DynamicLink href="/docs/distribution/content-packing">content extraction</DynamicLink> uses:
+
+- Windows: `%LOCALAPPDATA%\<game name>\roves.log`
+- macOS: `~/Library/Caches/<game name>/roves.log`
+- Linux: `~/.cache/<game name>/roves.log`
+
+It captures the engine's own logging, your game's `console.log`/`warn`/`error` output, and
+any panic — all in one place, from the very first line of startup. `RUST_LOG=debug` (or
+`trace`) before launching raises the verbosity if the default level doesn't show enough.
+
+<Callout title="Only one line in the log, then nothing?" type="warn">
+That's consistent with either a hang, or a native crash (a GPU/driver issue, or a missing
+system DLL) that happens *before* the point your build actually reached — not a Rust panic,
+which would always add at least one more line. Check which milestone was logged last to
+narrow down where.
+</Callout>
+
+## A real incident: `mach bundle`'s own flags leaking into the game's args
+
+Early on, a build reported "nothing happens" with `roves.log` showing the resolved launch
+args including `--package-name`/`--package-version` — flags meant for `mach bundle` itself
+(naming a `--msi`/`--deb`/`--dmg` output), not for the running game. Roves' own CLI parser
+rejects unrecognized flags outright and exits immediately, before a window ever exists —
+exactly matching "nothing happens." This is now guarded against directly in `mach bundle`
+(any of its own flags found in the passthrough args are dropped, with a loud warning,
+instead of silently corrupting `launch.json`) — but if you're building `mach bundle` at an
+older revision, double-check `launch.json` next to your bundle's executable for anything
+that looks like it belongs to `mach bundle` rather than your game.
+
+## Still stuck?
+
+Open an issue on [the repo](https://github.com/DRincs-Productions/roves/issues) with
+`roves.log`'s contents attached — the exact last line logged is the single most useful
+piece of information for narrowing down where to look next.

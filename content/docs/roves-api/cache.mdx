@@ -1,0 +1,22 @@
+---
+title: cache
+description: clearContentCache() — wipe the packed-content extraction cache.
+---
+
+```ts
+import { clearContentCache } from "@drincs/roves-api/cache";
+
+await clearContentCache();
+```
+
+Deletes the <DynamicLink href="/docs/distribution/content-packing">startup extraction
+cache</DynamicLink> — **not save data** — and closes the game, since that cache is the live
+document root while running. The next launch re-extracts fresh from the shipped bundle.
+
+<Callout title="No resume-in-place" type="warn">
+There is currently no way to clear the cache and keep playing, or to have the game relaunch
+itself afterwards — the player (or your own launcher, if you have one) starts it again.
+</Callout>
+
+Use this for a "repair install"/"reset local files" button — much simpler than trying to
+reconcile a running page against files being rewritten out from under it.

@@ -1,0 +1,27 @@
+---
+title: core
+description: invoke(cmd, args) — the generic bridge everything else is built on.
+---
+
+Roves' general-purpose native bridge. Every other module (`process`, `cache`) is a thin,
+typed wrapper around a call to `invoke()` here.
+
+```ts
+import { invoke } from "@drincs/roves-api/core";
+
+await invoke("exit");
+```
+
+`invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T>` calls a native
+`roves:` command and returns its JSON-decoded result. Under the hood it's a plain
+`fetch("roves:<cmd>?<args>")` against the engine's own `roves:` custom protocol handler —
+no runtime injection, no `window.__TAURI_INTERNALS__` equivalent required.
+
+`roves:` is deliberately small and general-purpose — window/process lifecycle today, more
+as Roves grows its own native surface. Larger, self-contained SDKs (Steam) get their own
+dedicated protocol instead of being routed through here — see
+<DynamicLink href="/docs/roves-api/steam">steam</DynamicLink>.
+
+Most of your game's code should reach for `process`/`steam`/`cache` directly rather than
+calling `invoke()` by hand — it's exported mainly so those modules (and any future ones)
+have a single, consistent implementation to build on.

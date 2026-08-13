@@ -1,0 +1,47 @@
+---
+title: Quick start
+description: Build the engine and bundle your first game with it.
+---
+
+## 1. Build the engine
+
+```bash title="from the repo root"
+./mach build --release
+```
+
+Add `--features steam` if you need the <DynamicLink href="/docs/distribution/steam">Steam
+bridge</DynamicLink> compiled in. See <DynamicLink href="/docs/getting-started/prerequisites">
+Prerequisites</DynamicLink> if this fails on a fresh machine.
+
+## 2. Build your game's web content
+
+Roves doesn't build your game — that's your own bundler's job (Vite, webpack, whatever your
+frontend stack already uses). Point it at a `dist/` folder the normal way; the next step
+just needs a path to that output.
+
+## 3. Bundle it
+
+```bash
+./mach bundle --content-dir path/to/dist --output release
+```
+
+This produces a single double-click-runnable binary in `release/` — `play.exe`, `Roves.app`,
+or `play`, depending on the platform you're building on — with your content either packed
+into a handful of compressed archives (the default) or copied in as loose files
+(`--content-compress=none`). See <DynamicLink href="/docs/distribution/bundling">Bundling
+& distribution</DynamicLink> for every flag `mach bundle` accepts, including `--msi`/`--deb`/
+`--dmg` for a real installer instead of a portable folder.
+
+<Callout title="Extra args after --output are forwarded to the game, not to mach">
+`mach bundle`'s own flags (`--package-name`, `--package-version`, `--msi`, ...) are for
+naming/shaping the *installer*. Anything else on the command line is written into the
+bundle's `launch.json` and handed to the running game at launch as real CLI args — the two
+are validated against each other so one can't accidentally leak into the other.
+</Callout>
+
+## 4. Run it
+
+Double-click the produced binary (or run it from a terminal). If something looks wrong and
+nothing obvious shows up, see <DynamicLink href="/docs/distribution/diagnosing-a-silent-launch">
+Diagnosing a silent launch</DynamicLink> — every launch writes a log file you can check
+before assuming it's a mystery.

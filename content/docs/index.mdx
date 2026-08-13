@@ -1,13 +1,51 @@
 ---
-title: Hello World
-description: Your first document
+title: Introduction
+description: What Roves is, and where to go next.
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+**Roves** is a customized, vendored fork of [Servo](https://servo.org) — a modern web
+engine built from scratch, not a repurposed browser — used as a native runtime for
+shipping web-built games as real desktop apps instead of a browser tab.
 
-## What is Next?
+You build your game's UI however you already do (React, Vue, plain HTML/CSS/JS —
+anything that runs in a browser). Roves takes that built output and produces a single,
+double-click-runnable binary: `play.exe` on Windows, `Roves.app` on macOS, `play` on
+Linux — with your content either sitting next to it or packed straight into the bundle.
 
 <Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" />
+  <Card title="Getting Started" href="/docs/getting-started">
+    Build and run your first Roves bundle.
+  </Card>
+  <Card title="Distribution" href="/docs/distribution">
+    Packing, Steam, `.msi`/`.deb`/`.dmg` installers, and diagnosing a broken launch.
+  </Card>
+  <Card title="roves-api" href="/docs/roves-api">
+    The JS/TS bridge your game's own code talks to Roves through.
+  </Card>
+  <Card title="Why Roves?" href="/docs/why">
+    Tauri vs. a bundled Chromium (Electron) vs. Roves — and why this exists at all.
+  </Card>
 </Cards>
+
+## How it fits together
+
+Roves is one of two distribution targets a game built on the
+[pixi-vn-react-template](https://github.com/DRincs-Productions/pixi-vn-react-template) project
+can target — the other being [Tauri](https://tauri.app/). Both wrap the same web content;
+they differ in what actually renders it. See <DynamicLink href="/docs/why">Why Roves?</DynamicLink>
+for the full comparison.
+
+Roves itself is not a from-scratch engine — it is upstream [Servo](https://servo.org),
+vendored and patched (not forked on GitHub — see the project's `CLAUDE.md`) with a
+focused, documented set of changes: no browser chrome (toolbar, tabs, address bar), a
+branded boot splash, single-executable bundling, packed-content extraction, a Steam
+bridge, and a few other game-shell-shaped conveniences. Every change is tracked in
+[`CUSTOMIZATIONS.md`](https://github.com/DRincs-Productions/roves/blob/main/CUSTOMIZATIONS.md)
+with the reasoning behind it, and mirrored as a real, machine-applicable patch under
+[`patches/`](https://github.com/DRincs-Productions/roves/tree/main/patches) — so upgrading to
+a newer Servo release means reapplying documented, reviewable diffs, not re-deriving
+changes from scratch.
+
+For anything about the engine itself that isn't specific to Roves — how rendering, layout,
+or the DOM/JS implementation works — the [Servo wiki](https://servo.org) is the right place
+to look; this documentation only covers what Roves changes or adds on top.

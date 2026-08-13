@@ -1,0 +1,68 @@
+---
+title: roves-api
+description: The JS/TS bridge your game's own code talks to Roves through — no Tauri required.
+---
+
+**[`@drincs/roves-api`](https://github.com/DRincs-Productions/roves-api)** is the JS/TS
+bridge for talking to Roves from your web content.
+
+<Accordions>
+
+<Accordion title="Why does this exist?" id="why-roves-api">
+
+Tauri's `invoke()` only works because Tauri's own runtime injects
+`window.__TAURI_INTERNALS__` into the page. Roves has no such runtime, and isn't going to
+pretend to be Tauri — this package is a real, independent implementation, just deliberately
+shaped to feel familiar if you already know Tauri's API.
+
+Under the hood, Roves has no Tauri-style `invoke()` built in at all. Instead, native code
+registers custom URL schemes (protocol handlers) that answer plain `fetch()` calls from
+your page's own JS. `roves-api` wraps that in a small, ergonomic API so you never have to
+touch `fetch("roves:...")` directly.
+
+</Accordion>
+
+<Accordion title="What if my game also targets Tauri?" id="dual-target">
+
+Branch between this package and `@tauri-apps/api` per shell — see the parent
+`pixi-vn-react-template` project's `src/lib/steam.ts` for exactly that pattern. Both expose
+a similar shape by design, so the branch is usually thin.
+
+</Accordion>
+
+</Accordions>
+
+## Modules
+
+```ts
+import { invoke } from "@drincs/roves-api/core";
+import { exit } from "@drincs/roves-api/process";
+import { steam } from "@drincs/roves-api/steam";
+import { clearContentCache } from "@drincs/roves-api/cache";
+```
+
+<Cards>
+  <Card title="core" href="/docs/roves-api/core">
+    The generic `invoke(cmd, args)` bridge everything else is built on.
+  </Card>
+  <Card title="process" href="/docs/roves-api/process">
+    `exit()` — close every window Roves opened.
+  </Card>
+  <Card title="steam" href="/docs/roves-api/steam">
+    Achievements, stats, DLC, overlay, store.
+  </Card>
+  <Card title="cache" href="/docs/roves-api/cache">
+    Wipe the packed-content extraction cache.
+  </Card>
+</Cards>
+
+## Installation
+
+```bash
+npm install @drincs/roves-api
+```
+
+It's a normal npm dependency — no Roves-specific build step required on your side. Every
+function is safe to call even when your code isn't actually running inside Roves (e.g. a
+plain browser preview during development) — see each module's own page for its specific
+fallback behavior.

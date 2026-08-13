@@ -1,0 +1,61 @@
+---
+title: What is Roves?
+description: Roves in one page — what it is, and what it isn't.
+---
+
+<Accordions>
+
+<Accordion title="What is Roves?" id="what-is-roves">
+
+Roves is a vendored, customized copy of [Servo](https://servo.org) — extracted from the
+official tagged source, not a GitHub fork and not a submodule — used as a native runtime
+for a web-built game. It plays the same role a Tauri app or an Electron app would: take
+your already-built web content and turn it into a real, double-click-runnable desktop
+binary. See <DynamicLink href="/docs/why">Why Roves?</DynamicLink> for how those three
+compare.
+
+</Accordion>
+
+<Accordion title="Why vendor instead of fork?" id="why-vendor">
+
+Servo's own repository is enormous (~1.3GB unpacked), almost entirely Web Platform Tests
+and perf benchmarks — irrelevant here. Maintaining a full GitHub fork of a repo that size
+for a handful of small, surgical UI/behavior changes was overkill. Downloading the tagged
+source zip once and applying targeted patches locally is far cheaper to maintain, and keeps
+every change reviewable as an actual diff instead of buried in fork history.
+
+</Accordion>
+
+</Accordions>
+
+## What Roves changes, on top of upstream Servo
+
+- **No browser chrome.** No toolbar, no tabs, no address bar, no page-reload/back-forward
+  shortcuts — this is meant to look and behave like a native app window, not a browser.
+- **A single executable.** `mach bundle` produces one binary (`play.exe` / `Roves.app` /
+  `play`) with your game's content either packed in or sitting next to it — no separate
+  launcher process, no bundled `roves-content-packer` binary.
+- **A branded boot splash**, shown immediately while packed content extracts in the
+  background, instead of a blank or undefined-content window.
+- **A `roves:` protocol bridge** (see <DynamicLink href="/docs/roves-api">roves-api</DynamicLink>)
+  exposing window/process lifecycle, Steam, and cache-clearing to your page's own JS — no
+  Tauri-style `invoke()` runtime, no `window.__TAURI_INTERNALS__` equivalent required.
+- **Optional Steam integration**, gated behind `--features steam`, degrading to harmless
+  defaults when Steam isn't running or wasn't compiled in.
+
+Every one of these is documented — file touched, what changed, why — in
+[`CUSTOMIZATIONS.md`](https://github.com/DRincs-Productions/roves/blob/main/CUSTOMIZATIONS.md),
+with a matching, machine-applicable patch under
+[`patches/`](https://github.com/DRincs-Productions/roves/tree/main/patches). Anything not
+listed there is stock Servo behavior — check [servo.org](https://servo.org) for that.
+
+## Where to go next
+
+<Cards>
+  <Card title="Prerequisites" href="/docs/getting-started/prerequisites">
+    What you need installed before building Roves.
+  </Card>
+  <Card title="Quick start" href="/docs/getting-started/quick-start">
+    Build the engine and bundle a game with it.
+  </Card>
+</Cards>

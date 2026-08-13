@@ -1,45 +1,55 @@
 # roves-wiki
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Documentation site for [Roves](https://github.com/DRincs-Productions/roves), built with
+Next.js and [Fumadocs](https://fumadocs.vercel.app).
 
-Run development server:
+Structurally modeled after [pixi-vn.wiki](https://github.com/DRincs-Productions/pixi-vn)'s
+own docs site (Fumadocs setup, theming pattern, custom search/OG/comments), scoped down for
+a single-product, English-only docs site — no i18n, no jsdoc auto-generation, no live
+playgrounds/AI chat.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000>.
 
-## Explore
+## Structure
 
-In the project, you can see:
+| Path | What |
+| --- | --- |
+| `app/(home)` | Landing page. |
+| `app/docs` | Documentation layout and pages, rendering `content/docs/**/*.mdx`. |
+| `app/api/search/route.ts` | Search API (Orama, via `fumadocs-core/search/server`). |
+| `app/og/docs/[...slug]/route.tsx` | Per-page OG image generation (`next/og`). |
+| `content/docs/` | All documentation content. Each subfolder has a `meta.json` controlling sidebar order/titles. |
+| `lib/shared.ts` | Site-wide constants — app name, GitHub repo, giscus config. |
+| `lib/layout.shared.tsx` | Shared nav/layout options (logo, GitHub link). |
+| `components/search.tsx` | Custom search dialog UI, still Orama-backed. |
+| `components/giscus-comments.tsx` | Per-page comments, rendered on every doc page once configured (see below). |
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `app/layout.config.tsx`: Shared options for layouts, optional but preferred to keep.
+## Branding
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+Colors and the heading font are pulled directly from the engine's own brand assets:
 
-### Fumadocs MDX
+- Primary/secondary colors are extracted from `icon.svg` (see `app/global.css`).
+- The heading font is **Metal Mania** — the same font used for the "Roves" wordmark on the
+  engine's own boot splash screen.
+- Body text is **Space Grotesk**.
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+## Enabling comments (Giscus)
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+Comments are wired up but render nothing until two IDs are filled in:
 
-## Learn More
+1. Enable **Discussions** on the `roves` GitHub repo.
+2. Go to [giscus.app](https://giscus.app), point it at `DRincs-Productions/roves`, pick a
+   discussion category, and copy the generated `data-repo-id`/`data-category-id`.
+3. Paste them into `lib/shared.ts`'s `giscusConfig`.
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+## Learn more
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Fumadocs](https://fumadocs.vercel.app)

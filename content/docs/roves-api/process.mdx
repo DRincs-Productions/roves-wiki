@@ -1,0 +1,23 @@
+---
+title: process
+description: exit() — close every window Roves opened, quitting the app.
+---
+
+The Roves equivalent of `@tauri-apps/plugin-process`'s `exit()`.
+
+```ts
+import { exit } from "@drincs/roves-api/process";
+
+await exit();
+```
+
+<Callout title="Why not window.close()?" type="info">
+Browsers (and Roves) only grant scripted `window.close()` on windows the *page itself*
+opened via `window.open()` — not on the top-level window a native shell created for you,
+which is the normal case for a game embedded in Roves. `exit()` instead asks the native
+side directly (`roves:exit`), which closes every open window through Roves' own
+window-management API — not the DOM API.
+</Callout>
+
+In Roves' usual single-window setup, closing the one window *is* quitting the app: once no
+windows remain open, the engine's own event loop exits on its own.

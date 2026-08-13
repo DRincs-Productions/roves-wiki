@@ -1,0 +1,41 @@
+---
+title: steam
+description: Achievements, stats, DLC, overlay, and store — Roves' full Steamworks wrapper.
+---
+
+A full Steamworks wrapper, talking to its own dedicated `steam:` protocol — Steam gets its
+own protocol rather than being routed through <DynamicLink href="/docs/roves-api/core">
+`core`</DynamicLink>'s generic `roves:` bridge, since it's a large, separate SDK surface,
+not a general "control this app" command.
+
+Requires the native binary to be built with `--features steam` (see
+<DynamicLink href="/docs/distribution/steam">Steam integration</DynamicLink>). Every
+function below degrades to a harmless default (`null` / `false` / `0`) when Steam isn't
+compiled in or isn't running — **none of them throw** for that reason, so you don't need a
+separate non-Steam build or a bunch of defensive `try`/`catch`.
+
+```ts
+import { steam } from "@drincs/roves-api/steam";
+
+if (await steam.isAvailable()) {
+  await steam.unlockAchievement("ACH_COMPLETE_CH1");
+  await steam.openOverlay("achievements");
+}
+```
+
+## API
+
+| Function | Returns | Notes |
+| --- | --- | --- |
+| `isAvailable()` | `boolean` | `true` once Steam initialized successfully. |
+| `getPlayerName()` | `string \| null` | Steam display name of the logged-in user. |
+| `getAppId()` | `number \| null` | App ID of the running application. |
+| `unlockAchievement(id)` | `boolean` | Unlocks and immediately persists it. `id` must match the API Name in Steamworks Partner. |
+| `isAchievementUnlocked(id)` | `boolean` | Reliable only after the first few seconds of launch (stats fetch automatically at startup). |
+| `clearAchievement(id)` | `boolean` | Development/testing only. |
+| `setStatInt(name, value)` / `setStatFloat(name, value)` | `boolean` | Call `storeStats()` afterwards to persist. |
+| `getStatInt(name)` / `getStatFloat(name)` | `number` | Returns `0` on error. |
+| `storeStats()` | `boolean` | Commits pending stat changes. `unlockAchievement`/`clearAchievement` already call this automatically. |
+| `isDlcInstalled(appId)` | `boolean` | Whether the user owns *and* has installed that DLC. |
+| `openOverlay(dialog)` | `boolean` | `dialog`: `"achievements"`, `"community"`, `"friends"`, and other standard overlay panes. |
+| `openStore(appId?)` | `boolean` | Opens the store page for this game, or a different `appId`. |

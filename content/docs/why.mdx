@@ -1,0 +1,66 @@
+---
+title: Why Roves?
+description: Tauri vs. a bundled Chromium (Electron) vs. Roves — what actually differs, and why a third option exists at all.
+---
+
+If you already build your game as a web app, you have three broad ways to ship it as a
+native desktop binary. They differ in exactly one thing: **what actually renders your
+HTML/CSS/JS.**
+
+## Tauri: the OS's own WebView
+
+Tauri is a thin Rust shell around whatever web engine your operating system already ships
+and maintains for its own apps — WebView2 (Chromium-based) on Windows, WebKitGTK on Linux,
+WKWebView on macOS.
+
+- **Tiny binary, low memory.** You're not shipping a browser — just your app code plus a
+  thin native wrapper. The engine itself is already on the user's machine.
+- **You don't control the exact engine version.** It's whatever the OS has installed,
+  updated on the OS's own schedule. Three platforms means three different engines, each
+  with its own quirks, bugs, and web-platform feature timeline — genuinely different
+  behavior is possible across users on the same "Tauri build."
+- **Best for:** apps that don't lean on bleeding-edge web features and want the smallest
+  possible download.
+
+## A bundled Chromium (Electron, NW.js): full consistency, full weight
+
+Electron and NW.js bundle an entire Chromium browser — plus a full Node.js runtime — inside
+every single app. You get one specific, pinned engine version, identical on every platform,
+completely under your control.
+
+- **Fully consistent rendering,** everywhere, because it's the literal same browser build
+  every time — no per-OS quirks to test around.
+- **Heavy.** Tens to well over a hundred megabytes per app, because every single Electron
+  app ships its own private copy of Chromium (and Node) rather than sharing one with the
+  OS or other apps. Startup and memory footprint pay for that too.
+- **Best for:** apps that need broad, guaranteed-consistent web-platform support and can
+  afford the size.
+
+## Roves: a real engine, not the OS's webview and not a full browser
+
+Roves bundles [Servo](https://servo.org) — a modern web engine written from scratch in
+Rust, not a stripped-down repurposed browser. Like Electron, it's one self-contained
+binary with a pinned, consistent engine version you control, not whatever the OS happens
+to have. Unlike Electron, it isn't shipping (or paying the size/memory cost of) an entire
+general-purpose browser — no dev tools, no extension system, no multi-process browser
+chrome, none of Node's own runtime — just enough engine to render your own game.
+
+Being honest about the trade-off: Servo is younger and less complete than Chromium or the
+mature system webviews Tauri relies on. Web-platform coverage is real but not exhaustive,
+and it's under active development rather than a decade-plus-mature target. Roves is the
+right fit for a game's own bundled, controlled UI — not for embedding arbitrary third-party
+web content and expecting perfect compatibility.
+
+## In short
+
+| | Engine | Size | Consistency |
+| --- | --- | --- | --- |
+| Tauri | OS's system webview | Smallest | Varies by OS/webview version |
+| Electron / NW.js | Bundled Chromium + Node | Largest | Fully consistent |
+| Roves | Bundled Servo | In between | Fully consistent |
+
+If your game is a fairly standard web app and you want the smallest download, use Tauri.
+If you need guaranteed, bleeding-edge web-platform completeness and size isn't a concern,
+a Chromium-based shell is the safer bet. If you want a single consistent engine you fully
+control without paying full-browser weight for it — and your game's UI is the only thing
+that needs to render — that's what Roves is for.
