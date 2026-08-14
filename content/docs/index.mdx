@@ -27,24 +27,45 @@ content either sitting next to it or packed straight into the bundle.
   </Card>
 </Cards>
 
-## How it fits together
+## What Roves is built from
 
-Roves is one of two distribution targets a game built on the
-[pixi-vn-react-template](https://github.com/DRincs-Productions/pixi-vn-react-template) project
-can target — the other being [Tauri](https://tauri.app/). Both wrap the same web content;
-they differ in what actually renders it. See <DynamicLink href="/docs/why">Why Roves?</DynamicLink>
-for the full comparison.
+Roves is not a from-scratch engine — it's upstream [Servo](https://servo.org), a web
+engine written in Rust from the ground up (not a fork of Chromium/WebKit), vendored and
+patched rather than forked on GitHub (see the project's `CLAUDE.md`). A few of the crates
+doing the real work under the hood: [`winit`](https://github.com/rust-windowing/winit) for
+the window and event loop, [`surfman`](https://github.com/servo/surfman) and Servo's own
+`webrender` for GPU-accelerated rendering (via ANGLE on Windows, native GL/Metal elsewhere),
+`ipc-channel` for the multiprocess architecture browsers use to isolate page content from
+the host process, and `egui` for the boot splash overlay. Rust's own portability is also
+*why* the console ports on the roadmap (Switch, PlayStation, Xbox) are realistic at all —
+several already have community Rust toolchains (`nx`, `ctru-rs`, `rust-psp`, `vitasdk-rs`).
 
-Roves itself is not a from-scratch engine — it is upstream [Servo](https://servo.org),
-vendored and patched (not forked on GitHub — see the project's `CLAUDE.md`) with a
-focused, documented set of changes: no browser chrome (toolbar, tabs, address bar), a
-branded boot splash, single-executable bundling, packed-content extraction, a Steam
-bridge, and a few other game-shell-shaped conveniences. Every change is tracked in
+## What changes for games
+
+On top of that engine, Roves' own patches (all itemized, with reasoning, in
 [`CUSTOMIZATIONS.md`](https://github.com/DRincs-Productions/roves/blob/main/CUSTOMIZATIONS.md)
-with the reasoning behind it, and mirrored as a real, machine-applicable patch under
-[`patches/`](https://github.com/DRincs-Productions/roves/tree/main/patches) — so upgrading to
-a newer Servo release means reapplying documented, reviewable diffs, not re-deriving
-changes from scratch.
+and mirrored as machine-applicable diffs under
+[`patches/`](https://github.com/DRincs-Productions/roves/tree/main/patches)) turn a browser
+engine into a game shell:
+
+- **No browser chrome** — no toolbar, tabs, or address bar; a native app window, not a
+  browser tab.
+- **Single-executable bundling** with packed, compressed content (see
+  <DynamicLink href="/docs/distribution/bundling">Bundling & distribution</DynamicLink>) —
+  one file to ship, fast cold start.
+- **A branded boot splash** shown immediately while content extracts, instead of a blank
+  window.
+- **Disabled browser-native affordances** that would break immersion — right-click context
+  menu, page-reload and back/forward navigation shortcuts.
+- **A built-in, opt-in Steam bridge** — achievements, stats, DLC, overlay, and store, via
+  `@drincs/roves-api/steam` (see <DynamicLink href="/docs/distribution/steam">Steam
+  integration</DynamicLink>) — degrading to harmless defaults when Steam isn't running or
+  wasn't compiled in.
+
+Roves is also one of two distribution targets a game built on the
+[pixi-vn-react-template](https://github.com/DRincs-Productions/pixi-vn-react-template)
+project can target — the other being [Tauri](https://tauri.app/). See
+<DynamicLink href="/docs/why">Why Roves?</DynamicLink> for that comparison.
 
 For anything about the engine itself that isn't specific to Roves — how rendering, layout,
 or the DOM/JS implementation works — the [Servo wiki](https://servo.org) is the right place
