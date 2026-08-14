@@ -34,11 +34,50 @@ Early on, a build reported "nothing happens" with `roves.log` showing the resolv
 args including `--package-name`/`--package-version` — flags meant for `mach bundle` itself
 (naming a `--msi`/`--deb`/`--dmg` output), not for the running game. Roves' own CLI parser
 rejects unrecognized flags outright and exits immediately, before a window ever exists —
-exactly matching "nothing happens." This is now guarded against directly in `mach bundle`
-(any of its own flags found in the passthrough args are dropped, with a loud warning,
-instead of silently corrupting `launch.json`) — but if you're building `mach bundle` at an
-older revision, double-check `launch.json` next to your bundle's executable for anything
-that looks like it belongs to `mach bundle` rather than your game.
+exactly matching "nothing happens."
+
+A first fix attempted to stop this at the source: `mach bundle` cross-checking every
+passthrough token against its own registered flags and dropping any match before writing
+`launch.json`. Real testing (downloading and running an actual CI-built bundle) showed this
+*didn't actually work* — the exact mechanism still isn't pinned down; a byte-faithful
+reconstruction of `mach`'s own argument-parsing logic, fed the exact failing invocation,
+parses cleanly in isolation, so the leak only manifests somewhere in the full `mach`
+environment.
+
+Given that, the actual fix stopped trying to guarantee `launch.json` is clean and made a
+broken one non-fatal instead: if the bundled launch args fail to parse, the engine now logs
+the failure and retries once with just the content URL, dropping every extra arg, rather than
+exiting before a window ever appears. Worst case you lose that `launch.json`'s window-size/
+title customization — the game still starts. A real CLI invocation with a typo'd flag is
+unaffected and still errors normally; this retry only applies to a bundled (double-click)
+launch. If you're building at an older revision than this fix, `launch.json` next to your
+bundle's executable is still worth checking for anything that looks like it belongs to `mach
+bundle` rather than your game — it explains the shape of the failure even if your build
+predates the retry logic that survives it.
+
+## A faster way to check: `--diagnostic-script`
+
+`mach bundle --diagnostic-script` ships a `diagnose.bat` (Windows) / `diagnose.sh`
+(macOS/Linux) right next to the game binary — including inside the `--msi`/`--dmg` installer
+outputs, since they wrap the same staged files (not `--deb`, where a terminal already shows
+output directly). Running it instead of the game launches the exact same binary from a
+console that stays open afterward, printing the exit code and the newest `roves.log`'s
+contents inline. It exists specifically so a non-technical tester who hits "I double-clicked
+it and nothing happened" can run one script and paste back something useful, instead of being
+walked through finding `%LOCALAPPDATA%` by hand. Off by default — add the flag when building a
+test/debug bundle you expect to hand to testers.
+
+## CI catches this now too
+
+`.github/workflows/test.yml` used to only confirm `mach bundle` succeeds — which is exactly
+how the incident above went unnoticed through several green CI runs: every real launch of the
+resulting bundle crashed instantly while CI stayed green throughout, because nothing there had
+ever actually run the binary. CI now launches each bundle it builds for a few seconds and
+fails the job if the process doesn't stay up, on every platform (Linux runs under `xvfb-run`;
+Windows and macOS have a real window server already). A build succeeding and a build
+launching are different claims — if you're setting up your own CI around `mach bundle` (or
+[`roves-action`](https://github.com/DRincs-Productions/roves-action)), consider adding an
+equivalent check rather than treating a successful bundle step as proof the game runs.
 
 ## Still stuck?
 

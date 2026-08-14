@@ -39,6 +39,7 @@ installer is built.
 | `--dmg` | off | macOS only: wrap `Roves.app` in an installable `.dmg`. |
 | `--package-name <name>` | `roves` | Package name for `--deb`/`--msi`/`--dmg`. |
 | `--package-version <ver>` | `0.0.0` | Package version for `--deb`/`--msi`/`--dmg`. |
+| `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary (portable/`--msi`/`--dmg` only, not `--deb`) that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/distribution/diagnosing-a-silent-launch">Diagnosing a silent launch</DynamicLink>. |
 | *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
 
 ## CI: `roves-action`
