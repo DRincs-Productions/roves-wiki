@@ -7,7 +7,7 @@ const features = [
   {
     title: 'Single native binary',
     description:
-      "One executable — play.exe, Roves.app, or play — for desktop (Windows, macOS, Linux), with your web content baked in. The engine ships inside the binary itself instead of delegating to the OS's own webview like Tauri does, so your game looks and runs the same way on every machine.",
+      "Ship one native binary to every desktop platform — Windows, macOS, and Linux. The engine is baked directly into it instead of relying on the OS's own webview the way Tauri does, so your game looks and behaves exactly the same no matter where it runs.",
   },
   {
     title: 'Built on Servo',
