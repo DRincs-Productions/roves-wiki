@@ -1,5 +1,5 @@
 export const appName = "Roves";
-export const tagline = "A Servo-based native shell for web-built games.";
+export const tagline = "A Servo-based native shell for web-built games — any framework, Vite included.";
 
 export const gitConfig = {
   user: "DRincs-Productions",
