@@ -30,14 +30,14 @@ content either sitting next to it or packed straight into the bundle.
 ## What Roves is built from
 
 Roves is not a from-scratch engine — it's upstream [Servo](https://servo.org), a web
-engine written in Rust from the ground up (not a fork of Chromium/WebKit), vendored and
-patched rather than forked on GitHub (see the project's `CLAUDE.md`). A few of the crates
-doing the real work under the hood: [`winit`](https://github.com/rust-windowing/winit) for
-the window and event loop, [`surfman`](https://github.com/servo/surfman) and Servo's own
-`webrender` for GPU-accelerated rendering (via ANGLE on Windows, native GL/Metal elsewhere),
-`ipc-channel` for the multiprocess architecture browsers use to isolate page content from
-the host process, and `egui` for the boot splash overlay. Rust's own portability is also
-*why* the console ports on the roadmap (Switch, PlayStation, Xbox) are realistic at all —
+engine written in Rust from the ground up (not a fork of Chromium/WebKit). Under the hood,
+a handful of Rust libraries handle the technical heavy lifting: one opens and manages the
+game window, another draws everything using your graphics card so it stays smooth, and
+another keeps your web content running safely walled off from the rest of the app — the
+same trick real web browsers use to stop one broken tab from taking down the whole browser.
+None of this needs any attention from you; it's just what makes Roves fast and reliable
+without extra work on your end. Rust's own portability is also *why* the console ports on
+the roadmap (Switch, PlayStation, Xbox) are realistic at all —
 several already have community Rust toolchains (`nx`, `ctru-rs`, `rust-psp`, `vitasdk-rs`).
 
 ## What changes for games
