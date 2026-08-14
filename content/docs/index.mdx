@@ -39,25 +39,3 @@ None of this needs any attention from you; it's just what makes Roves fast and r
 without extra work on your end. Rust's own portability is also *why* the console ports on
 the roadmap (Switch, PlayStation, Xbox) are realistic at all —
 several already have community Rust toolchains (`nx`, `ctru-rs`, `rust-psp`, `vitasdk-rs`).
-
-## What changes for games
-
-On top of that engine, Roves' own changes turn a browser engine into a game shell:
-
-- **No browser chrome** — no toolbar, tabs, or address bar; a native app window, not a
-  browser tab.
-- **Single-executable bundling** with packed, compressed content (see
-  <DynamicLink href="/docs/distribution/bundling">Bundling & distribution</DynamicLink>) —
-  one file to ship, fast cold start.
-- **A branded boot splash** shown immediately while content extracts, instead of a blank
-  window.
-- **Disabled browser-native affordances** that would break immersion — right-click context
-  menu, page-reload and back/forward navigation shortcuts.
-- **A built-in, opt-in Steam bridge** — achievements, stats, DLC, overlay, and store, via
-  `@drincs/roves-api/steam` (see <DynamicLink href="/docs/distribution/steam">Steam
-  integration</DynamicLink>) — degrading to harmless defaults when Steam isn't running or
-  wasn't compiled in.
-
-For anything about the engine itself that isn't specific to Roves — how rendering, layout,
-or the DOM/JS implementation works — the [Servo wiki](https://servo.org) is the right place
-to look; this documentation only covers what Roves changes or adds on top.
