@@ -6,8 +6,12 @@ import { githubUrl, tagline } from '@/lib/shared';
 const features = [
   {
     title: 'Single native binary',
+    description: 'Ship one native binary to every desktop platform — Windows, macOS, and Linux.',
+  },
+  {
+    title: 'Consistent everywhere',
     description:
-      "Ship one native binary to every desktop platform — Windows, macOS, and Linux. The engine is baked directly into it instead of relying on the OS's own webview the way Tauri does, so your game looks and behaves exactly the same no matter where it runs.",
+      "The engine is baked directly into it instead of relying on the OS's own webview the way Tauri does, so your game looks and behaves exactly the same no matter where it runs.",
   },
   {
     title: 'Built on Servo',
