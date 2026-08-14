@@ -14,7 +14,7 @@ itself, which already links that crate as a library).
 | Platform | Portable (default) | Installer |
 | --- | --- | --- |
 | Windows | `play.exe` + its DLLs, flat in the output folder | `--msi` |
-| macOS | `Roves.app`, whose `Contents/MacOS/Roves` *is* the engine binary | `--dmg` |
+| macOS | `play.app`, whose `Contents/MacOS/play` *is* the engine binary | `--dmg` |
 | Linux | `play` | `--deb` |
 
 An installer flag (`--msi`/`--deb`/`--dmg`) wraps the exact same portable output the plain
@@ -36,7 +36,7 @@ installer is built.
 | `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
 | `--deb` | off | Linux only: build a `.deb` instead of a plain `play` binary. |
 | `--msi` | off | Windows only: build an installable `.msi`. |
-| `--dmg` | off | macOS only: wrap `Roves.app` in an installable `.dmg`. |
+| `--dmg` | off | macOS only: wrap `play.app` in an installable `.dmg`. |
 | `--package-name <name>` | `roves` | Package name for `--deb`/`--msi`/`--dmg`. |
 | `--package-version <ver>` | `0.0.0` | Package version for `--deb`/`--msi`/`--dmg`. |
 | `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary (portable/`--msi`/`--dmg` only, not `--deb`) that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/distribution/diagnosing-a-silent-launch">Diagnosing a silent launch</DynamicLink>. |
