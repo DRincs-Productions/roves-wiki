@@ -5,23 +5,35 @@ import { githubUrl, tagline } from '@/lib/shared';
 
 const features = [
   {
-    title: 'No Tauri required',
-    description: 'A single native binary — play.exe, Roves.app, or play — with your web content baked in.',
+    title: 'Single native binary',
+    description:
+      "One executable — play.exe, Roves.app, or play — for desktop (Windows, macOS, Linux), with your web content baked in. The engine ships inside the binary itself instead of delegating to the OS's own webview like Tauri does, so your game looks and runs the same way on every machine.",
   },
   {
     title: 'Built on Servo',
-    description: "A modern, from-scratch web engine, not a repurposed browser. See servo.org for engine internals.",
+    description:
+      'Roves embeds Servo, stripped down into an embedded, modular engine built strictly to run games — not a general-purpose browser like Chromium.',
   },
   {
-    title: 'Small JS bridge',
-    description: '@drincs/roves-api gives your game window/process/Steam/cache access — no runtime injection required.',
+    title: 'Simple JS bridge',
+    description: "With @drincs/roves-api, access Roves' native features directly from JS in your game.",
+  },
+  {
+    title: 'Steam integration',
+    description:
+      'An opt-in, built-in Steamworks wrapper — achievements, stats, DLC, overlay, store — via @drincs/roves-api/steam. Zero overhead when left out of the build.',
+  },
+  {
+    title: '🚧 Console support',
+    description:
+      "Thanks to Rust's portability, console targets (Switch, PlayStation, Xbox) are on the roadmap — in active development, not shipped yet.",
   },
 ];
 
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16 text-center">
-      <Image src={LogoImg} alt="" width={96} height={96} priority />
+      <Image src={LogoImg} alt="" width={160} height={160} priority />
       <h1 className="font-heading mt-6 text-5xl text-fd-foreground sm:text-6xl">Roves</h1>
       <p className="mt-4 max-w-xl text-lg text-fd-muted-foreground">{tagline}</p>
 
