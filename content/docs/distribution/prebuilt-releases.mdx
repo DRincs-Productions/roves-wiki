@@ -1,0 +1,41 @@
+---
+title: Prebuilt engine releases
+description: What's on the Roves GitHub Releases page, what's inside each download, and how the release CI that builds them works.
+---
+
+Separately from bundling your *own* game (see <DynamicLink href="/docs/distribution/bundling">Bundling & distribution</DynamicLink>), the Roves repo itself publishes versioned, prebuilt
+copies of the bare engine shell on its own
+[Releases page](https://github.com/DRincs-Productions/roves/releases) — no game content
+bundled in. Useful for trying the shell itself, or as a quick sanity check that a given
+version launches on your machine before building your own game against it.
+
+## What's in a release
+
+Each version tag (`v<major>.<minor>.<patch>`, starting at `v0.1.0`) publishes six zips — the
+same portable/installer split as a regular `mach bundle` output:
+
+| Platform | Portable | Installer |
+| --- | --- | --- |
+| Windows | `roves_windows-portable.zip` | `roves_windows-msi.zip` (wraps a `.msi`) |
+| macOS | `roves_macos-portable.zip` | `roves_macos-dmg.zip` (wraps a `.dmg`) |
+| Linux | `roves_linux-portable.zip` | `roves_linux-deb.zip` (wraps a `.deb`) |
+
+`v0.1.0` is the engine shell only — no bundled UI or game content. A future release will add
+that (see [roves-ui](https://github.com/DRincs-Productions/roves-ui)).
+
+These are optimized (`--release`) builds with the **real GStreamer media stack** — audio/
+video actually work, unlike the debug/`--media-stack dummy` builds `test.yml` produces for
+its own from-source smoke tests. GStreamer is bundled automatically with the Windows/macOS
+downloads; the Linux downloads expect GStreamer to already be installed via your distro's
+package manager (`gstreamer1.0-plugins-{good,bad,ugly}`, `gstreamer1.0-libav`, etc. — the same
+packages a from-source Linux build needs, see <DynamicLink href="/docs/getting-started/prerequisites">Prerequisites</DynamicLink>).
+
+## How these get built
+
+`.github/workflows/release.yml` in the Roves repo builds and publishes these on every push of
+a `v*.*.*` tag, directly from that tagged checkout (this repo tracks its own full patched
+Servo source, not just a diff against upstream). See that repo's own `CLAUDE.md` for the full
+cut/retry/verify procedure, including the one Windows-specific wrinkle: `mach bootstrap`'s own
+GStreamer installer needs a UAC prompt that hangs on a non-interactive CI runner, so this
+workflow installs GStreamer itself first, non-interactively, before handing off to `mach
+build`/`mach bundle`.
