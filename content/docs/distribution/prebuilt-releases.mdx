@@ -11,14 +11,14 @@ version launches on your machine before building your own game against it.
 
 ## What's in a release
 
-Each version tag (`v<major>.<minor>.<patch>`, starting at `v0.1.0`) publishes six zips — the
-same portable/installer split as a regular `mach bundle` output:
+Each version tag (`v<major>.<minor>.<patch>`, starting at `v0.1.0`) publishes three zips, one
+portable bundle per platform — no `.msi`/`.dmg`/`.deb` installers in these releases:
 
-| Platform | Portable | Installer |
-| --- | --- | --- |
-| Windows | `roves_windows-portable.zip` | `roves_windows-msi.zip` (wraps a `.msi`) |
-| macOS | `roves_macos-portable.zip` | `roves_macos-dmg.zip` (wraps a `.dmg`) |
-| Linux | `roves_linux-portable.zip` | `roves_linux-deb.zip` (wraps a `.deb`) |
+| Platform | Download |
+| --- | --- |
+| Windows | `roves_shell_windows.zip` |
+| macOS | `roves_shell_macos.zip` |
+| Linux | `roves_shell_linux.zip` |
 
 `v0.1.0` is the engine shell only — no bundled UI or game content. A future release will add
 that (see [roves-ui](https://github.com/DRincs-Productions/roves-ui)).
