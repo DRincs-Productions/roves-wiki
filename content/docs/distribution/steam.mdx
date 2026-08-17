@@ -17,6 +17,17 @@ Compile the flag in at build time — there's no runtime toggle. Every function 
 JS-side wrapper degrades to a harmless default when Steam isn't compiled in, or isn't
 running, so you don't need a separate non-Steam build for players launching outside Steam.
 
+## Building it via Packmaster
+
+You don't need a Rust/Python toolchain to get a Steam-enabled build — [Roves
+Packmaster](https://github.com/DRincs-Productions/roves-ui) downloads a prebuilt shell
+rather than compiling one, and its published releases now include a Steam-enabled shell
+variant alongside the plain one. In Packmaster's "Steam" section, turn on the toggle and
+enter your Steam App ID; Packmaster downloads the matching `_steam` shell asset instead of
+the plain one and writes a `steam_appid.txt` next to the packaged game's executable (Valve's
+own convention for local testing outside the Steam client — Steam itself sets the App ID
+directly once your game is actually published there).
+
 ## Using it from your game
 
 ```ts
