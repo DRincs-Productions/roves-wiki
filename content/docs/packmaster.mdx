@@ -8,20 +8,19 @@ packages your already-built web game into Roves distributions — without you ne
 Python installed. Point it at your build output, choose what to generate, and it produces
 the releases for you.
 
-It never compiles anything: it downloads the engine's own prebuilt shell (see
-<DynamicLink href="/docs/shell">the Shell section</DynamicLink>'s "Prebuilt shells" section) and
+It never compiles anything: it downloads the engine's own prebuilt <DynamicLink href="/docs/shell">shell</DynamicLink> and
 packs your content into it by linking the engine's `roves-content-packer` crate directly as
 a library.
+
+Packmaster points at your bundler's output folder (a Vite.js project's `dist/`, or the
+equivalent from any other bundler) — not your source code. It checks for an `index.html`
+there, and rejects a folder that still has its own `package.json` (a project's source root,
+not its built output — Vite ships an `index.html` at the source root too, so that check
+alone can't tell the two apart).
 
 <Accordions>
 
 <Accordion title="Prerequisites" id="prerequisites">
-
-**Your game, already built.** Packmaster points at your bundler's output folder (a Vite.js
-project's `dist/`, or the equivalent from any other bundler) — not your source code. It
-checks for an `index.html` there, and rejects a folder that still has its own
-`package.json` (a project's source root, not its built output — Vite ships an `index.html`
-at the source root too, so that check alone can't tell the two apart).
 
 **Nothing else, for a portable release.** No Rust, no Python, no `mach` — Packmaster
 downloads a prebuilt shell instead of building one.
@@ -38,8 +37,7 @@ unlike the portable path.
 
 ## Portable distribution
 
-1. **Pick your build output.** See the Prerequisites accordion above for what Packmaster
-   expects to find there.
+1. **Pick your build output.** See above for what Packmaster expects to find there.
 2. **Configure your release:**
    - **Release info** — game name and version, read from the build folder's parent
      `package.json` when present (the version always follows it fresh; the name is
