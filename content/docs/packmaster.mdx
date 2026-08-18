@@ -39,6 +39,8 @@ there, and rejects a folder that still has its own `package.json` (a project's s
 not its built output — Vite ships an `index.html` at the source root too, so that check
 alone can't tell the two apart).
 
+![Packmaster's build output picker](/packmaster.png)
+
 ## 2. Configure your release
 
 - **Release info** — game name and version, read from the build folder's parent
@@ -56,6 +58,8 @@ alone can't tell the two apart).
   <DynamicLink href="/docs/integrations/steam">Steam integration</DynamicLink> for the full
   mechanics (the Steam-enabled shell variant, `steam_appid.txt`) — again, explained there,
   not repeated here.
+
+![Packmaster's release info and portable platform pickers](/packmaster2.png)
 
 <Accordions>
 
@@ -76,3 +80,5 @@ Downloads the shell, packs your content into it, and shows real, per-step progre
 the folder the release was written to when done — a `release/` folder next to wherever
 Packmaster itself is running
 from, containing one `<your-game-name>_<platform>.zip` per platform.
+
+![Packmaster's finished-release screen](/packmaster3.png)

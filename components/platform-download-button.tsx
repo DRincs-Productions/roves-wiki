@@ -59,14 +59,20 @@ export function PlatformDownloadButton({ platform }: { platform: Platform }) {
   );
 }
 
-/** All three platforms' buttons, laid out horizontally -- the common case wherever a page
- * wants "download Packmaster" without picking one specific platform. */
+/** All three platforms' buttons, laid out horizontally and centered inside a labeled card --
+ * the common case wherever a page wants "download Packmaster" without picking one specific
+ * platform. */
 export function PlatformDownloads() {
   return (
-    <div className="not-prose flex flex-row flex-wrap items-center gap-3">
-      <PlatformDownloadButton platform="windows" />
-      <PlatformDownloadButton platform="macos" />
-      <PlatformDownloadButton platform="linux" />
+    <div className="not-prose my-4 flex flex-col items-center gap-4 rounded-xl border bg-fd-card p-6 text-center text-fd-card-foreground">
+      <p className="text-base font-medium text-fd-muted-foreground">
+        Download the latest Packmaster build for your platform
+      </p>
+      <div className="flex flex-row flex-wrap items-center justify-center gap-3">
+        <PlatformDownloadButton platform="windows" />
+        <PlatformDownloadButton platform="macos" />
+        <PlatformDownloadButton platform="linux" />
+      </div>
     </div>
   );
 }
