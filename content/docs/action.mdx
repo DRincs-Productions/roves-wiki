@@ -25,7 +25,7 @@ doesn't know or care what produced your `content-dir`.
 
 **One job per desktop platform you want output for** — `windows-latest`/`macos-latest`/
 `ubuntu-latest`. Desktop is all that actually works today; there's no cross-compiling for
-consoles here (see <DynamicLink href="/docs/shell">the Shell tab</DynamicLink> for what
+consoles here (see <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what
 `mach` itself supports).
 
 **`contents: write` permission** on the job, only if you're using `gh release upload` (or
@@ -66,7 +66,7 @@ The default output on every platform, no install step:
 
 The only required input is `content-dir`; everything else defaults sensibly. Every input is
 tagged `[servo]` (plain upstream Servo — see <DynamicLink href="/docs/shell">the Shell
-tab</DynamicLink> for what each one does) or `[roves]` (added by `mach bundle`, which
+section</DynamicLink> for what each one does) or `[roves]` (added by `mach bundle`, which
 doesn't exist upstream at all) in the action's own `action.yml`/README — the flags
 themselves are exactly the ones documented there, this action is a near 1:1 forwarding
 layer over them. `features: 'steam'` compiles in the
@@ -104,5 +104,5 @@ can stay the same across a matrix:
 
 `package-name`/`package-version` name and version whichever installable format you asked
 for — ignored entirely when none of `deb`/`msi`/`dmg` are set. See
-<DynamicLink href="/docs/shell">the Shell tab</DynamicLink> for what each format actually
+<DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each format actually
 wraps under the hood.

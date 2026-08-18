@@ -9,7 +9,7 @@ you needing Rust or Python installed. Point it at your build output, choose what
 generate, and it produces the releases for you.
 
 It never compiles anything: it downloads the engine's own prebuilt shell (see
-<DynamicLink href="/docs/shell">the Shell tab</DynamicLink>'s "Prebuilt shells" section) and
+<DynamicLink href="/docs/shell">the Shell section</DynamicLink>'s "Prebuilt shells" section) and
 packs your content into it by linking the engine's `roves-content-packer` crate directly as
 a library. Building *Packmaster itself* needs a Rust/Tauri toolchain, same as any Tauri app
 — using it doesn't.
@@ -48,7 +48,7 @@ unlike the portable path.
      generated files and the bundled window title.
    - **Portable** — a self-contained, double-click-to-run bundle per platform. Each
      platform shows a real, live check (a HEAD request against the targeted shell
-     release's actual asset — see <DynamicLink href="/docs/shell">the Shell tab</DynamicLink>)
+     release's actual asset — see <DynamicLink href="/docs/shell">the Shell section</DynamicLink>)
      for whether it's currently distributable, rather than assuming it always is.
    - **Advanced → Compression** — packs your content into compressed archives instead of
      loose files, with the same tunables as `mach bundle --content-compress` (see
@@ -73,7 +73,7 @@ Spanish, French, Russian, German).
 
 The **Installable** section produces a real `.msi`/`.dmg`/`.deb` per platform instead of a
 portable zip, each with its own live host-OS-and-tool availability check (see the
-Prerequisites accordion above) — see <DynamicLink href="/docs/shell">the Shell tab</DynamicLink>
+Prerequisites accordion above) — see <DynamicLink href="/docs/shell">the Shell section</DynamicLink>
 for what each installer format actually wraps.
 
 ## Trying it without building it yourself

@@ -6,12 +6,12 @@ description: The raw engine itself — mach build/mach bundle, prerequisites, ev
 The "shell" is the compiled Roves binary itself — what `./mach build` + `./mach bundle`
 produce directly from a checkout of the [engine repo](https://github.com/DRincs-Productions/roves).
 
-This is the **least important tab for most people**. Most game developers never touch
+This is the **least important section for most people**. Most game developers never touch
 `mach` directly — they use <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> (a
 GUI) or <DynamicLink href="/docs/action">the GitHub Action</DynamicLink> (for CI), both of
 which build on exactly what's described here without you needing a Rust/Python toolchain
-yourself. Read this tab if you're working on Roves itself, need a flag neither of those two
-exposes, or just want to understand what's actually happening underneath them.
+yourself. Read this section if you're working on Roves itself, need a flag neither of those
+two exposes, or just want to understand what's actually happening underneath them.
 
 <Accordions>
 
@@ -100,7 +100,7 @@ are optimized (`--release`) builds with the real GStreamer media stack (bundled 
 on Windows/macOS; Linux expects GStreamer already installed via your distro's package
 manager). This is exactly what
 <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> downloads instead of compiling
-its own — see that tab for the actual game-developer-facing side of this.
+its own — see that section for the actual game-developer-facing side of this.
 
 ## Distributing installers
 
