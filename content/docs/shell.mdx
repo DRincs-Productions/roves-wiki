@@ -58,6 +58,9 @@ This is the central path — a single, double-click-runnable binary, no install 
 Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
 bridge</DynamicLink> compiled in.
 
+Roves doesn't build your game — that's your own bundler's job (Vite, webpack, whatever your
+frontend stack already uses). Point `--content-dir` at that output:
+
 ```bash
 ./mach bundle --content-dir path/to/dist --output release
 ```
