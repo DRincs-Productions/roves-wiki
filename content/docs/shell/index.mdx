@@ -1,0 +1,133 @@
+---
+title: Shell
+description: The raw engine itself — mach build/mach bundle, prerequisites, every flag.
+---
+
+The "shell" is the compiled Roves binary itself — what `./mach build` + `./mach bundle`
+produce directly from a checkout of the [engine repo](https://github.com/DRincs-Productions/roves).
+
+This is the **least important tab for most people**. Most game developers never touch
+`mach` directly — they use <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> (a
+GUI) or <DynamicLink href="/docs/action">the GitHub Action</DynamicLink> (for CI), both of
+which build on exactly what's described here without you needing a Rust/Python toolchain
+yourself. Read this tab if you're working on Roves itself, need a flag neither of those two
+exposes, or just want to understand what's actually happening underneath them.
+
+<Accordions>
+
+<Accordion title="Prerequisites" id="prerequisites">
+
+Roves builds exactly like upstream Servo, using the same `mach` tooling — see the
+[Servo wiki](https://servo.org) for the authoritative, up-to-date build documentation. This
+only calls out the parts specific to working in *this* repo.
+
+**Rust** — the exact toolchain version is pinned in `rust-toolchain.toml` at the repo root;
+`rustup` picks it up automatically once you `cd` into the repo, no manual version selection
+needed.
+
+**Python 3.11+** — Servo's `mach` tooling needs it. A couple of Python standard-library
+additions used by `python/mach`/`python/tidy` (`contextlib.chdir`, `typing.LiteralString`)
+simply don't exist on 3.10 — `mach` fails importing its own commands, not just warns, on an
+older interpreter. The repo expects [`uv`](https://github.com/astral-sh/uv) to provision the
+right Python version automatically; without it, `mach` falls back to whatever `python3`
+resolves to on `PATH`, a real, easy-to-hit gap on Linux distros that still default to 3.10.
+
+**Platform build dependencies** — run `./mach bootstrap` first; it installs the
+platform-specific system packages the build needs (a C/C++ toolchain, `libclang`, and a
+handful of media/graphics libraries). A `bindgen`/`libclang` error, or a linker error naming
+`-ludev`, means you skipped this (`gamepad`, on by default, links `libudev` on Linux).
+
+**Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
+ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
+the Rust — budget real disk space for `target/`, and enough RAM that a fully parallel build
+doesn't thrash (`cargo build -j <n>` with a lower job count trades build time for peak
+memory if you're constrained).
+
+</Accordion>
+
+</Accordions>
+
+## Portable distribution
+
+This is the central path — a single, double-click-runnable binary, no install step.
+
+```bash title="from the repo root"
+./mach build --release
+```
+
+Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
+bridge</DynamicLink> compiled in.
+
+```bash
+./mach bundle --content-dir path/to/dist --output release
+```
+
+`mach bundle` turns that build plus your game's built web content (your own bundler's
+output — Vite, webpack, whatever) into one executable — no separate launcher process, and no
+`roves-content-packer` binary shipped alongside it (packed-content extraction happens
+in-process, inside the engine binary itself, which already links that crate as a library):
+
+| Platform | Portable output |
+| --- | --- |
+| Windows | `play.exe` + its DLLs, flat in the output folder |
+| macOS | `play.app`, whose `Contents/MacOS/play` *is* the engine binary |
+| Linux | `play` |
+
+### Flags
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--content-dir <dir>` | — | Web content to copy/pack into the bundle. |
+| `--html-file <path>` | `dist/index.html` | Entry HTML file, relative to the bundle root. |
+| `--output`, `-o <dir>` | `<build dir>/bundle` | Where to write the bundle. |
+| `--window-size <WxH>` | `1280x720` | Initial window size in logical pixels. |
+| `--content-compress` | `auto` | `auto`: pack into a handful of tar+zstd archives (see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>). `none`: copy in as loose, individually browsable files. |
+| `--content-compression-level` | `1` | zstd level for `--content-compress=auto`. Low by default — speed over ratio. |
+| `--content-max-pack-size` | `500M` | Split archives so none exceeds this size. |
+| `--content-exclude <glob>` | — | Repeatable. Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
+| `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
+| `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
+| *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
+
+### Prebuilt shells
+
+You don't have to build the shell yourself just to try it — the engine repo's own
+[Releases page](https://github.com/DRincs-Productions/roves/releases) publishes versioned,
+prebuilt copies of the bare shell (no game content bundled), starting at `v0.1.0`. Each
+platform is published **twice**: a plain build and a `_steam`-suffixed one compiled with
+`--features steam` — e.g. `roves_shell_windows.zip` / `roves_shell_windows_steam.zip`. These
+are optimized (`--release`) builds with the real GStreamer media stack (bundled automatically
+on Windows/macOS; Linux expects GStreamer already installed via your distro's package
+manager). This is exactly what
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> downloads instead of compiling
+its own — see that tab for the actual game-developer-facing side of this.
+
+## Distributing installers
+
+Each platform also has one installable alternative to the portable output above, wrapping
+the exact same staged files — nothing extra is left behind once the installer is built:
+
+| Platform | Installer flag | Produces |
+| --- | --- | --- |
+| Windows | `--msi` | An installable `.msi` |
+| macOS | `--dmg` | `play.app` wrapped in an installable `.dmg` |
+| Linux | `--deb` | An installable `.deb` |
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--package-name <name>` | `roves` | Package name for `--deb`/`--msi`/`--dmg`. |
+| `--package-version <ver>` | `0.0.0` | Package version for `--deb`/`--msi`/`--dmg`. |
+
+<Callout title="Extra args after --output are forwarded to the game, not to mach">
+`mach bundle`'s own flags (`--package-name`, `--package-version`, `--msi`, ...) are for
+naming/shaping the *installer*. Anything else on the command line is written into the
+bundle's `launch.json` and handed to the running game at launch as real CLI args — the two
+are validated against each other so one can't accidentally leak into the other.
+</Callout>
+
+## Run it
+
+Double-click the produced binary (or run it from a terminal). If something looks wrong and
+nothing obvious shows up, see <DynamicLink href="/docs/integrations/diagnostics">
+Diagnostics</DynamicLink> — every launch writes a log file you can check before assuming
+it's a mystery.

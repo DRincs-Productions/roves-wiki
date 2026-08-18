@@ -9,7 +9,7 @@ own protocol rather than being routed through <DynamicLink href="/docs/roves-api
 not a general "control this app" command.
 
 Requires the native binary to be built with `--features steam` (see
-<DynamicLink href="/docs/distribution/steam">Steam integration</DynamicLink>). Every
+<DynamicLink href="/docs/integrations/steam">Steam integration</DynamicLink>). Every
 function below degrades to a harmless default (`null` / `false` / `0`) when Steam isn't
 compiled in or isn't running — **none of them throw** for that reason, so you don't need a
 separate non-Steam build or a bunch of defensive `try`/`catch`.

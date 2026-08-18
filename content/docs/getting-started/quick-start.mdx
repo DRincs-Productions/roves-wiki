@@ -3,15 +3,23 @@ title: Quick start
 description: Build the engine and bundle your first game with it.
 ---
 
+This page walks through the raw path — compiling the engine yourself with `mach`, which
+needs Rust and Python on your machine (see <DynamicLink href="/docs/shell">the Shell
+tab</DynamicLink> for exactly what and why, in an accordion). If you'd rather not touch
+either, skip straight to <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> (a
+GUI, no toolchain needed) or <DynamicLink href="/docs/action">the GitHub Action</DynamicLink>
+(for your own CI) instead — both download a prebuilt shell rather than compiling one.
+
 ## 1. Build the engine
 
 ```bash title="from the repo root"
 ./mach build --release
 ```
 
-Add `--features steam` if you need the <DynamicLink href="/docs/distribution/steam">Steam
-bridge</DynamicLink> compiled in. See <DynamicLink href="/docs/getting-started/prerequisites">
-Prerequisites</DynamicLink> if this fails on a fresh machine.
+Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
+bridge</DynamicLink> compiled in. See <DynamicLink href="/docs/shell">the Shell tab</DynamicLink>
+if this fails on a fresh machine — its Prerequisites accordion covers Rust, Python, and
+platform build dependencies.
 
 ## 2. Build your game's web content
 
@@ -28,9 +36,9 @@ just needs a path to that output.
 This produces a single double-click-runnable binary in `release/` — `play.exe`, `play.app`,
 or `play`, depending on the platform you're building on — with your content either packed
 into a handful of compressed archives (the default) or copied in as loose files
-(`--content-compress=none`). See <DynamicLink href="/docs/distribution/bundling">Bundling
-& distribution</DynamicLink> for every flag `mach bundle` accepts, including `--msi`/`--deb`/
-`--dmg` for a real installer instead of a portable folder.
+(`--content-compress=none`). See <DynamicLink href="/docs/shell">the Shell tab</DynamicLink>
+for every flag `mach bundle` accepts, including `--msi`/`--deb`/`--dmg` for a real installer
+instead of a portable folder.
 
 <Callout title="Extra args after --output are forwarded to the game, not to mach">
 `mach bundle`'s own flags (`--package-name`, `--package-version`, `--msi`, ...) are for
@@ -42,6 +50,6 @@ are validated against each other so one can't accidentally leak into the other.
 ## 4. Run it
 
 Double-click the produced binary (or run it from a terminal). If something looks wrong and
-nothing obvious shows up, see <DynamicLink href="/docs/distribution/diagnosing-a-silent-launch">
-Diagnosing a silent launch</DynamicLink> — every launch writes a log file you can check
-before assuming it's a mystery.
+nothing obvious shows up, see <DynamicLink href="/docs/integrations/diagnostics">
+Diagnostics</DynamicLink> — every launch writes a log file you can check before assuming
+it's a mystery.

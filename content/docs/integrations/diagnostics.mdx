@@ -1,17 +1,19 @@
 ---
-title: Diagnosing a silent launch
-description: What to check when a bundled Roves build starts and nothing visibly happens.
+title: Diagnostics
+description: What tools Roves gives you for figuring out what went wrong, in general.
 ---
 
 A double-clicked Roves build has no console — Windows builds set `#![windows_subsystem =
-"windows"]` specifically so it never flashes one — so a launch that fails early can look
-like literally nothing happened. There's a log file for exactly this.
+"windows"]` specifically so it never flashes one — so failures don't show up the way a
+terminal app's would. Whatever you're actually debugging (a silent launch, a crash mid-game,
+a rendering glitch, a Steam integration that isn't responding), the same handful of tools
+below are where to start.
 
 ## Check `roves.log` first
 
 Every launch writes a fresh log (truncated on each run, so you're never looking at stale
 output from a previous launch) to the same per-game directory
-<DynamicLink href="/docs/distribution/content-packing">content extraction</DynamicLink> uses:
+<DynamicLink href="/docs/integrations/content-packing">content extraction</DynamicLink> uses:
 
 - Windows: `%LOCALAPPDATA%\<game name>\roves.log`
 - macOS: `~/Library/Caches/<game name>/roves.log`

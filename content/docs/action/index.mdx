@@ -1,0 +1,108 @@
+---
+title: GitHub Action
+description: roves-action — wire mach build/mach bundle into your own game's CI.
+---
+
+[`roves-action`](https://github.com/DRincs-Productions/roves-action) is a GitHub Action that
+checks out and builds the engine from source, then packages your already-built web content
+into a native bundle — without a full Roves checkout sitting in your own repo. It runs
+`mach build` + `mach bundle` for you, mirroring the engine repo's own `test.yml`, generalized
+so any game's own CI can call it instead of reimplementing that pipeline.
+
+Unlike <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink>, this action always
+compiles the engine from source on every call — it doesn't download a prebuilt shell. If
+your CI runs this often, cache Cargo's registry/target directories yourself around the
+action (e.g. `actions/cache` keyed on `roves-ref` + your lockfile); the action doesn't do
+that for you, since the right cache key/scope depends on your own workflow.
+
+<Accordions>
+
+<Accordion title="Prerequisites" id="prerequisites">
+
+**A GitHub Actions workflow in your own repo**, with a step that builds your game's web
+content *before* this action runs — this action doesn't set up Node/npm/etc. for you, and
+doesn't know or care what produced your `content-dir`.
+
+**One job per desktop platform you want output for** — `windows-latest`/`macos-latest`/
+`ubuntu-latest`. Desktop is all that actually works today; there's no cross-compiling for
+consoles here (see <DynamicLink href="/docs/shell">the Shell tab</DynamicLink> for what
+`mach` itself supports).
+
+**`contents: write` permission** on the job, only if you're using `gh release upload` (or
+similar) afterward to attach the output to a GitHub Release — this action itself never
+uploads anywhere; it only produces a zip on disk and exposes its path as the `archive-path`
+output.
+
+</Accordion>
+
+</Accordions>
+
+## Portable distribution
+
+The default output on every platform, no install step:
+
+```yml
+- uses: actions/checkout@v4
+
+- name: build game content
+  uses: actions/setup-node@v4
+  with:
+    node-version: '22'
+- run: npm install && npm run build
+
+- name: build & bundle with Roves
+  id: roves
+  uses: DRincs-Productions/roves-action@v1
+  with:
+    content-dir: dist
+    artifact-name: my-game_windows
+    media-stack: dummy
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: my-game_windows
+    path: ${{ steps.roves.outputs.archive-path }}
+```
+
+The only required input is `content-dir`; everything else defaults sensibly. Every input is
+tagged `[servo]` (plain upstream Servo — see <DynamicLink href="/docs/shell">the Shell
+tab</DynamicLink> for what each one does) or `[roves]` (added by `mach bundle`, which
+doesn't exist upstream at all) in the action's own `action.yml`/README — the flags
+themselves are exactly the ones documented there, this action is a near 1:1 forwarding
+layer over them. `features: 'steam'` compiles in the
+<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>, the same as `mach
+build` directly.
+
+### Outputs
+
+| Name | Description |
+| --- | --- |
+| `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
+| `archive-path` | Absolute path to `<artifact-name>.zip` |
+
+## Distributing installers
+
+Each platform also has one installable input, gated to its own OS — setting one on the
+wrong runner is silently ignored, so a single input set (even with more than one turned on)
+can stay the same across a matrix:
+
+| Platform (`runner.os`) | Installable input | Produces |
+| --- | --- | --- |
+| `Windows` | `msi: 'true'` | A real `.msi` (needs WiX's `candle`/`light` on `PATH` — this action adds it for you on `windows-latest`) |
+| `macOS` | `dmg: 'true'` | `play.app` wrapped in a `.dmg` |
+| `Linux` | `deb: 'true'` | A real `.deb` |
+
+```yml
+- uses: DRincs-Productions/roves-action@v1
+  with:
+    content-dir: dist
+    artifact-name: my-game_linux-deb
+    deb: 'true' # msi: 'true' on windows-latest, dmg: 'true' on macos-latest
+    package-name: my-game
+    package-version: ${{ github.ref_name }}
+```
+
+`package-name`/`package-version` name and version whichever installable format you asked
+for — ignored entirely when none of `deb`/`msi`/`dmg` are set. See
+<DynamicLink href="/docs/shell">the Shell tab</DynamicLink> for what each format actually
+wraps under the hood.
