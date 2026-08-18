@@ -1,4 +1,4 @@
 {
   "title": "Docs",
-  "pages": ["index", "getting-started", "packmaster", "action", "shell", "integrations", "roves-api", "faq"]
+  "pages": ["index", "getting-started", "packmaster", "action", "shell", "console", "integrations", "roves-api", "faq"]
 }

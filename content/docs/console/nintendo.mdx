@@ -1,0 +1,17 @@
+---
+title: Nintendo
+description: Why a Switch port is realistic, and where it stands today.
+---
+
+Rust already runs on Nintendo hardware today, outside of Roves entirely — the homebrew
+community maintains real, working toolchains for it (`nx` for Switch, `ctru-rs` for 3DS),
+proving the language itself isn't the blocker. Since Servo (the engine underneath Roves) is
+written in Rust top to bottom, the same portability applies: a Switch port is mostly a matter
+of implementing Roves' native integration layer — window/surface creation, controller input,
+and GPU setup — against Nintendo's own APIs (or the homebrew equivalents), not rewriting the
+rendering engine itself.
+
+<Callout title="Coming soon" type="info">
+This isn't built yet. It's a realistic direction, not a shipping target — there's no Switch
+build of Roves today.
+</Callout>

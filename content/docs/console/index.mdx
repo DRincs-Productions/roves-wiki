@@ -1,0 +1,29 @@
+---
+title: Console
+description: Why Roves can realistically reach consoles too, not just desktop.
+---
+
+Everything on the <DynamicLink href="/docs/shell">Shell</DynamicLink> tab, and everything
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink>/
+<DynamicLink href="/docs/action">the GitHub Action</DynamicLink> build on top of it, targets
+desktop today — Windows, macOS, and Linux. But nothing about Roves' own architecture ties it
+to desktop specifically: Servo, the engine underneath it, is written in Rust from the ground
+up, and Rust's portability is exactly what makes a console port a realistic engineering
+project rather than a rewrite. Reaching a new platform is mostly about the native
+integration layer around the engine — windowing, input, GPU surface setup — talking to that
+platform's own APIs, not about touching how pages render.
+
+See the platform-specific pages in this section for what that actually looks like on each
+console:
+
+<Cards>
+  <Card title="Nintendo" href="/docs/console/nintendo">
+    Switch.
+  </Card>
+  <Card title="PlayStation" href="/docs/console/playstation">
+    PlayStation-family hardware.
+  </Card>
+  <Card title="Xbox" href="/docs/console/xbox">
+    Xbox, via Microsoft's own GDK.
+  </Card>
+</Cards>

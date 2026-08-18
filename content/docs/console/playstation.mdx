@@ -1,0 +1,19 @@
+---
+title: PlayStation
+description: Why a PlayStation-family port is realistic, and where it stands today.
+---
+
+Rust already has real, working homebrew toolchains for Sony's PlayStation-family handhelds
+(`rust-psp` for PSP, community `vitasdk` bindings for PS Vita), which proves Rust code can
+run on this hardware family at all. Since Servo (the engine underneath Roves) is written in
+Rust top to bottom, that same portability carries over: a port is mostly about implementing
+Roves' native integration layer — window/surface creation, controller input, GPU setup —
+against the target console's own APIs, not about rewriting the rendering engine itself.
+Modern PlayStation hardware (PS4/PS5) additionally needs Sony's own licensed developer SDK,
+which isn't publicly downloadable the way the homebrew toolchains above are — a registered
+developer account is the actual gate there, not Rust support.
+
+<Callout title="Coming soon" type="info">
+This isn't built yet. It's a realistic direction, not a shipping target — there's no
+PlayStation build of Roves today.
+</Callout>

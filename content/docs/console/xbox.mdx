@@ -1,0 +1,21 @@
+---
+title: Xbox
+description: Why an Xbox port is realistic, and where it stands today.
+---
+
+Xbox's path here actually looks more mature than Nintendo's or PlayStation's, just from a
+different direction: Xbox consoles run a customized Windows kernel, targeted officially
+through Microsoft's own Game Development Kit (GDK/GDKX) — and Microsoft itself maintains the
+`windows`/`windows-sys` crates, official Rust bindings for the Win32 and Windows APIs Roves
+already builds against on desktop Windows. That's a real, sanctioned Rust story on
+Microsoft's own platform, not a homebrew workaround. A port is mostly about implementing
+Roves' native integration layer — window/surface creation, controller input, GPU setup —
+against GDKX instead of desktop Win32/DirectX, not about rewriting the rendering engine
+itself. The real gate is registration: the GDK/GDKX itself isn't publicly downloadable
+without a Microsoft-approved developer account (the ID@Xbox program), unlike the open
+homebrew toolchains the other console pages describe.
+
+<Callout title="Coming soon" type="info">
+This isn't built yet. It's a realistic direction, not a shipping target — there's no Xbox
+build of Roves today.
+</Callout>
