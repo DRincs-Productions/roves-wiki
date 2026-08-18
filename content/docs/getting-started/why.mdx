@@ -7,11 +7,19 @@ If you already build your game as a web app, you have three broad ways to ship i
 native desktop binary. They differ in exactly one thing: **what actually renders your
 HTML/CSS/JS.**
 
-## Tauri: the OS's own WebView
+## Tauri vs Roves
+
+<Accordions>
+
+<Accordion title="What is Tauri?" id="what-is-tauri">
 
 Tauri is a thin Rust shell around whatever web engine your operating system already ships
 and maintains for its own apps — WebView2 (Chromium-based) on Windows, WebKitGTK on Linux,
 WKWebView on macOS.
+
+</Accordion>
+
+</Accordions>
 
 - **Tiny binary, low memory.** You're not shipping a browser — just your app code plus a
   thin native wrapper. The engine itself is already on the user's machine.
@@ -22,11 +30,19 @@ WKWebView on macOS.
 - **Best for:** apps that don't lean on bleeding-edge web features and want the smallest
   possible download.
 
-## A bundled Chromium (Electron, NW.js): full consistency, full weight
+## Electron (Chromium) vs Roves
+
+<Accordions>
+
+<Accordion title="What is Electron (Chromium)?" id="what-is-electron">
 
 Electron and NW.js bundle an entire Chromium browser — plus a full Node.js runtime — inside
 every single app. You get one specific, pinned engine version, identical on every platform,
 completely under your control.
+
+</Accordion>
+
+</Accordions>
 
 - **Fully consistent rendering,** everywhere, because it's the literal same browser build
   every time — no per-OS quirks to test around.
