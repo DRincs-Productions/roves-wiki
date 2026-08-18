@@ -72,7 +72,7 @@ in-process, inside the engine binary itself, which already links that crate as a
 
 | Platform | Portable output |
 | --- | --- |
-| Windows | `play.exe` + its DLLs, flat in the output folder |
+| Windows | `play.exe` next to a handful of DLLs it needs directly, with GStreamer's plugin DLLs (and their own private codec dependencies) tucked into a `lib/` subfolder |
 | macOS | `play.app`, whose `Contents/MacOS/play` *is* the engine binary |
 | Linux | `play` |
 
