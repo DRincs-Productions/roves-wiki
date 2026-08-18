@@ -11,8 +11,7 @@ the releases for you.
 It never compiles anything: it downloads the engine's own prebuilt shell (see
 <DynamicLink href="/docs/shell">the Shell section</DynamicLink>'s "Prebuilt shells" section) and
 packs your content into it by linking the engine's `roves-content-packer` crate directly as
-a library. Building *Packmaster itself* needs a Rust/Tauri toolchain, same as any Tauri app
-— using it doesn't.
+a library.
 
 <Accordions>
 
@@ -75,10 +74,3 @@ The **Installable** section produces a real `.msi`/`.dmg`/`.deb` per platform in
 portable zip, each with its own live host-OS-and-tool availability check (see the
 Prerequisites accordion above) — see <DynamicLink href="/docs/shell">the Shell section</DynamicLink>
 for what each installer format actually wraps.
-
-## Trying it without building it yourself
-
-Packmaster's own CI builds it (portable output) on every push and publishes it to a rolling,
-unversioned ["test" release](https://github.com/DRincs-Productions/roves-ui/releases/tag/test)
-— its assets are overwritten on every run. Grab a build from there if you don't have (or
-don't want to set up) a local Rust/Tauri toolchain.
