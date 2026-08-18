@@ -3,19 +3,40 @@ title: GitHub Action
 description: roves-action — wire mach build/mach bundle into your own game's CI.
 ---
 
-[`roves-action`](https://github.com/DRincs-Productions/roves-action) is a GitHub Action that
-checks out and builds the engine from source, then packages your already-built web content
-into a native bundle — without a full Roves checkout sitting in your own repo. It runs
-`mach build` + `mach bundle` for you, mirroring the engine repo's own `test.yml`, generalized
-so any game's own CI can call it instead of reimplementing that pipeline.
+[`roves-action`](https://github.com/DRincs-Productions/roves-action) is a GitHub Action — a
+reusable, automated step for the kind of workflow described in the accordion below. It lets
+you delegate what you'd otherwise do by hand with the
+<DynamicLink href="/docs/shell">Shell</DynamicLink> or
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> to an online job instead — one
+GitHub starts for you on a Windows, macOS, or Linux machine on demand, to generate your
+package without you sitting in front of any of them.
 
-Unlike <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink>, this action always
-compiles the engine from source on every call — it doesn't download a prebuilt shell. If
-your CI runs this often, cache Cargo's registry/target directories yourself around the
-action (e.g. `actions/cache` keyed on `roves-ref` + your lockfile); the action doesn't do
-that for you, since the right cache key/scope depends on your own workflow.
+It checks out and builds the engine from source, then packages your already-built web
+content into a native bundle — without a full Roves checkout sitting in your own repo. It
+runs `mach build` + `mach bundle` for you, mirroring the engine repo's own `test.yml`,
+generalized so any game's own CI can call it instead of reimplementing that pipeline.
+
+The big advantage over Packmaster: this runs the actual compilation on whichever operating
+system you need — Windows, macOS, or Linux — without you ever installing Rust, Python,
+GStreamer, WiX, or anything else `mach build`/`mach bundle` need, on your own machine.
+GitHub's own runner already has (or this action installs, non-interactively) everything
+required; you only ever provide your already-built web content.
 
 <Accordions>
+
+<Accordion title="New to GitHub Actions?" id="what-is-github-actions">
+
+**GitHub Actions** is GitHub's built-in automation system: a `.yml` *workflow* file describes
+a sequence of steps GitHub runs for you, on GitHub's own servers, whenever something happens
+in your repo (a push, a tag, a manual trigger) — nothing runs on your own machine. Workflow
+files live at `.github/workflows/*.yml` in your repo; GitHub picks up anything there
+automatically, no separate registration step needed.
+
+An *action* like `roves-action` is a single reusable step you drop into one of those
+workflows with `uses: ...`, the same way `actions/checkout` or `actions/setup-node` already
+are in the examples below.
+
+</Accordion>
 
 <Accordion title="Prerequisites" id="prerequisites">
 
@@ -79,6 +100,18 @@ build` directly.
 | --- | --- |
 | `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
 | `archive-path` | Absolute path to `<artifact-name>.zip` |
+
+## Skipping the compile step
+
+Compiling the engine from source is flexible but slow. Setting `use-prebuilt-shell: 'true'`
+skips that entirely — it downloads the exact same prebuilt shell
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> itself uses instead, at the
+`roves-ref` tag, and only packs your content into it. Much faster, at the cost of every
+input that exists purely to control *how the engine compiles* (extra Cargo features besides
+Steam, cross-compile target, sanitizers, and a few others) no longer being available —
+setting one of those alongside `use-prebuilt-shell: 'true'` fails the run with a clear error
+instead of silently ignoring it. See the action's own README for the full list and a working
+example.
 
 ## Distributing installers
 
