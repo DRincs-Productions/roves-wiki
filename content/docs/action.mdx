@@ -127,11 +127,6 @@ jobs:
 
 ### Inputs
 
-Every input is tagged `[servo]` (plain upstream Servo — see
-<DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each one does) or
-`[roves]` (added by `mach bundle`, which doesn't exist upstream at all) in the action's own
-`action.yml`/README — this is just the non-advanced subset, usable in base mode:
-
 | Name | Description |
 | --- | --- |
 | `content-dir` | **Required.** Path to your already-built web content (e.g. a Vite/webpack `dist/` folder). |
@@ -139,7 +134,11 @@ Every input is tagged `[servo]` (plain upstream Servo — see
 | `features` | `''` (default) or `'steam'`, for the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink> — selects the separately-published Steam-enabled shell asset instead of compiling anything. |
 | `content-compress`, `content-compression-level`, `content-max-pack-size`, `content-exclude`, `content-boot-include` | How your content gets packed into the bundle — see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>. |
 | `deb` / `msi` / `dmg`, `package-name`, `package-version` | Build an installer instead of a portable bundle — see [Distributing installers](#distributing-installers) below. |
-| `html-file`, `window-size`, `bundle-params`, `diagnostic-script`, `output` | Smaller bundle-time tweaks (entry file, initial window size, extra launch args, a debug launcher script, output path) — see the action's own README for details. |
+| `html-file` | Entry HTML file, relative to `content-dir` (default `index.html`). |
+| `window-size` | Initial window size, e.g. `1280x720` (the default). |
+| `output` | Where the bundle gets written, relative to your repo root. Usually left unset — the action picks its own path and exposes it via `bundle-dir`/`archive-path` regardless. |
+| `diagnostic-script` | Ship a `diagnose.bat`/`diagnose.sh` alongside the bundle (portable/`msi`/`dmg`, not `deb`) that launches the game from a console and prints its exit code plus `roves.log` — for testers to run when a build appears to do nothing. Off by default. |
+| `bundle-params` | Extra launch arguments baked into the bundle, passed to the game every time it starts. |
 
 ### Outputs
 
