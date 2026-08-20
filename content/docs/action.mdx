@@ -44,19 +44,10 @@ required; you only ever provide your already-built web content.
 
 <Accordion title="Prerequisites" id="prerequisites">
 
-**A GitHub Actions workflow in your own repo**, with a step that builds your game's web
-content *before* this action runs — this action doesn't set up Node/npm/etc. for you, and
-doesn't know or care what produced your `content-dir`.
-
-**One job per desktop platform you want output for** — `windows-latest`/`macos-latest`/
-`ubuntu-latest`. Desktop is all that actually works today; there's no cross-compiling for
-consoles here (see <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what
-`mach` itself supports).
-
-**`contents: write` permission** on the job, only if you're using `gh release upload` (or
-similar) afterward to attach the output to a GitHub Release — this action itself never
-uploads anywhere; it only produces a zip on disk and exposes its path as the `archive-path`
-output.
+A GitHub account, and your game's project in a GitHub repository — that's it. The repository
+doesn't need to be public: GitHub Actions runs on private repos too, it just draws from your
+account's own included Actions minutes there (public repos get unlimited minutes on the
+standard runners this action uses; private repos don't).
 
 </Accordion>
 
@@ -64,7 +55,13 @@ output.
 
 ## Portable distribution
 
-The default output on every platform, no install step:
+The default output on every platform, no install step. This action doesn't build your
+game's own web content for you — it doesn't know or care what produced it — so a step that
+does that has to run first, as in the `build game content` step below. Add one job per
+desktop platform you want output for (`windows-latest`/`macos-latest`/`ubuntu-latest`) —
+desktop is all that actually works today, there's no cross-compiling for consoles here (see
+<DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what `mach` itself
+supports):
 
 ```yml
 - uses: actions/checkout@v4
@@ -104,6 +101,12 @@ build` directly.
 | --- | --- |
 | `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
 | `archive-path` | Absolute path to `<artifact-name>.zip` |
+
+This action itself never uploads anywhere — the example above hands `archive-path` to
+`actions/upload-artifact` instead, GitHub's own build-artifact storage for the run itself.
+If you'd rather attach it directly to a GitHub Release yourself (`gh release upload` or
+similar), that step needs `contents: write` permission on the job — this action doesn't
+need that permission itself, only whatever you do with its output afterward does.
 
 ## Skipping the compile step
 
