@@ -29,16 +29,18 @@ you delegate what you'd otherwise do by hand with the
 GitHub starts for you on a Windows, macOS, or Linux machine on demand, to generate your
 package without you sitting in front of any of them.
 
-It checks out and builds the engine from source, then packages your already-built web
-content into a native bundle — without a full Roves checkout sitting in your own repo. It
-runs `mach build` + `mach bundle` for you, mirroring the engine repo's own `test.yml`,
-generalized so any game's own CI can call it instead of reimplementing that pipeline.
+By default it packages your already-built web content into a native bundle the same way
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> does: it downloads the same
+prebuilt `roves_shell_<platform>[_steam].zip` release asset Packmaster itself uses and packs
+your content into it — nothing gets compiled, so there's no native toolchain to install at
+all. Setting `advanced-mode: 'true'` switches to a slower, opt-in path instead: check out the
+engine source and run `mach build` + `mach bundle` for you, mirroring the engine repo's own
+`test.yml`, with every `mach build` flag (extra Cargo features, cross-compile target,
+sanitizers, and more) available since this is the only path that actually compiles anything.
 
-The big advantage over Packmaster: this runs the actual compilation on whichever operating
-system you need — Windows, macOS, or Linux — without you ever installing Rust, Python,
-GStreamer, WiX, or anything else `mach build`/`mach bundle` need, on your own machine.
-GitHub's own runner already has (or this action installs, non-interactively) everything
-required; you only ever provide your already-built web content.
+The big advantage over Packmaster either way: this runs on whichever operating system you
+need — Windows, macOS, or Linux — as a GitHub-hosted job, without you ever installing
+anything on your own machine. You only ever provide your already-built web content.
 
 <Accordions>
 
@@ -116,7 +118,6 @@ jobs:
         with:
           content-dir: dist
           artifact-name: my-game_${{ matrix.os_name }}
-          media-stack: dummy
 
       - name: upload to the release
         env:
@@ -129,13 +130,15 @@ for it) — otherwise 3 concurrent jobs would race to create the same release. B
 `contents: write`: one to create the release, the other to upload to it.
 
 The only required `roves-action` input is `content-dir`; everything else defaults sensibly.
-Every input is tagged `[servo]` (plain upstream Servo — see
+Every `mach build`/`mach bundle` input is tagged `[servo]` (plain upstream Servo — see
 <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each one does) or
 `[roves]` (added by `mach bundle`, which doesn't exist upstream at all) in the action's own
 `action.yml`/README — the flags themselves are exactly the ones documented there, this
-action is a near 1:1 forwarding layer over them. `features: 'steam'` compiles in the
-<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>, the same as `mach
-build` directly.
+action is a near 1:1 forwarding layer over them. `features: 'steam'` gets you the
+<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink> either way: in the
+default base mode it selects the separately-published Steam-enabled shell asset instead of
+compiling anything, while with `advanced-mode: 'true'` it's forwarded straight to `mach
+build --features steam` as usual.
 
 ### Outputs
 
@@ -144,17 +147,22 @@ build` directly.
 | `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
 | `archive-path` | Absolute path to `<artifact-name>.zip` |
 
-## Skipping the compile step
+## Base mode vs. advanced mode
 
-Compiling the engine from source is flexible but slow. Setting `use-prebuilt-shell: 'true'`
-skips that entirely — it downloads the exact same prebuilt shell
-<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> itself uses instead, at the
-`roves-ref` tag, and only packs your content into it. Much faster, at the cost of every
-input that exists purely to control *how the engine compiles* (extra Cargo features besides
-Steam, cross-compile target, sanitizers, and a few others) no longer being available —
-setting one of those alongside `use-prebuilt-shell: 'true'` fails the run with a clear error
-instead of silently ignoring it. See the action's own README for the full list and a working
-example.
+By default (`advanced-mode: 'false'`, the same as leaving it unset) this action never
+compiles anything: it downloads the exact same prebuilt shell
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> itself uses, at the `roves-ref`
+tag, and only packs your content into it — fast, and no native toolchain needed. This is
+what every example on this page uses.
+
+Setting `advanced-mode: 'true'` switches to checking out the engine source at `roves-ref`
+and running `mach bootstrap` + `mach build` + `mach bundle` against it instead — slower, but
+every input that exists purely to control *how the engine compiles* (cross-compile target,
+`media-stack`, sanitizers, a custom `icon-png`/`icon-ico`, and a few others) becomes
+available, since this is the only path that actually compiles anything. Setting one of those
+inputs while `advanced-mode` is left at its default fails the run with a clear error instead
+of silently ignoring it. See the action's own README for the full list and a working
+advanced-mode example.
 
 ## Distributing installers
 
