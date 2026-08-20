@@ -25,6 +25,16 @@ Packed files fall into two groups:
 uncompressed, next to the packs. Use this for anything that shouldn't sit inside a
 read-only archive, like a save-data or user-config subfolder.
 
+## Where the packed archives themselves land
+
+`mach bundle` places the packs flat, next to the engine binary itself.
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> instead puts them (or the
+loose files, when compression is off) into their own `content` subfolder — keeping the
+bundle root down to just the engine's own files (the binary, DLLs/dylibs,
+`launch.json`/diagnostic script) rather than mixing dozens of pack files in alongside
+them. Neither location is something your game's own code ever needs to know or care
+about — the engine finds them itself either way.
+
 ## Where extracted content lives
 
 Extraction targets the OS's real, disk-backed cache directory — never a RAM-backed `tmpfs`
