@@ -33,10 +33,8 @@ By default it packages your already-built web content into a native bundle the s
 <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> does: it downloads the same
 prebuilt `roves_shell_<platform>[_steam].zip` release asset Packmaster itself uses and packs
 your content into it — nothing gets compiled, so there's no native toolchain to install at
-all. Setting `advanced-mode: 'true'` switches to a slower, opt-in path instead: check out the
-engine source and run `mach build` + `mach bundle` for you, mirroring the engine repo's own
-`test.yml`, with every `mach build` flag (extra Cargo features, cross-compile target,
-sanitizers, and more) available since this is the only path that actually compiles anything.
+all. See [Advanced mode](#advanced-mode) below for the opt-in, slower path that compiles the
+engine from source instead.
 
 The big advantage over Packmaster either way: this runs on whichever operating system you
 need — Windows, macOS, or Linux — as a GitHub-hosted job, without you ever installing
@@ -147,23 +145,6 @@ build --features steam` as usual.
 | `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
 | `archive-path` | Absolute path to `<artifact-name>.zip` |
 
-## Base mode vs. advanced mode
-
-By default (`advanced-mode: 'false'`, the same as leaving it unset) this action never
-compiles anything: it downloads the exact same prebuilt shell
-<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> itself uses, at the `roves-ref`
-tag, and only packs your content into it — fast, and no native toolchain needed. This is
-what every example on this page uses.
-
-Setting `advanced-mode: 'true'` switches to checking out the engine source at `roves-ref`
-and running `mach bootstrap` + `mach build` + `mach bundle` against it instead — slower, but
-every input that exists purely to control *how the engine compiles* (cross-compile target,
-`media-stack`, sanitizers, a custom `icon-png`/`icon-ico`, and a few others) becomes
-available, since this is the only path that actually compiles anything. Setting one of those
-inputs while `advanced-mode` is left at its default fails the run with a clear error instead
-of silently ignoring it. See the action's own README for the full list and a working
-advanced-mode example.
-
 ## Distributing installers
 
 Each platform also has one installable input, gated to its own OS — setting one on the
@@ -176,17 +157,87 @@ can stay the same across a matrix:
 | `macOS` | `dmg: 'true'` | `play.app` wrapped in a `.dmg` |
 | `Linux` | `deb: 'true'` | A real `.deb` |
 
+The same matrix shape as [Portable distribution](#portable-distribution) above, with one
+installable input added per platform instead:
+
 ```yml
-- uses: DRincs-Productions/roves-action@v1
-  with:
-    content-dir: dist
-    artifact-name: my-game_linux-deb
-    deb: 'true' # msi: 'true' on windows-latest, dmg: 'true' on macos-latest
-    package-name: my-game
-    package-version: ${{ github.ref_name }}
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: create the GitHub Release for this tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ github.ref_name }}" --title "My Game ${{ github.ref_name }}"
+
+  build-and-publish:
+    needs: create-release
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            os_name: windows
+            msi: 'true'
+          - platform: macos-latest
+            os_name: macos
+            dmg: 'true'
+          - platform: ubuntu-latest
+            os_name: linux
+            deb: 'true'
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build game content
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install && npm run build
+
+      - name: build & bundle with Roves
+        id: roves
+        uses: DRincs-Productions/roves-action@v1
+        with:
+          content-dir: dist
+          artifact-name: my-game_${{ matrix.os_name }}
+          msi: ${{ matrix.msi || 'false' }}
+          dmg: ${{ matrix.dmg || 'false' }}
+          deb: ${{ matrix.deb || 'false' }}
+          package-name: my-game
+          package-version: ${{ github.ref_name }}
+
+      - name: upload to the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" "${{ steps.roves.outputs.archive-path }}"
 ```
 
 `package-name`/`package-version` name and version whichever installable format you asked
 for — ignored entirely when none of `deb`/`msi`/`dmg` are set. See
 <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each format actually
 wraps under the hood.
+
+## Advanced mode
+
+Setting `advanced-mode: 'true'` switches to checking out the engine source at `roves-ref`
+and running `mach bootstrap` + `mach build` + `mach bundle` against it, mirroring the engine
+repo's own `test.yml`, instead of downloading a prebuilt shell — slower, but every input
+that exists purely to control *how the engine compiles* (cross-compile target,
+`media-stack`, sanitizers, a custom `icon-png`/`icon-ico`, and a few others) becomes
+available, since this is the only path that actually compiles anything. Setting one of those
+inputs while `advanced-mode` is left at its default fails the run with a clear error instead
+of silently ignoring it. See the action's own README for the full list and a working
+advanced-mode example.
