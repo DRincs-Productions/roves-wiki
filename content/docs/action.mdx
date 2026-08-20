@@ -57,62 +57,14 @@ standard runners this action uses; private repos don't).
 
 The default output on every platform, no install step. This action doesn't build your
 game's own web content for you — it doesn't know or care what produced it — so a step that
-does that has to run first, as in the `build game content` step below. Add one job per
-desktop platform you want output for (`windows-latest`/`macos-latest`/`ubuntu-latest`) —
-desktop is all that actually works today, there's no cross-compiling for consoles here (see
+does that has to run first, as in the `build game content` step below.
+
+A full, realistic shape: triggered by pushing a version tag, one job per desktop platform
+via a matrix (`windows-latest`/`macos-latest`/`ubuntu-latest` — desktop is all that actually
+works today, there's no cross-compiling for consoles here, see
 <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what `mach` itself
-supports):
-
-```yml
-- uses: actions/checkout@v4
-
-- name: build game content
-  uses: actions/setup-node@v4
-  with:
-    node-version: '22'
-- run: npm install && npm run build
-
-- name: build & bundle with Roves
-  id: roves
-  uses: DRincs-Productions/roves-action@v1
-  with:
-    content-dir: dist
-    artifact-name: my-game_windows
-    media-stack: dummy
-
-- uses: actions/upload-artifact@v4
-  with:
-    name: my-game_windows
-    path: ${{ steps.roves.outputs.archive-path }}
-```
-
-The only required input is `content-dir`; everything else defaults sensibly. Every input is
-tagged `[servo]` (plain upstream Servo — see <DynamicLink href="/docs/shell">the Shell
-section</DynamicLink> for what each one does) or `[roves]` (added by `mach bundle`, which
-doesn't exist upstream at all) in the action's own `action.yml`/README — the flags
-themselves are exactly the ones documented there, this action is a near 1:1 forwarding
-layer over them. `features: 'steam'` compiles in the
-<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>, the same as `mach
-build` directly.
-
-### Outputs
-
-| Name | Description |
-| --- | --- |
-| `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
-| `archive-path` | Absolute path to `<artifact-name>.zip` |
-
-This action itself never uploads anywhere — the example above hands `archive-path` to
-`actions/upload-artifact` instead, GitHub's own build-artifact storage for the run itself.
-If you'd rather attach it directly to a GitHub Release yourself (`gh release upload` or
-similar), that step needs `contents: write` permission on the job — this action doesn't
-need that permission itself, only whatever you do with its output afterward does.
-
-## Cutting a real release on every tag push
-
-A more complete example: triggered by pushing a version tag, one job per platform via a
-matrix, and a real GitHub Release created first and uploaded to at the end — the same
-create-then-upload shape this repo's own release workflows use.
+supports), and a real GitHub Release created first and uploaded to at the end — the same
+create-then-upload shape this repo's own release workflows use:
 
 ```yml
 name: Release
@@ -175,6 +127,22 @@ jobs:
 `create-release` runs once, before the matrix starts (`build-and-publish`'s `needs:` waits
 for it) — otherwise 3 concurrent jobs would race to create the same release. Both jobs need
 `contents: write`: one to create the release, the other to upload to it.
+
+The only required `roves-action` input is `content-dir`; everything else defaults sensibly.
+Every input is tagged `[servo]` (plain upstream Servo — see
+<DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each one does) or
+`[roves]` (added by `mach bundle`, which doesn't exist upstream at all) in the action's own
+`action.yml`/README — the flags themselves are exactly the ones documented there, this
+action is a near 1:1 forwarding layer over them. `features: 'steam'` compiles in the
+<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>, the same as `mach
+build` directly.
+
+### Outputs
+
+| Name | Description |
+| --- | --- |
+| `bundle-dir` | Absolute path to the unzipped bundle folder (named `artifact-name`) |
+| `archive-path` | Absolute path to `<artifact-name>.zip` |
 
 ## Skipping the compile step
 
