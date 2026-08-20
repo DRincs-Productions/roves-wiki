@@ -3,8 +3,26 @@ title: GitHub Action
 description: roves-action — wire mach build/mach bundle into your own game's CI.
 ---
 
+<Accordions>
+
+<Accordion title="New to GitHub Actions?" id="what-is-github-actions">
+
+**GitHub Actions** is GitHub's built-in automation system: a `.yml` *workflow* file describes
+a sequence of steps GitHub runs for you, on GitHub's own servers, whenever something happens
+in your repo (a push, a tag, a manual trigger) — nothing runs on your own machine. Workflow
+files live at `.github/workflows/*.yml` in your repo; GitHub picks up anything there
+automatically, no separate registration step needed.
+
+An *action* like `roves-action` is a single reusable step you drop into one of those
+workflows with `uses: ...`, the same way `actions/checkout` or `actions/setup-node` already
+are in the examples below.
+
+</Accordion>
+
+</Accordions>
+
 [`roves-action`](https://github.com/DRincs-Productions/roves-action) is a GitHub Action — a
-reusable, automated step for the kind of workflow described in the accordion below. It lets
+reusable, automated step for the kind of workflow described in the accordion above. It lets
 you delegate what you'd otherwise do by hand with the
 <DynamicLink href="/docs/shell">Shell</DynamicLink> or
 <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> to an online job instead — one
@@ -23,20 +41,6 @@ GitHub's own runner already has (or this action installs, non-interactively) eve
 required; you only ever provide your already-built web content.
 
 <Accordions>
-
-<Accordion title="New to GitHub Actions?" id="what-is-github-actions">
-
-**GitHub Actions** is GitHub's built-in automation system: a `.yml` *workflow* file describes
-a sequence of steps GitHub runs for you, on GitHub's own servers, whenever something happens
-in your repo (a push, a tag, a manual trigger) — nothing runs on your own machine. Workflow
-files live at `.github/workflows/*.yml` in your repo; GitHub picks up anything there
-automatically, no separate registration step needed.
-
-An *action* like `roves-action` is a single reusable step you drop into one of those
-workflows with `uses: ...`, the same way `actions/checkout` or `actions/setup-node` already
-are in the examples below.
-
-</Accordion>
 
 <Accordion title="Prerequisites" id="prerequisites">
 

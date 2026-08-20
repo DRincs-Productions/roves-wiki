@@ -7,6 +7,25 @@ If you already build your game as a web app, you have three broad ways to ship i
 native desktop binary. They differ in exactly one thing: **what actually renders your
 HTML/CSS/JS.**
 
+What sets Roves apart from the other two isn't just "a different rendering engine" — it's
+built around a few choices specific to games:
+
+- **Built for games, not general-purpose apps.** Roves isn't a general embeddable web view
+  with a game running inside it — no address bar, no tabs, no browser chrome to strip away.
+  Every design choice, from window handling to <DynamicLink href="/docs/integrations/steam">Steam
+  integration</DynamicLink>, starts from "this is a game," not "this is a generic app."
+- **Fast repeat launches.** The first launch caches the files your game actually needs to
+  boot — especially valuable when your content ships compressed (see
+  <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>) —
+  so every launch after that is close to instant, not re-extracting from scratch.
+- **A GUI, not just a toolchain.** <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink>
+  packages your game with a few clicks, no command line or Rust/Python toolchain required.
+- **Rust, not Node.js.** Roves itself is written in Rust — lighter on memory and startup
+  than the Node.js runtime Electron/NW.js bundle alongside their browser, with fewer
+  platform-specific compatibility surprises.
+- **Only enough engine to run a game, not a whole browser.** See "Roves: a real engine, not
+  the OS's webview and not a full browser" below for what that actually means in practice.
+
 ## Tauri vs Roves
 
 <Accordions>
