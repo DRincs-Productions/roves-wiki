@@ -55,15 +55,17 @@ standard runners this action uses; private repos don't).
 
 ## Base mode (the default)
 
-The default output on every platform, no install step. This action doesn't build your
-game's own web content for you — it doesn't know or care what produced it — so a step that
-does that has to run first, as in the `build game content` step below.
+Add [`DRincs-Productions/roves-action@v1`](https://github.com/DRincs-Productions/roves-action)
+as a step in your own workflow — this is the action that actually generates your game. Its
+only required input is `content-dir`, pointing at your already-built web content (this
+action doesn't build that for you — it doesn't know or care what produced it, so a step that
+does that has to run first, as in the `build game content` step below); every other input
+(see [Inputs](#inputs) below) defaults sensibly, and by default it produces a portable,
+no-install-step game for whichever platform the job runs on.
 
-A full, realistic shape: triggered by pushing a version tag, one job per desktop platform
-via a matrix (`windows-latest`/`macos-latest`/`ubuntu-latest` — desktop is all that actually
-works today, there's no cross-compiling for consoles here, see
-<DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what `mach` itself
-supports), and a real GitHub Release created first and uploaded to at the end — the same
+Triggered by pushing a version tag, a matrix starts one job per desktop platform
+(`windows-latest`/`macos-latest`/`ubuntu-latest`) in parallel, each running this action once
+and uploading its own output to a real GitHub Release created first — the same
 create-then-upload shape this repo's own release workflows use:
 
 ```yml
@@ -72,7 +74,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*'
 
 jobs:
   create-release:
@@ -123,20 +125,22 @@ jobs:
         run: gh release upload "${{ github.ref_name }}" "${{ steps.roves.outputs.archive-path }}"
 ```
 
-`create-release` runs once, before the matrix starts (`build-and-publish`'s `needs:` waits
-for it) — otherwise 3 concurrent jobs would race to create the same release. Both jobs need
-`contents: write`: one to create the release, the other to upload to it.
+### Inputs
 
-The only required `roves-action` input is `content-dir`; everything else defaults sensibly.
-Every `mach build`/`mach bundle` input is tagged `[servo]` (plain upstream Servo — see
+Every input is tagged `[servo]` (plain upstream Servo — see
 <DynamicLink href="/docs/shell">the Shell section</DynamicLink> for what each one does) or
 `[roves]` (added by `mach bundle`, which doesn't exist upstream at all) in the action's own
-`action.yml`/README — the flags themselves are exactly the ones documented there, this
-action is a near 1:1 forwarding layer over them. `features: 'steam'` gets you the
-<DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink> either way: in the
-default base mode it selects the separately-published Steam-enabled shell asset instead of
-compiling anything, while with `advanced-mode: 'true'` it's forwarded straight to `mach
-build --features steam` as usual.
+`action.yml`/README — this is just the non-advanced subset, usable in base mode:
+
+| Name | Description |
+| --- | --- |
+| `content-dir` | **Required.** Path to your already-built web content (e.g. a Vite/webpack `dist/` folder). |
+| `artifact-name` | Base name for the output folder and zip (default `roves-game`). |
+| `features` | `''` (default) or `'steam'`, for the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink> — selects the separately-published Steam-enabled shell asset instead of compiling anything. |
+| `content-compress`, `content-compression-level`, `content-max-pack-size`, `content-exclude`, `content-boot-include` | How your content gets packed into the bundle — see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>. |
+| `deb` / `msi` / `dmg`, `package-name`, `package-version` | Build an installer instead of a portable bundle — see [Distributing installers](#distributing-installers) below. |
+| `html-file`, `window-size`, `bundle-params`, `diagnostic-script`, `output` | Smaller bundle-time tweaks (entry file, initial window size, extra launch args, a debug launcher script, output path) — see the action's own README for details. |
+| `roves-repo`, `roves-ref`, `roves-src-path` | Which engine fork/tag to check out and where — `roves-ref` defaults to the latest Roves release. |
 
 ### Outputs
 
