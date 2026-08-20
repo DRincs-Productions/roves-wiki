@@ -53,7 +53,7 @@ standard runners this action uses; private repos don't).
 
 </Accordions>
 
-## Portable distribution
+## Base mode (the default)
 
 The default output on every platform, no install step. This action doesn't build your
 game's own web content for you — it doesn't know or care what produced it — so a step that
@@ -157,8 +157,8 @@ can stay the same across a matrix:
 | `macOS` | `dmg: 'true'` | `play.app` wrapped in a `.dmg` |
 | `Linux` | `deb: 'true'` | A real `.deb` |
 
-The same matrix shape as [Portable distribution](#portable-distribution) above, with one
-installable input added per platform instead:
+The same matrix shape as [Base mode](#base-mode-the-default) above, with one installable
+input added per platform instead:
 
 ```yml
 name: Release
