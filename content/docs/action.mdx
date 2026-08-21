@@ -129,7 +129,7 @@ jobs:
 | --- | --- |
 | `content-dir` | **Required.** Path to your already-built web content (e.g. a Vite/webpack `dist/` folder). |
 | `artifact-name` | Base name for the output folder and zip (default `roves-game`). |
-| `features` | `''` (default) or `'steam'`, for the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink> — selects the separately-published Steam-enabled shell asset instead of compiling anything. |
+| `features` | `''` (default) or `'steam'`, for the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>. |
 | `content-compress`, `content-compression-level`, `content-max-pack-size`, `content-exclude`, `content-boot-include` | How your content gets packed into the bundle — see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>. |
 | `deb` / `msi` / `dmg`, `package-name`, `package-version` | Build an installer instead of a portable bundle — see [Distributing installers](#distributing-installers) below. |
 | `html-file` | Entry HTML file, relative to `content-dir` (default `index.html`). |
