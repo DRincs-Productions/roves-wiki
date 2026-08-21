@@ -57,9 +57,7 @@ standard runners this action uses; private repos don't).
 
 Add [`DRincs-Productions/roves-action@v1`](https://github.com/DRincs-Productions/roves-action)
 as a step in your own workflow — this is the action that actually generates your game. Its
-only required input is `content-dir`, pointing at your already-built web content (this
-action doesn't build that for you — it doesn't know or care what produced it, so a step that
-does that has to run first, as in the `build game content` step below); every other input
+only required input is `content-dir`, pointing at your already-built web content; every other input
 (see [Inputs](#inputs) below) defaults sensibly, and by default it produces a portable,
 no-install-step game for whichever platform the job runs on.
 
