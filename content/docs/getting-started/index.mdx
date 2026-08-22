@@ -45,8 +45,9 @@ engine/bundle underneath, so nothing here locks you in.
 - **A single executable.** `mach bundle` produces one binary (`play.exe` / `play.app` /
   `play`) with your game's content either packed in or sitting next to it — no separate
   launcher process, no bundled `roves-content-packer` binary.
-- **A branded boot splash**, shown immediately while packed content extracts in the
-  background, instead of a blank or undefined-content window.
+- **A branded boot splash**, shown immediately and held up through both packed-content
+  extraction and your page's own initial load, instead of a blank, undefined-content, or
+  black window while either is still working.
 - **A `roves:` protocol bridge** (see <DynamicLink href="/docs/roves-api">roves-api</DynamicLink>)
   exposing window/process lifecycle, Steam, and cache-clearing to your page's own JS — no
   Tauri-style `invoke()` runtime, no `window.__TAURI_INTERNALS__` equivalent required.

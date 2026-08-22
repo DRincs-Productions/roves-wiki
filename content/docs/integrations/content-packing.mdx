@@ -16,7 +16,8 @@ Packed files fall into two groups:
 
 - **Boot set** — the HTML entry file plus whatever it directly references (script/link/img
   `src`/`href`), or anything matched by `--content-boot-include`. Extracted **eagerly**, in
-  full, before the engine opens anything — this is what the boot splash covers.
+  full, before the engine opens anything — the boot splash stays up for this, and then for
+  your page's own initial load on top of it.
 - **Everything else** — stays compressed until something actually requests a file inside
   it (the engine's own `file:` protocol handler triggers extraction on demand, one archive
   at a time, the first time a request needs it).
