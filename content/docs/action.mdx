@@ -232,12 +232,59 @@ wraps under the hood.
 
 ## Advanced mode
 
-Setting `advanced-mode: 'true'` switches to checking out the engine source at `roves-ref`
-and running `mach bootstrap` + `mach build` + `mach bundle` against it, mirroring the engine
-repo's own `test.yml`, instead of downloading a prebuilt shell — slower, but every input
-that exists purely to control *how the engine compiles* (cross-compile target,
-`media-stack`, sanitizers, a custom `icon-png`/`icon-ico`, and a few others) becomes
-available, since this is the only path that actually compiles anything. Setting one of those
-inputs while `advanced-mode` is left at its default fails the run with a clear error instead
-of silently ignoring it. See the action's own README for the full list and a working
-advanced-mode example.
+Setting `advanced-mode: 'true'` kicks off a much slower, longer-running job: instead of using
+Roves' already-built files — ready to be packed straight into your game's bundle, the default
+— it compiles them itself from scratch, on the spot. That trades speed for a lot more control
+over how the engine gets built, entirely at your own risk.
+
+:::warning
+
+Setting any of the inputs below while `advanced-mode` is left at its default (`'false'`) fails the run with a clear error
+instead of silently ignoring it.
+
+:::
+
+<Accordions>
+
+<Accordion title="Inputs" id="advanced-mode-inputs">
+
+| Name | Description |
+| --- | --- |
+| `bootstrap` | Install the native build dependencies the compile step needs (default `true`). Set to `false` only if you already installed them yourself in an earlier step. |
+| `icon-png` | Path to a window/taskbar icon (PNG) to bake into the build. |
+| `icon-ico` | Path to a Windows `.exe` icon (multi-size `.ico`). Windows only. |
+| `release` | Build with full optimizations. |
+| `dev` | Debug build (the default if `release`, `production`, and `profile` are all unset). |
+| `production` | Release build without debug assertions. |
+| `profile` | Build with a custom named profile instead of `dev`/`release`/`production`. |
+| `target` | Cross-compile for a different target triple. Leave unset for a normal desktop build. |
+| `features` | Extra engine features to enable, space-separated (e.g. `steam`). |
+| `media-stack` | Which media backend to build with: `gstreamer` for real audio/video, or `dummy` to skip it and avoid installing GStreamer at all (no audio/video playback). |
+| `jobs` | Limit how many build jobs run in parallel. |
+| `with-asan` / `with-tsan` | Build with AddressSanitizer / ThreadSanitizer, for tracking down memory or threading bugs. |
+| `with-debug-assertions` | Keep debug assertions even in an otherwise optimized build. |
+| `debug-mozjs` | Build the JavaScript engine with debug assertions. |
+| `with-frame-pointer` | Keep frame pointers in the build (helps diagnose hangs). |
+| `use-crown` | Enable the engine's own memory-safety lint tool during the build. |
+| `coverage` | Build with code-coverage instrumentation. |
+| `android` / `ohos` | Build for Android / OpenHarmony. Not currently a supported Roves platform. |
+| `win-arm64` | Build for Windows on Arm64 instead of x64. |
+| `flavor` | Product flavor name — only relevant to Android/OpenHarmony packaging. |
+| `verbose` / `very-verbose` | Print more detail while building. |
+| `no-package` | Android only: skip packaging into a `.apk` after building. |
+| `build-params` | Any extra arguments to pass straight through to the build step, space-separated. |
+| `bin` | Point at a specific already-built binary instead of letting the action find the one it just built. |
+| `nightly` | Use a dated nightly build instead of the one just compiled. |
+
+</Accordion>
+
+</Accordions>
+
+```yml
+- name: build & bundle with Roves (advanced mode)
+  uses: DRincs-Productions/roves-action@v1
+  with:
+    content-dir: dist
+    advanced-mode: 'true'
+    media-stack: dummy
+```

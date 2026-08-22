@@ -25,6 +25,7 @@ Open <http://localhost:3000>.
 | `app/docs` | Documentation layout and pages, rendering `content/docs/**/*.mdx`. |
 | `app/api/search/route.ts` | Search API (Orama, via `fumadocs-core/search/server`). |
 | `app/og/docs/[...slug]/route.tsx` | Per-page OG image generation (`next/og`). |
+| `app/llms.txt`, `app/llms-full.txt`, `app/llms.mdx/docs/[[...slug]]` | Plain-markdown docs for LLMs — a page index, a full dump, and one page's raw markdown, respectively. See [llmstxt.org](https://llmstxt.org). |
 | `content/docs/` | All documentation content. Each subfolder has a `meta.json` controlling sidebar order/titles. |
 | `lib/shared.ts` | Site-wide constants — app name, GitHub repo, giscus config. |
 | `lib/layout.shared.tsx` | Shared nav/layout options (logo, GitHub link). |

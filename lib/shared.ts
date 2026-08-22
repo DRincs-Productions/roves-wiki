@@ -11,6 +11,10 @@ export const rovesApiRepoUrl = `https://github.com/${gitConfig.user}/roves-api`;
 export const rovesActionRepoUrl = `https://github.com/${gitConfig.user}/roves-action`;
 export const servoWikiUrl = "https://servo.org";
 
+// Where the per-page raw markdown used by llms.txt/llms-full.txt is served from —
+// see app/llms.mdx/docs/[[...slug]]/route.ts.
+export const docsContentRoute = "/llms.mdx/docs";
+
 // Filled in once Discussions + the giscus GitHub App are enabled on the
 // `roves` repo — see https://giscus.app, which generates these two IDs from
 // the repo/category you pick. Comments are simply not rendered (see
