@@ -1,7 +1,10 @@
+import { Github } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import LogoImg from '@/app/icon.png';
-import { githubUrl, tagline } from '@/lib/shared';
+import { DiscordIcon } from '@/components/ui/icons';
+import { PlatformDownloadButton } from '@/components/platform-download-button';
+import { discordUrl, tagline } from '@/lib/shared';
 
 const features = [
   {
@@ -48,11 +51,35 @@ export default function HomePage() {
         >
           Get Started
         </Link>
-        <Link
-          href={githubUrl}
-          className="rounded-md border border-fd-border px-5 py-2.5 font-medium text-fd-foreground transition-colors hover:bg-fd-accent"
+        <a
+          href={discordUrl}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="flex items-center gap-2 rounded-md border border-transparent bg-[#5865F2] px-5 py-2.5 font-medium text-white transition-colors hover:bg-[#4752C4] hover:shadow-[0_0_20px_-4px_#5865F2]"
         >
-          GitHub
+          <DiscordIcon className="size-4" />
+          Discord
+        </a>
+      </div>
+
+      <Image
+        src="/packmaster2.png"
+        alt="Packmaster, the desktop GUI for packaging your game with Roves"
+        width={1010}
+        height={645}
+        className="mt-12 w-full max-w-2xl rounded-lg border border-fd-border"
+      />
+
+      <div className="mt-8 flex flex-row flex-wrap items-center justify-center gap-3">
+        <PlatformDownloadButton platform="windows" />
+        <PlatformDownloadButton platform="macos" />
+        <PlatformDownloadButton platform="linux" />
+        <Link
+          href="/docs/action"
+          className="not-prose inline-flex items-center gap-2 rounded-lg border bg-fd-secondary/50 px-4 py-2.5 text-sm font-medium text-fd-secondary-foreground no-underline transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
+        >
+          <Github className="size-5" />
+          GitHub Action (CI/CD)
         </Link>
       </div>
 
