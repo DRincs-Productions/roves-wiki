@@ -9,7 +9,13 @@ export const gitConfig = {
 export const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 export const rovesApiRepoUrl = `https://github.com/${gitConfig.user}/roves-api`;
 export const rovesActionRepoUrl = `https://github.com/${gitConfig.user}/roves-action`;
+export const rovesWikiRepoUrl = `https://github.com/${gitConfig.user}/roves-wiki`;
 export const servoWikiUrl = "https://servo.org";
+
+// Shared across all DRincs-Productions projects (pixi-vn included) — one Discord
+// server and one Ko-fi page, not a Roves-specific one.
+export const discordUrl = "https://discord.gg/E95FZWakzp";
+export const kofiUrl = "https://ko-fi.com/pixivn";
 
 // Where the per-page raw markdown used by llms.txt/llms-full.txt is served from —
 // see app/llms.mdx/docs/[[...slug]]/route.ts.

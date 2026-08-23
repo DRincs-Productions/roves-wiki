@@ -1,7 +1,8 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
 import LogoImg from '@/app/icon.png';
-import { appName, githubUrl } from '@/lib/shared';
+import { DiscordIcon, KofiIcon } from '@/components/ui/icons';
+import { appName, discordUrl, githubUrl, kofiUrl } from '@/lib/shared';
 
 export function baseOptions(): BaseLayoutProps {
   return {
@@ -14,6 +15,21 @@ export function baseOptions(): BaseLayoutProps {
       ),
     },
     githubUrl,
-    links: [],
+    links: [
+      {
+        type: 'icon',
+        label: 'Discord',
+        icon: <DiscordIcon className="size-5" />,
+        text: 'Discord',
+        url: discordUrl,
+      },
+      {
+        type: 'icon',
+        label: 'Ko-fi',
+        icon: <KofiIcon className="h-5 w-auto" />,
+        text: 'Ko-fi',
+        url: kofiUrl,
+      },
+    ],
   };
 }
