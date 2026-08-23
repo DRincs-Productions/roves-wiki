@@ -2,6 +2,7 @@ import { Github } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import LogoImg from '@/app/icon.png';
+import { Contributing } from '@/components/contributing';
 import { DiscordIcon } from '@/components/ui/icons';
 import { PlatformDownloadButton } from '@/components/platform-download-button';
 import { discordUrl, tagline } from '@/lib/shared';
@@ -91,6 +92,8 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+
+      <Contributing />
     </main>
   );
 }

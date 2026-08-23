@@ -17,6 +17,11 @@ export const servoWikiUrl = "https://servo.org";
 export const discordUrl = "https://discord.gg/E95FZWakzp";
 export const kofiUrl = "https://ko-fi.com/pixivn";
 
+// Repos whose GitHub contributors are shown on the home page's "Made Possible
+// by You" section (components/contributing.tsx) — every repo under the Roves
+// umbrella, not just the engine itself.
+export const contributorRepos = ["roves", "roves-wiki", "roves-packmaster", "roves-action", "roves-api"];
+
 // Where the per-page raw markdown used by llms.txt/llms-full.txt is served from —
 // see app/llms.mdx/docs/[[...slug]]/route.ts.
 export const docsContentRoute = "/llms.mdx/docs";
