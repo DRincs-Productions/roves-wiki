@@ -1,17 +1,114 @@
 ---
 title: Shell
-description: The raw engine itself — mach build/mach bundle, prerequisites, every flag.
+description: The engine itself — a container that runs your built game as a native desktop app.
 ---
 
-The "shell" is the compiled Roves binary itself — what `./mach build` + `./mach bundle`
-produce directly from a checkout of the [engine repo](https://github.com/DRincs-Productions/roves).
+## What the Shell is
 
-This is the **least important section for most people**. Most game developers never touch
-`mach` directly — they use <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> (a
-GUI) or <DynamicLink href="/docs/action">the GitHub Action</DynamicLink> (for CI), both of
-which build on exactly what's described here without you needing a Rust/Python toolchain
-yourself. Read this section if you're working on Roves itself, need a flag neither of those
-two exposes, or just want to understand what's actually happening underneath them.
+The Shell is **the heart of Roves** — the actual compiled engine binary. Everything else on
+this wiki (<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink>,
+<DynamicLink href="/docs/action">the GitHub Action</DynamicLink>) doesn't replace it — both
+just build or download this exact same Shell on your behalf and hand you the result already
+put together.
+
+As the name suggests, the Shell is a **container**: an empty, pre-built native application
+that knows how to load and run a *dist* — your game's already-built web output, whatever
+your own bundler (Vite, webpack, or anything else that produces a browser-runnable
+`index.html`) produces — as a real, double-click desktop app. No browser chrome, no toolbar,
+no address bar — one window that opens your game and nothing else. It's the same role a
+Tauri or Electron shell plays, just for a different underlying engine; see
+<DynamicLink href="/docs/getting-started/why">Why Roves?</DynamicLink> for that comparison.
+
+## The Shell is already built for you
+
+You don't need to compile anything to get a working Shell. Every tagged engine version
+publishes a ready-to-run Shell — with no game content in it yet — on the
+[Releases page](https://github.com/DRincs-Productions/roves/releases), starting at
+`v0.1.0`. Each platform is published **twice**: a plain build and a `_steam`-suffixed one
+compiled with the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>
+built in.
+
+| Platform | Download | Contains |
+| --- | --- | --- |
+| Windows | `roves_shell_windows.zip` / `_steam.zip` | `play.exe` + the DLLs (incl. GStreamer's) it needs |
+| macOS | `roves_shell_macos.zip` / `_steam.zip` | `play.app`, whose `Contents/MacOS/play` *is* the engine binary |
+| Linux | `roves_shell_linux.zip` / `_steam.zip` | `play` (expects GStreamer already installed via your distro) |
+
+These are optimized (`--release`) builds with the real GStreamer media stack (bundled
+automatically on Windows/macOS). Pick the version your game targets, download the zip for
+your platform, and extract it anywhere — that's the whole install step.
+
+## Inserting your dist into the Shell
+
+This is the part that actually matters: turning that empty container plus your built game
+into something playable. Every path below — Packmaster included — ends up doing the exact
+same thing under the hood, so pick whichever fits how you work.
+
+Nothing here requires Rust, Python, or `mach` — just a downloaded Shell and your already-built
+game.
+
+1. **Build your game** with your own bundler, however you already do it. This produces a
+   folder — commonly named `dist/` — containing an `index.html` plus whatever assets it
+   references.
+2. **Download and extract** the matching Shell zip from the table above.
+3. **Copy your build output next to the Shell binary** (`play.exe` / `play.app` /
+   `play`), keeping it named `dist` so it lines up with the Shell's own default expectations.
+4. **Tell the Shell where to find it.** Two ways, depending on whether you want a
+   double-click-runnable copy or you're just testing:
+
+   - **A `launch.json` next to the binary** (recommended — this is exactly what
+     `mach bundle`/Packmaster generate for you):
+
+     ```json title="launch.json"
+     {
+       "url": "dist/index.html"
+     }
+     ```
+
+     With this file in place, double-clicking the Shell binary opens your game directly —
+     no arguments needed. This is what actually makes the container double-click-runnable.
+
+   - **Pass the path as an argument**, for a quick check without creating any file:
+
+     ```bash title="from a terminal, or a shortcut's target"
+     ./play dist/index.html
+     ```
+
+     Any argument on the command line skips `launch.json` entirely, so use this for testing,
+     not for what you hand to a player.
+
+<Callout title="No launch.json and no argument? The Shell isn't broken">
+Without either, the container has nothing to run — it just opens the stock Servo homepage.
+That's expected: it means no dist has been pointed at it yet, not that something failed.
+</Callout>
+
+<Callout title="This covers loose files only" type="warn">
+Hand-writing `launch.json` this way ships your dist as plain, individually browsable files
+(equivalent to `mach bundle --content-compress=none`). The compressed tar+zstd packing
+described in <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>
+is produced by `roves-content-packer`, invoked either through `mach bundle` or by Packmaster
+linking that same crate as a library — there's no manual equivalent for that path.
+</Callout>
+
+`launch.json` also accepts `window_size` and extra `args` — see the flags table further down
+for what each corresponds to; a hand-written file only needs `url` to work.
+
+## Building the Shell yourself
+
+This is the **least important section for most people**. You only need this if you're
+working on Roves itself, need a flag Packmaster doesn't expose, or want to understand what's
+actually happening underneath the paths above.
+
+Roves' Shell is not a from-scratch engine — it's a vendored, customized fork of
+[Servo](https://servo.org), built with Servo's own `mach` tooling. Every customization on top
+of stock Servo (no browser chrome, the single-executable bundle, the boot splash, the
+`roves:` protocol bridge, optional Steam) is tracked, file by file, in
+[`CUSTOMIZATIONS.md`](https://github.com/DRincs-Productions/roves/blob/main/CUSTOMIZATIONS.md).
+
+```bash
+git clone https://github.com/DRincs-Productions/roves
+cd roves
+```
 
 <Accordions>
 
@@ -47,26 +144,22 @@ memory if you're constrained).
 
 </Accordions>
 
-## Portable distribution
-
-This is the central path — a single, double-click-runnable binary, no install step.
+### Build and bundle
 
 ```bash title="from the repo root"
+./mach bootstrap
 ./mach build --release
 ```
 
 Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
 bridge</DynamicLink> compiled in.
 
-Roves doesn't build your game — that's your own bundler's job (Vite, webpack, whatever your
-frontend stack already uses). Point `--content-dir` at that output:
-
 ```bash
 ./mach bundle --content-dir path/to/dist --output release
 ```
 
-`mach bundle` turns that build plus your game's built web content (your own bundler's
-output — Vite, webpack, whatever) into one executable — no separate launcher process, and no
+`mach bundle` is what turns that build plus your dist into the container described above,
+producing exactly the same `launch.json`-driven layout — no separate launcher process, no
 `roves-content-packer` binary shipped alongside it (packed-content extraction happens
 in-process, inside the engine binary itself, which already links that crate as a library):
 
@@ -92,20 +185,7 @@ in-process, inside the engine binary itself, which already links that crate as a
 | `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
 | *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
 
-### Prebuilt shells
-
-You don't have to build the shell yourself just to try it — the engine repo's own
-[Releases page](https://github.com/DRincs-Productions/roves/releases) publishes versioned,
-prebuilt copies of the bare shell (no game content bundled), starting at `v0.1.0`. Each
-platform is published **twice**: a plain build and a `_steam`-suffixed one compiled with
-`--features steam` — e.g. `roves_shell_windows.zip` / `roves_shell_windows_steam.zip`. These
-are optimized (`--release`) builds with the real GStreamer media stack (bundled automatically
-on Windows/macOS; Linux expects GStreamer already installed via your distro's package
-manager). This is exactly what
-<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> downloads instead of compiling
-its own — see that section for the actual game-developer-facing side of this.
-
-## Distributing installers
+### Distributing installers
 
 Each platform also has one installable alternative to the portable output above, wrapping
 the exact same staged files — nothing extra is left behind once the installer is built:
@@ -127,10 +207,3 @@ naming/shaping the *installer*. Anything else on the command line is written int
 bundle's `launch.json` and handed to the running game at launch as real CLI args — the two
 are validated against each other so one can't accidentally leak into the other.
 </Callout>
-
-## Run it
-
-Double-click the produced binary (or run it from a terminal). If something looks wrong and
-nothing obvious shows up, see <DynamicLink href="/docs/integrations/diagnostics">
-Diagnostics</DynamicLink> — every launch writes a log file you can check before assuming
-it's a mystery.
