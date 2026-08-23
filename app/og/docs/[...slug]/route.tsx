@@ -8,8 +8,12 @@ export const dynamic = 'force-static';
 
 // Same brand font used for the "Roves" wordmark on the engine's own boot
 // splash, and for headings across this wiki (see app/layout.tsx) — reused
-// here so the OG image's title matches.
-const metalManiaPath = join(process.cwd(), '..', 'resources', 'fonts', 'MetalMania-Regular.ttf');
+// here so the OG image's title matches. A copy lives in ./fonts rather than
+// being read from the main engine repo's own resources/fonts: this route
+// needs a real font file (not next/font's CSS-based loading, since takumi-js
+// renders images server-side), and roves-wiki must build standalone, without
+// a sibling checkout of the engine repo (e.g. in CI, or any other clone).
+const metalManiaPath = join(process.cwd(), 'fonts', 'MetalMania-Regular.ttf');
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params;
