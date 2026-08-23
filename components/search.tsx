@@ -1,5 +1,6 @@
 'use client';
 
+import { create } from '@orama/orama';
 import { useDocsSearch } from 'fumadocs-core/search/client';
 import {
   SearchDialog,
@@ -13,13 +14,21 @@ import {
   type SharedProps,
 } from 'fumadocs-ui/components/dialog/search';
 
-// A thin customization over fumadocs-ui's default search dialog, still
-// backed by Orama (via `app/api/search/route.ts` -> `fumadocs-core/search/server`,
-// which uses Orama under the hood) — `type: 'fetch'` hits that API route on
-// each query rather than shipping a static search index, since this site is
-// a normal Next.js server, not a static export.
+function initOrama() {
+  return create({
+    schema: { _: 'string' },
+    // https://docs.orama.com/open-source/supported-languages
+    language: 'english',
+  });
+}
+
+// A thin customization over fumadocs-ui's default search dialog, still backed
+// by Orama (via app/api/search/route.ts's staticGET) — `type: 'static'` fetches
+// the whole pre-built index once and queries it client-side, since this site
+// is a static export (`output: 'export'` in next.config.mjs) with no server
+// to hit per-query.
 export default function DefaultSearchDialog(props: SharedProps) {
-  const { search, setSearch, query } = useDocsSearch({ type: 'fetch' });
+  const { search, setSearch, query } = useDocsSearch({ type: 'static', initOrama });
 
   return (
     <SearchDialog search={search} onSearchChange={setSearch} isLoading={query.isLoading} {...props}>
