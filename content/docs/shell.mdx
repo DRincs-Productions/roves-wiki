@@ -177,13 +177,23 @@ in-process, inside the engine binary itself, which already links that crate as a
 | `--html-file <path>` | `dist/index.html` | Entry HTML file, relative to the bundle root. |
 | `--output`, `-o <dir>` | `<build dir>/bundle` | Where to write the bundle. |
 | `--window-size <WxH>` | `1280x720` | Initial window size in logical pixels. |
-| `--content-compress` | `auto` | `auto`: pack into a handful of tar+zstd archives (see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>). `none`: copy in as loose, individually browsable files. |
+| `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
+| *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
+
+### Content packing
+
+How `--content-dir` gets packed into the bundle — see
+<DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink> for the
+full design (why, the boot-set/lazy-extraction split, the archive layout). These flags tune
+or disable it:
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--content-compress` | `auto` | `auto`: pack into a handful of tar+zstd archives. `none`: copy in as loose, individually browsable files. |
 | `--content-compression-level` | `1` | zstd level for `--content-compress=auto`. Low by default — speed over ratio. |
 | `--content-max-pack-size` | `500M` | Split archives so none exceeds this size. |
 | `--content-exclude <glob>` | — | Repeatable. Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
 | `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
-| `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
-| *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
 
 ### Distributing installers
 

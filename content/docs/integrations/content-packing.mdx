@@ -3,12 +3,15 @@ title: Content packing
 description: How --content-compress=auto packs your game and extracts it back at launch.
 ---
 
-By default (`--content-compress=auto`), `mach bundle` doesn't ship your game's web content
-as loose, individually browsable files. It packs `--content-dir` into a handful of
-tar+zstd archives via `roves-content-packer` (built once, on the machine running
-`mach bundle` — never shipped in the final bundle), then the engine binary extracts them
-back to plain files **in-process**, at launch time, using that same crate linked in as a
-library.
+By default, `mach bundle` doesn't ship your game's web content as loose, individually
+browsable files. It packs your content directory into a handful of tar+zstd archives via
+`roves-content-packer` (built once, on the machine running `mach bundle` — never shipped in
+the final bundle), then the engine binary extracts them back to plain files **in-process**,
+at launch time, using that same crate linked in as a library. See
+<DynamicLink href="/docs/shell#content-packing">the Shell page's own "Content packing"
+table</DynamicLink> for the exact flags (`mach bundle`) or
+<DynamicLink href="/docs/action#content-packing">the Action page's</DynamicLink> (its
+matching inputs) that tune or disable any of this.
 
 ## Boot set vs. lazy extraction
 
@@ -22,9 +25,10 @@ Packed files fall into two groups:
   it (the engine's own `file:` protocol handler triggers extraction on demand, one archive
   at a time, the first time a request needs it).
 
-`--content-exclude <glob>` opts specific files out of packing entirely — they stay loose,
+A glob-based exclude opts specific files out of packing entirely — they stay loose,
 uncompressed, next to the packs. Use this for anything that shouldn't sit inside a
-read-only archive, like a save-data or user-config subfolder.
+read-only archive, like a save-data or user-config subfolder — see the flags table linked
+above for its exact name.
 
 ## Where the packed archives themselves land
 

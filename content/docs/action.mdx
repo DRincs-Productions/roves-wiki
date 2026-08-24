@@ -130,13 +130,28 @@ jobs:
 | `content-dir` | **Required.** Path to your already-built web content (e.g. a Vite/webpack `dist/` folder). |
 | `artifact-name` | Base name for the output folder and zip (default `roves-game`). |
 | `features` | `''` (default) or `'steam'`, for the <DynamicLink href="/docs/integrations/steam">Steam bridge</DynamicLink>. |
-| `content-compress`, `content-compression-level`, `content-max-pack-size`, `content-exclude`, `content-boot-include` | How your content gets packed into the bundle — see <DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink>. |
 | `deb` / `msi` / `dmg`, `package-name`, `package-version` | Build an installer instead of a portable bundle — see [Distributing installers](#distributing-installers) below. |
 | `html-file` | Entry HTML file, relative to `content-dir` (default `index.html`). |
 | `window-size` | Initial window size, e.g. `1280x720` (the default). |
 | `output` | Where the bundle gets written, relative to your repo root. Usually left unset — the action picks its own path and exposes it via `bundle-dir`/`archive-path` regardless. |
 | `diagnostic-script` | Ship a `diagnose.bat`/`diagnose.sh` alongside the bundle (portable/`msi`/`dmg`, not `deb`) that launches the game from a console and prints its exit code plus `roves.log` — for testers to run when a build appears to do nothing. Off by default. |
 | `bundle-params` | Extra launch arguments baked into the bundle, passed to the game every time it starts. |
+
+### Content packing
+
+How your content gets packed into the bundle — see
+<DynamicLink href="/docs/integrations/content-packing">Content packing</DynamicLink> for the
+full design (why, the boot-set/lazy-extraction split, the archive layout). These inputs are
+a direct passthrough to the matching `mach bundle` flags (see
+<DynamicLink href="/docs/shell#content-packing">the Shell page's own table</DynamicLink>):
+
+| Name | Description |
+| --- | --- |
+| `content-compress` | `auto` (default): pack into a handful of tar+zstd archives. `none`: copy in as loose, individually browsable files. |
+| `content-compression-level` | zstd level for `content-compress: 'auto'` (default `1`). Low by default — speed over ratio. |
+| `content-max-pack-size` | Split archives so none exceeds this size (default `500M`). |
+| `content-exclude` | Globs (one per line for more than one). Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
+| `content-boot-include` | Globs (one per line for more than one). Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
 
 ### Outputs
 
