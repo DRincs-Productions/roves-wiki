@@ -30,6 +30,38 @@ which would always add at least one more line. Check which milestone was logged 
 narrow down where.
 </Callout>
 
+<Callout title="A black window isn't always silent anymore" type="info">
+If the page's own top-level `<script>` fails to load, the engine now shows a visible error
+screen (the message plus a pointer to `roves.log`) instead of a plain black window — see the
+root-relative-path incident below for the most common way to hit this. A black window with
+*no* error screen and *no* new log line at all past startup is still the hang/crash case
+above, not this one.
+</Callout>
+
+## A real incident: root-relative asset paths resolving to the OS filesystem root, not your game
+
+A build reported a plain black window, no content ever rendering — `roves.log` showed:
+
+```text
+ERROR script::script_module] Fetching module script failed Opening file failed
+ERROR script::dom::html::htmlscriptelement] Fetching classic script failed Opening file failed (file:///C:/registerSW.js)
+```
+
+The game's own build output referenced its scripts root-relative (`/assets/index-XXXX.js`) —
+Vite's default, and every other major bundler's default too, since that content is normally
+served over http(s) from an actual domain root. Roves opens `index.html` via a bare `file:`
+URL instead (never an http(s) server): per the URL spec, a root-relative reference resolved
+against a `file:` document becomes the real OS filesystem root (`C:\assets\...` on Windows,
+`/assets/...` on Linux/macOS), not the game's own content directory — exactly what any
+browser does for a `file://` document opened directly instead of served. Every script the
+page needed then failed to fetch, and nothing ever rendered.
+
+This is now fixed at the engine level: a root-absolute reference that doesn't resolve for
+real is retried rebased onto the game's own content root before failing — covers packed
+content, `--content-compress none`, and a raw dev `--url` launch alike. If you're on an
+older engine build than this fix and hit the exact log lines above, the workaround is
+configuring your bundler for relative output instead (Vite: `base: './'`).
+
 ## A real incident: `mach bundle`'s own flags leaking into the game's args
 
 Early on, a build reported "nothing happens" with `roves.log` showing the resolved launch
@@ -80,6 +112,10 @@ Windows and macOS have a real window server already). A build succeeding and a b
 launching are different claims — if you're setting up your own CI around `mach bundle` (or
 [`roves-action`](https://github.com/DRincs-Productions/roves-action)), consider adding an
 equivalent check rather than treating a successful bundle step as proof the game runs.
+`roves-action` now has exactly this: its own `.github/workflows/test.yml` builds a real game
+([`pixi-vn-react-template`](https://github.com/DRincs-Productions/pixi-vn-react-template))
+through the action on every push — it's what surfaced the root-relative-path incident above
+in the first place, not a synthetic fixture that happened to avoid it.
 
 ## Still stuck?
 
