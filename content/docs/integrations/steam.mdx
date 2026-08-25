@@ -40,7 +40,8 @@ if (await steam.isAvailable()) {
 ```
 
 See <DynamicLink href="/docs/roves-api/steam">roves-api → steam</DynamicLink> for the full
-API surface.
+API surface. A Steam-enabled build also gets automatic Steam Cloud sync for player saves —
+see <DynamicLink href="/docs/integrations/saves">Save-game storage</DynamicLink>.
 
 <Callout title="No Tauri, no window.__TAURI_INTERNALS__" type="info">
 This isn't the same code path as the Tauri build's Steam integration — Roves has no Tauri

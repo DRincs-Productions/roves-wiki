@@ -35,15 +35,16 @@ a similar shape by design, so the branch is usually thin.
 ## Modules
 
 ```ts
-import { invoke } from "@drincs/roves-api/core";
+import { invoke, isAvailable } from "@drincs/roves-api/core";
 import { exit } from "@drincs/roves-api/process";
 import { steam } from "@drincs/roves-api/steam";
 import { clearContentCache } from "@drincs/roves-api/cache";
+import { saves } from "@drincs/roves-api/saves";
 ```
 
 <Cards>
   <Card title="core" href="/docs/roves-api/core">
-    The generic `invoke(cmd, args)` bridge everything else is built on.
+    The generic `invoke(cmd, args)` bridge everything else is built on, plus `isAvailable()`.
   </Card>
   <Card title="process" href="/docs/roves-api/process">
     `exit()` — close every window Roves opened.
@@ -53,6 +54,9 @@ import { clearContentCache } from "@drincs/roves-api/cache";
   </Card>
   <Card title="cache" href="/docs/roves-api/cache">
     Wipe the packed-content extraction cache.
+  </Card>
+  <Card title="saves" href="/docs/roves-api/saves">
+    An async, IndexedDB-shaped key/value store for player save data, with Steam Cloud sync.
   </Card>
 </Cards>
 

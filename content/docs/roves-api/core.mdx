@@ -22,6 +22,27 @@ as Roves grows its own native surface. Larger, self-contained SDKs (Steam) get t
 dedicated protocol instead of being routed through here — see
 <DynamicLink href="/docs/roves-api/steam">steam</DynamicLink>.
 
-Most of your game's code should reach for `process`/`steam`/`cache` directly rather than
-calling `invoke()` by hand — it's exported mainly so those modules (and any future ones)
+Most of your game's code should reach for `process`/`steam`/`cache`/`saves` directly rather
+than calling `invoke()` by hand — it's exported mainly so those modules (and any future ones)
 have a single, consistent implementation to build on.
+
+## `isAvailable()`
+
+```ts
+import { isAvailable } from "@drincs/roves-api/core";
+
+if (await isAvailable()) {
+  // running inside Roves
+}
+```
+
+`true` when this page is actually running inside Roves, `false` in a regular browser (or any
+other embedder that never registered a `roves:` scheme handler). There's no build-time signal
+for this — Roves injects no global marker into the page — so this is a genuine runtime check:
+under the hood, reaching this far at all means a `roves:` `fetch()` resolved, which only
+happens when this exact protocol handler is registered. A plain browser fails the `fetch()`
+itself before any Rust code ever runs, which is exactly what this reports as "unavailable".
+
+Check this before calling into <DynamicLink href="/docs/roves-api/saves">`saves`</DynamicLink>
+(or any other Roves-only module) if your code might also run outside Roves — e.g. a browser
+preview during development.

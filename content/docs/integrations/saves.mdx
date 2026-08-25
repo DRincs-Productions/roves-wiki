@@ -1,0 +1,88 @@
+---
+title: Save-game storage
+description: Where player saves live, how Roves picks a location, and Steam Cloud sync.
+---
+
+Roves has a built-in save-data API — an async, origin-scoped key/value store your game's own
+code talks to, shaped like IndexedDB in spirit (the same reasoning applies: keys, async
+reads/writes, no server round-trip) but backed by real files on disk that Roves places
+somewhere sensible for you.
+
+```ts
+import { isAvailable } from "@drincs/roves-api/core";
+import { saves } from "@drincs/roves-api/saves";
+
+if (await isAvailable()) {
+  await saves.writeText("slot-1", JSON.stringify(gameState));
+  const saved = await saves.readText("slot-1");
+}
+```
+
+See <DynamicLink href="/docs/roves-api/saves">roves-api → saves</DynamicLink> for the full API
+surface, and <DynamicLink href="/docs/roves-api/core">roves-api → core</DynamicLink> for
+`isAvailable()` — check that first, since a plain browser preview (or any embedder other than
+Roves) has no `saves:` handler to answer at all.
+
+<Callout title="Not IndexedDB itself" type="info">
+Roves also ships the engine's own (unmodified, upstream) IndexedDB implementation, and it
+works. This API exists alongside it as the *recommended* path specifically because it, not
+IndexedDB, is the one Roves actively manages the location of and syncs to Steam Cloud — see
+below.
+</Callout>
+
+## Where saves actually land
+
+You never choose a path yourself — Roves picks one based on how the exact binary the player
+is running was shipped, and creates the folder for you the first time it's needed:
+
+| How the game was shipped | Save location |
+| --- | --- |
+| Portable (the default `mach bundle` output — no installer) | A `saves/` folder next to the game itself |
+| Installed (`--msi` / `--dmg` / `--deb`) | The OS's cache directory (a sibling of the packed-content extraction cache and `roves.log`) |
+| Console | Not implemented yet — every `saves` call answers "unavailable" rather than guessing at a location no console port exists to validate against |
+
+<Callout title="macOS specifics" type="info">
+For a portable macOS build, "next to the game itself" means next to the `.app` bundle (on the
+Desktop, wherever the player dragged it), never *inside* it — `.app` bundles are
+conventionally treated as read-only, signed artifacts, and one mounted straight from a `.dmg`
+genuinely is read-only.
+</Callout>
+
+This split exists because a portable game's own folder is usually the most discoverable,
+"just works" place for a player to find their saves (copy the whole folder to back them up,
+move them to another PC) — but an *installed* game commonly lives somewhere a player
+shouldn't write to (`Program Files`) or wouldn't think to look (`/usr/lib/<package>` on
+Linux), so Roves redirects to the OS cache directory instead. If the portable location
+genuinely isn't writable (e.g. a zip extracted into `Program Files` without admin rights),
+Roves falls back to the same cache-directory location an installed build would use, rather
+than failing outright.
+
+## Steam Cloud sync
+
+Build with `--features steam` (see
+<DynamicLink href="/docs/integrations/steam">Steam integration</DynamicLink>) and, whenever a
+Steam client is actually running, every `saves.write()`/`saves.delete()` call is
+**automatically** mirrored to Steam Cloud — nothing extra to call, and nothing to configure
+in the Steamworks partner dashboard either (this isn't Steam's dashboard-configured
+"Auto-Cloud" folder sync; it's a direct `ISteamRemoteStorage` read/write per save file,
+keyed by the same name you pass to `saves`).
+
+- **Local disk is always the source of truth for reads.** A `saves.read()`/`readText()` call
+  checks disk first; there's no merge or conflict resolution to reason about.
+- **A fresh install still finds existing cloud saves.** If a key has no local file yet but a
+  Steam Cloud copy exists (e.g. a player's second PC, or a reinstall), reading that key pulls
+  the Cloud copy down and caches it locally before returning it.
+- **`list()`/`clear()` are local-only.** They don't enumerate cloud saves that have never
+  been read on *this* machine — a save that exists only in the Cloud won't show up in
+  `list()` until something calls `read()` (or `readText()`) for its exact key at least once.
+  If your game always knows its own save-slot names up front (`"slot-1"`, `"autosave"`, ...)
+  this rarely matters in practice; if it doesn't, read every expected slot at least once on
+  startup rather than relying on `list()` alone to discover what exists.
+
+<Callout title="Verify this against a real Steam client before shipping" type="warn">
+This sync path talks directly to the Steamworks SDK and has not yet been exercised against a
+real, running Steam client and an actual Cloud-enabled app — see the engine repo's own
+`CUSTOMIZATIONS.md` ("Save-game storage API" entry) for exactly what still needs hands-on
+verification. Test a save written on one machine actually appearing under your app's Steam
+Cloud files before relying on this for a real release.
+</Callout>

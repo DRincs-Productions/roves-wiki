@@ -1,0 +1,53 @@
+---
+title: saves
+description: An async, IndexedDB-shaped key/value store for player save data.
+---
+
+```ts
+import { saves } from "@drincs/roves-api/saves";
+
+await saves.writeText("slot-1", JSON.stringify(gameState));
+const raw = await saves.readText("slot-1");
+const gameState = raw ? JSON.parse(raw) : null;
+
+await saves.list();       // ["slot-1", "autosave", ...]
+await saves.delete("slot-1");
+await saves.clear();      // delete every save — a "reset save data" button, not routine use
+```
+
+See <DynamicLink href="/docs/integrations/saves">Save-game storage</DynamicLink> for where
+these actually land on disk (it depends on how the game was shipped) and how Steam Cloud sync
+works. Check <DynamicLink href="/docs/roves-api/core">core</DynamicLink>'s `isAvailable()`
+before calling any of this if your code might also run outside Roves.
+
+## API
+
+```ts
+interface SavesApi {
+  isAvailable(): Promise<boolean>;
+  write(key: string, data: Uint8Array): Promise<boolean>;
+  writeText(key: string, text: string): Promise<boolean>;
+  read(key: string): Promise<Uint8Array | null>;
+  readText(key: string): Promise<string | null>;
+  delete(key: string): Promise<boolean>;
+  list(): Promise<string[]>;
+  clear(): Promise<boolean>;
+}
+```
+
+- **`write`/`read`** work with raw bytes — reach for these if a save isn't plain text (a
+  compressed or binary format you produce yourself).
+- **`writeText`/`readText`** are the convenience pair for a JSON (or any other text) save —
+  handles the UTF-8 encode/decode for you.
+- **`isAvailable()`** is almost always `true` on desktop today; it exists for the future case
+  of a console port with no save API wired up yet, where every method here degrades to a
+  harmless default (`false`/`null`/`[]`) instead of throwing.
+- Every method already catches its own errors and resolves to a safe default rather than
+  rejecting — a failed save shows up as `write()`/`delete()` returning `false`, not as an
+  unhandled promise rejection.
+
+<Callout title="Keys, not paths" type="info">
+A `key` is a short, arbitrary name your game chooses (`"slot-1"`, `"autosave"`,
+`"settings"`) — not a filesystem path. Roves sanitizes it before touching disk, so path
+separators or `..` in a key are rejected rather than doing anything unexpected.
+</Callout>
