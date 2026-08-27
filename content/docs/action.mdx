@@ -137,6 +137,18 @@ jobs:
 | `diagnostic-script` | Ship a `diagnose.bat`/`diagnose.sh` alongside the bundle (portable/`msi`/`dmg`, not `deb`) that launches the game from a console and prints its exit code plus `roves.log` — for testers to run when a build appears to do nothing. Off by default. |
 | `bundle-params` | Extra launch arguments baked into the bundle, passed to the game every time it starts. |
 
+### Custom game icon
+
+| Name | Description |
+| --- | --- |
+| `icon-png` | Path to a window/taskbar icon (PNG). Works in either mode — `mach bundle` applies it after packaging, no compile needed. Not supported on macOS yet (its own Dock/app icon has no runtime override). |
+| `icon-ico` | Path to a Windows `.exe` icon (multi-size `.ico`). Windows only. Patches the bundled `play.exe`'s icon resource in place via `rcedit`, also no compile needed. |
+
+Leave both unset and Roves auto-detects an `icon.png`/`icon.ico` sitting directly in
+`content-dir` before falling back to its own default branding — many bundlers already emit
+one there for their own PWA manifest, so a game that already has one gets its own icon for
+free. An explicit `icon-png`/`icon-ico` above always wins over this.
+
 ### Content packing
 
 How your content gets packed into the bundle — see
@@ -266,8 +278,6 @@ instead of silently ignoring it.
 | Name | Description |
 | --- | --- |
 | `bootstrap` | Install the native build dependencies the compile step needs (default `true`). Set to `false` only if you already installed them yourself in an earlier step. |
-| `icon-png` | Path to a window/taskbar icon (PNG) to bake into the build. |
-| `icon-ico` | Path to a Windows `.exe` icon (multi-size `.ico`). Windows only. |
 | `release` | Build with full optimizations. |
 | `dev` | Debug build (the default if `release`, `production`, and `profile` are all unset). |
 | `production` | Release build without debug assertions. |

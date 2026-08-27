@@ -180,6 +180,18 @@ in-process, inside the engine binary itself, which already links that crate as a
 | `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
 | *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
 
+### Custom game icon
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--icon-png <path>` | auto-detect | Window/taskbar icon (PNG), applied after packaging — no compile needed, works for a prebuilt shell too. Not supported on macOS yet (its own Dock/app icon has no runtime override). |
+| `--icon-ico <path>` | auto-detect | Windows-only `.exe` icon (multi-size `.ico`), patched into the bundled `play.exe` in place via `rcedit`. |
+
+"Auto-detect" means: with neither flag given, `mach bundle` looks for an `icon.png`/`icon.ico`
+sitting directly in `--content-dir` before falling back to Roves' own branding — many
+bundlers already emit one there for their own PWA manifest, so a game that already has one
+gets its own icon for free, no flag needed. Pass either flag explicitly to override this.
+
 ### Content packing
 
 How `--content-dir` gets packed into the bundle — see
