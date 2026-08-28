@@ -12,7 +12,7 @@ somewhere sensible for you.
 import { isAvailable } from "@drincs/roves-api/core";
 import { saves } from "@drincs/roves-api/saves";
 
-if (await isAvailable()) {
+if (isAvailable()) {
   await saves.writeText("slot-1", JSON.stringify(gameState));
   const saved = await saves.readText("slot-1");
 }

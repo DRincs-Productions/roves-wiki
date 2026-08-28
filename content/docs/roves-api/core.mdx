@@ -14,8 +14,7 @@ await invoke("exit");
 
 `invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T>` calls a native
 `roves:` command and returns its JSON-decoded result. Under the hood it's a plain
-`fetch("roves:<cmd>?<args>")` against the engine's own `roves:` custom protocol handler —
-no runtime injection, no `window.__TAURI_INTERNALS__` equivalent required.
+`fetch("roves:<cmd>?<args>")` against the engine's own `roves:` custom protocol handler.
 
 `roves:` is deliberately small and general-purpose — window/process lifecycle today, more
 as Roves grows its own native surface. Larger, self-contained SDKs (Steam) get their own
@@ -31,17 +30,18 @@ have a single, consistent implementation to build on.
 ```ts
 import { isAvailable } from "@drincs/roves-api/core";
 
-if (await isAvailable()) {
+if (isAvailable()) {
   // running inside Roves
 }
 ```
 
-`true` when this page is actually running inside Roves, `false` in a regular browser (or any
-other embedder that never registered a `roves:` scheme handler). There's no build-time signal
-for this — Roves injects no global marker into the page — so this is a genuine runtime check:
-under the hood, reaching this far at all means a `roves:` `fetch()` resolved, which only
-happens when this exact protocol handler is registered. A plain browser fails the `fetch()`
-itself before any Rust code ever runs, which is exactly what this reports as "unavailable".
+`isAvailable(): boolean` — synchronous, no `await` needed. `true` when this page is actually
+running inside Roves, `false` in a regular browser (or any other embedder). There's no
+build-time signal for this — instead, Roves injects `window.__ROVES__ = true` into every page
+as soon as `<head>` exists, before the page's own scripts run (mirroring how Tauri exposes
+`window.__TAURI_INTERNALS__`), and `isAvailable()` just reads that marker directly — no
+`fetch()` round trip. A plain browser never gets this marker, which is exactly what this
+reports as "unavailable".
 
 Check this before calling into <DynamicLink href="/docs/roves-api/saves">`saves`</DynamicLink>
 (or any other Roves-only module) if your code might also run outside Roves — e.g. a browser
