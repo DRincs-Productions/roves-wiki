@@ -78,6 +78,14 @@ keyed by the same name you pass to `saves`).
   If your game always knows its own save-slot names up front (`"slot-1"`, `"autosave"`, ...)
   this rarely matters in practice; if it doesn't, read every expected slot at least once on
   startup rather than relying on `list()` alone to discover what exists.
+- **`getMostRecent()` is the exception — it *does* see Cloud-only saves.** Steam tracks a
+  per-file timestamp for every Cloud file regardless of whether it's ever touched this
+  machine's disk, so "which save is newest" can be answered by comparing local file mtimes
+  against Steam's own timestamps, without downloading anything. This is what a "Continue"
+  button should use if a player might switch machines: it correctly finds a save made
+  somewhere else even before that save has ever been pulled down locally — `list()` alone
+  cannot do this. Once you have the winning key, fetch just that one save with `readJSON`
+  (or `readText`/`read`).
 
 <Callout title="Verify this against a real Steam client before shipping" type="warn">
 This sync path talks directly to the Steamworks SDK and has not yet been exercised against a
