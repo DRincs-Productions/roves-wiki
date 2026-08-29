@@ -75,21 +75,34 @@ position instead. This isn't a Roves bug: the browser's own native URL resolutio
 root-absolute reference against `game://content/` is correct, host and all; the bug is purely
 inside PixiJS's own reimplementation of that logic.
 
-**Fix:** pass an explicit `basePath` built from `location.protocol`/`location.host` (not
-`location.origin` — that reports the literal string `"null"` under `game://content/`'s opaque
-origin, since `location.protocol`/`location.host` are read straight off the document's real
-URL and stay correct regardless):
+**Fix:** set both `resolver.rootPath` *and* `basePath`, built from `location.protocol`/
+`location.host` (not `location.origin` — that reports the literal string `"null"` under
+`game://content/`'s opaque origin, since `location.protocol`/`location.host` are read straight
+off the document's real URL and stay correct regardless):
 
 ```ts
-await Assets.init({
-  manifest,
-  basePath: `${location.protocol}//${location.host}/`,
-});
+const origin = `${location.protocol}//${location.host}/`;
+Assets.resolver.rootPath = origin; // must be set before init() — see below
+await Assets.init({ manifest, basePath: origin });
 ```
+
+<Callout title="basePath alone is not enough" type="warn">
+It's tempting to pass only `basePath` and assume `rootPath` follows from it — it doesn't.
+`Resolver.toAbsolute()` only uses `rootPath` *directly* when you set it yourself; left unset,
+it falls back to deriving one from `basePath` via that exact same `isUrl()` check, so the bug
+resurfaces identically. `rootPath` also isn't an `Assets.init()` option at all (only the
+`Resolver` class exposes it) — set it straight on `Assets.resolver`, and **before** calling
+`Assets.init()`, since `init()` already resolves every manifest asset's URL as part of adding
+the manifest. Setting it afterward is too late: by then every asset's `src` has already been
+(mis)resolved once.
+</Callout>
 
 This resolves every root-absolute asset reference correctly under Roves (`game://content/`)
 *and* under a normal web deployment (`https://yourgame.com/`) without any special-casing —
-`location.protocol`/`location.host` are simply always correct.
+`location.protocol`/`location.host` are simply always correct, and outside Roves this is a
+harmless no-op (PixiJS's own `isUrl()` already recognizes `http`/`https` and gets the right
+answer on its own; verified live against a plain `vite preview` web build alongside the Roves
+build for this same page).
 
 <Callout title="Not limited to PixiJS" type="warn">
 Any other library that resolves URLs by hand-rolling scheme/host recognition instead of the
