@@ -1,0 +1,99 @@
+---
+title: Content root & client-side routing
+description: Why your game boots at game://content/, and a known PixiJS asset-loading gotcha that comes with it.
+---
+
+Roves serves your bundled content from a fixed virtual origin, `game://content/` — not the
+raw `file://<absolute path on the player's disk>/index.html` you might expect from a plain
+desktop wrapper. Your app also boots by requesting the *root* (`game://content/`), not
+`game://content/index.html` directly.
+
+## Why
+
+A `file://` document's `location.pathname` is the real OS path (e.g.
+`/C:/Users/.../dist/index.html`), not a root-relative one — so any client-side history router
+(React Router, TanStack Router, Vue Router in "history" mode, ...) can never match its own
+routes against it, and falls back to its own "not found" page immediately, both at boot and on
+every `pushState`/`history.pushState` navigation. Root-absolute asset references
+(`<script src="/assets/foo.js">`) have the same problem, but that one's easy to miss: a
+*root-level* route loader (data preloading, asset prefetch) still runs even when no *leaf*
+route matches, so network requests keep firing normally while the actual visible page is
+nothing but the router's own unstyled "Not Found" fallback the whole time.
+
+`game://content/` is a real, distinct origin (with its own authority, `content`, standing in
+for what an actual HTTP deployment's domain would be) — the same idea
+[Tauri](https://tauri.app/) itself uses (`tauri://localhost/` / `https://tauri.localhost/`) to
+avoid this exact class of problem. `location.pathname` at boot is simply `/`, and
+`pushState("/about")` stays same-origin and same-scheme, so the History API allows it and your
+router's own routes match normally.
+
+A direct navigation to a sub-route (a hard reload while on `game://content/about`, or
+`location.href = "/about"`) has no `about.html` file to serve — same as any static host
+serving a history-mode SPA needs a fallback rule (nginx's `try_files`, Vite's own dev-server
+`historyApiFallback`). Roves serves your bundle's entry HTML for exactly this case, but only
+for a real navigation — a genuinely missing *asset* still surfaces as a real 404, not silently
+becomes HTML.
+
+<Callout title="Boots at the root, not index.html" type="info">
+Booting at `game://content/index.html` instead would serve identical bytes, but a router
+matches its own root route against `/`, not against a literal `/index.html` — same as it would
+never match a hard-coded `/about.html`. Every history-mode router would be unable to match
+anything at boot, immediately falling back to its own "not found" page.
+</Callout>
+
+## Known gotcha: PixiJS root-absolute asset paths
+
+A custom, non-`http(s)` scheme isn't always transparent to every JS library — some hardcode
+`http`/`https` recognition into their own URL-handling code instead of relying on the
+browser's real, spec-compliant URL resolution. **PixiJS is one of them.**
+
+If your manifest references an asset with a root-absolute path —
+
+```ts
+{
+  alias: "background_main_menu",
+  src: "/main-menu.png",
+}
+```
+
+— and you call `Assets.init({ manifest })` with no further options, loading that asset fails
+under Roves with an error like:
+
+```
+[Loader.load] Failed to load game://main-menu.png.
+TypeError: Network error: game: only serves the "content" host
+```
+
+**Why:** PixiJS's own internal `path.toAbsolute()`/`path.rootname()` utilities only recognize
+`http:`/`https:` as a "real" URL with a host (their `path.isUrl()` check is a plain
+`/^https?:/` regex). For any other scheme with an authority — `game://content/` included —
+`rootname()` stops at just the scheme prefix (`"game://"`), dropping the host (`"content"`)
+entirely. When it then rejoins your root-absolute `/main-menu.png` against that truncated
+root, you get `game://main-menu.png` instead of `game://content/main-menu.png` — a URL with no
+host at all in the place `content` should be, since `main-menu.png` slides into the host
+position instead. This isn't a Roves bug: the browser's own native URL resolution of a
+root-absolute reference against `game://content/` is correct, host and all; the bug is purely
+inside PixiJS's own reimplementation of that logic.
+
+**Fix:** pass an explicit `basePath` built from `location.protocol`/`location.host` (not
+`location.origin` — that reports the literal string `"null"` under `game://content/`'s opaque
+origin, since `location.protocol`/`location.host` are read straight off the document's real
+URL and stay correct regardless):
+
+```ts
+await Assets.init({
+  manifest,
+  basePath: `${location.protocol}//${location.host}/`,
+});
+```
+
+This resolves every root-absolute asset reference correctly under Roves (`game://content/`)
+*and* under a normal web deployment (`https://yourgame.com/`) without any special-casing —
+`location.protocol`/`location.host` are simply always correct.
+
+<Callout title="Not limited to PixiJS" type="warn">
+Any other library that resolves URLs by hand-rolling scheme/host recognition instead of the
+browser's own `URL`/`fetch` resolution could hit the same class of bug under a custom scheme.
+If an asset or resource fails to load with a `game://<something-that-looks-like-a-filename>`
+URL (no `content` host), suspect this pattern first.
+</Callout>
