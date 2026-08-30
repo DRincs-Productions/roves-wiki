@@ -1,0 +1,73 @@
+---
+title: VS Code Extension
+description: Roves — run your already-built project locally from VS Code, no toolchain needed.
+---
+
+[**Roves**](https://marketplace.visualstudio.com/items?itemName=DRincs-Productions.roves-run)
+is a VS Code extension that runs a web project you've already built locally with the Roves
+shell, straight from your editor — no Rust or Python toolchain, and nothing added to your
+project. It's the fastest way to try a change in the real engine during development, without
+reaching for <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> or
+<DynamicLink href="/docs/action">the GitHub Action</DynamicLink>, neither of which are meant
+for a tight local edit-reload loop.
+
+<Callout title="Not a packaging tool" type="info">
+Roves (the extension) only *runs* your build locally — it doesn't produce anything
+distributable. For a real shippable bundle, use
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> (a desktop app) or
+<DynamicLink href="/docs/action">the GitHub Action</DynamicLink> (CI). Source:
+[`DRincs-Productions/roves-vscode`](https://github.com/DRincs-Productions/roves-vscode).
+</Callout>
+
+## Install
+
+Search for **Roves** in VS Code's Extensions view, or install directly from the
+[Marketplace listing](https://marketplace.visualstudio.com/items?itemName=DRincs-Productions.roves-run).
+
+## Use
+
+Build your project as usual (`npm run build`, or whatever your own toolchain uses), then
+click **Roves: Run** in the status bar — or run it from the Command Palette. The first time,
+this downloads the right `roves_shell_<platform>[_steam].zip` release asset for your OS from
+[Roves' GitHub releases](https://github.com/DRincs-Productions/roves/releases), showing
+progress right there in the status bar, and caches it in VS Code's own extension storage —
+never inside your workspace. Every following run reuses that cached shell instantly, unless
+you change the configured version.
+
+**Roves: Stop** stops the running instance. Output (the shell's own stdout/stderr) goes to
+the **Roves** output channel.
+
+## How it works
+
+No `mach bundle`, no packing — the extension writes a small `launch.json` next to the cached
+shell binary, pointing its `url` field directly at your project's built `index.html` by
+absolute path. `bundle_launch.rs` (the part of the engine that reads this file) resolves that
+path via a plain filesystem join, and joining an *absolute* path onto anything just returns
+the absolute path unchanged — so this works without your content ever needing to be copied,
+packed, or bundled next to the shell at all. See
+<DynamicLink href="/docs/integrations/content-root">Content root & client-side routing</DynamicLink>
+for what that `launch.json`-driven boot actually does once the shell opens it
+(`game://content/`, not a raw `file://` path).
+
+Steam App IDs go through the same `steam_appid.txt`-next-to-the-binary convention
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> already uses.
+
+## Settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `roves-run.distFolder` | `"dist"` | Folder (relative to the workspace root) containing your built `index.html`. |
+| `roves-run.version` | `"latest"` | Shell version to run, e.g. `"v0.4.7"`. `"latest"` always resolves to the newest published release. |
+| `roves-run.steam` | `false` | Run the Steam-enabled shell variant instead of the plain one. |
+| `roves-run.steamAppId` | `""` | Steam App ID to run with. Only used when `steam` is enabled. |
+| `roves-run.windowSize` | `"1280x720"` | Initial window size, as `<width>x<height>`. |
+| `roves-run.extraArgs` | `[]` | Extra command-line arguments passed through to the shell on launch. |
+
+## Known limitations
+
+- Only runs a **loose (uncompressed)** build — it doesn't pack content the way
+  `mach bundle --content-compress=auto` does. Not needed for a local dev loop, and not
+  something a real bundle for distribution should skip — use Packmaster or the Action for that.
+- Downloaded shells are cached per version/platform/Steam-variant and never cleaned up
+  automatically — delete old ones yourself from the extension's storage folder if you want the
+  disk space back.
