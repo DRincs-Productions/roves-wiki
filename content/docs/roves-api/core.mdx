@@ -46,3 +46,33 @@ reports as "unavailable".
 Check this before calling into <DynamicLink href="/docs/roves-api/saves">`saves`</DynamicLink>
 (or any other Roves-only module) if your code might also run outside Roves — e.g. a browser
 preview during development.
+
+## `systemInfo()`
+
+```ts
+import { systemInfo } from "@drincs/roves-api/core";
+
+const info = await systemInfo();
+console.log(`${info.os_type} ${info.os_version} (${info.architecture})`);
+```
+
+`systemInfo(): Promise<SystemInfo>` returns host OS and engine diagnostics — useful for bug
+reports and graphics-compatibility triage, since Servo has a different renderer than
+Chromium/WebKit and the same WebGL feature probes a game might already run don't tell the
+whole story:
+
+```ts
+interface SystemInfo {
+  os_type: string; // e.g. "windows", "macos", or a Linux distro id like "ubuntu"
+  os_version: string | null;
+  bitness: "64-bit" | "32-bit";
+  architecture: string; // e.g. "x86_64", "aarch64"
+  engine_version: string; // the running Roves/Servo build's own version
+}
+```
+
+Field names deliberately mirror `@tauri-apps/plugin-os`'s (`type()`/`version()`/`arch()`) and
+the `os_info` crate's (`os_type`/`version`/`bitness`/`architecture`) own conventions.
+`engine_version` names the actual Servo fork build that's running — the equivalent of a
+"webview version" elsewhere, but naming the rendering engine itself rather than a wrapper
+around someone else's, which is what matters when triaging a graphics/rendering report.
