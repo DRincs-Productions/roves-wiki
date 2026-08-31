@@ -5,11 +5,19 @@ description: Roves — run your already-built project locally from VS Code, no t
 
 [**Roves**](https://marketplace.visualstudio.com/items?itemName=DRincs-Productions.roves-run)
 is a VS Code extension that runs a web project you've already built locally with the Roves
-shell, straight from your editor — no Rust or Python toolchain, and nothing added to your
-project. It's the fastest way to try a change in the real engine during development, without
-reaching for <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> or
+shell, straight from VS Code's own **Run and Debug** UI — no Rust or Python toolchain, and
+nothing added to your project. It's the fastest way to try a change in the real engine during
+development, without reaching for
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> or
 <DynamicLink href="/docs/action">the GitHub Action</DynamicLink>, neither of which are meant
 for a tight local edit-reload loop.
+
+<Callout title="Not a real debugger" type="info">
+The extension contributes a `"roves"` debug configuration type so it can reuse VS Code's own
+Run and Debug UI (`F5`, a `preLaunchTask` to build first, the Debug Console, the stop button)
+as a launcher — there are no breakpoints, variables, or stack traces. It's a launch mechanism
+borrowing that UI, not a debugger.
+</Callout>
 
 <Callout title="Not a packaging tool" type="info">
 Roves (the extension) only *runs* your build locally — it doesn't produce anything
@@ -26,16 +34,52 @@ Search for **Roves** in VS Code's Extensions view, or install directly from the
 
 ## Use
 
-Build your project as usual (`npm run build`, or whatever your own toolchain uses), then
-click **Roves: Run** in the status bar — or run it from the Command Palette. The first time,
+Add a configuration to your project's `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "roves",
+      "request": "launch",
+      "name": "Run with Roves",
+      "preLaunchTask": "build",
+      "distFolder": "dist"
+    }
+  ]
+}
+```
+
+(VS Code's own "Add Configuration…" in `launch.json`, or the Run and Debug view's
+configuration dropdown, offers a **Roves: Run** snippet to start from.)
+
+`preLaunchTask` is a plain VS Code task that builds your project first — e.g. in
+`.vscode/tasks.json`:
+
+```json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "npm run build",
+      "presentation": { "reveal": "silent", "close": true }
+    }
+  ]
+}
+```
+
+Press `F5` (or **Run and Debug** → select the configuration → the ▷ button). The first time,
 this downloads the right `roves_shell_<platform>[_steam].zip` release asset for your OS from
 [Roves' GitHub releases](https://github.com/DRincs-Productions/roves/releases), showing
-progress right there in the status bar, and caches it in VS Code's own extension storage —
-never inside your workspace. Every following run reuses that cached shell instantly, unless
-you change the configured version.
+progress in the status bar, and caches it in VS Code's own extension storage — never inside
+your workspace. Every following run reuses that cached shell instantly, unless you change the
+configured version.
 
-**Roves: Stop** stops the running instance. Output (the shell's own stdout/stderr) goes to
-the **Roves** output channel.
+Stop it from the debug toolbar's stop button, same as any other debug session. Output (the
+shell's own stdout/stderr) streams into the Debug Console.
 
 ## How it works
 
@@ -52,16 +96,16 @@ for what that `launch.json`-driven boot actually does once the shell opens it
 Steam App IDs go through the same `steam_appid.txt`-next-to-the-binary convention
 <DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> already uses.
 
-## Settings
+## Launch configuration properties
 
-| Setting | Default | Description |
+| Property | Default | Description |
 | --- | --- | --- |
-| `roves-run.distFolder` | `"dist"` | Folder (relative to the workspace root) containing your built `index.html`. |
-| `roves-run.version` | `"latest"` | Shell version to run, e.g. `"v0.4.7"`. `"latest"` always resolves to the newest published release. |
-| `roves-run.steam` | `false` | Run the Steam-enabled shell variant instead of the plain one. |
-| `roves-run.steamAppId` | `""` | Steam App ID to run with. Only used when `steam` is enabled. |
-| `roves-run.windowSize` | `"1280x720"` | Initial window size, as `<width>x<height>`. |
-| `roves-run.extraArgs` | `[]` | Extra command-line arguments passed through to the shell on launch. |
+| `distFolder` | `"dist"` | Folder (relative to the workspace root) containing your built `index.html`. |
+| `version` | `"latest"` | Shell version to run, e.g. `"v0.4.7"`. `"latest"` always resolves to the newest published release. |
+| `steam` | `false` | Run the Steam-enabled shell variant instead of the plain one. |
+| `steamAppId` | `""` | Steam App ID to run with. Only used when `steam` is enabled. |
+| `windowSize` | `"1280x720"` | Initial window size, as `<width>x<height>`. |
+| `extraArgs` | `[]` | Extra command-line arguments passed through to the shell on launch. |
 
 ## Known limitations
 

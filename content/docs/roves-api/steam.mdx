@@ -14,6 +14,13 @@ function below degrades to a harmless default (`null` / `false` / `0`) when Stea
 compiled in or isn't running — **none of them throw** for that reason, so you don't need a
 separate non-Steam build or a bunch of defensive `try`/`catch`.
 
+For achievements specifically, prefer
+<DynamicLink href="/docs/roves-api/achievements">`achievements`</DynamicLink> over calling
+`unlockAchievement`/`isAchievementUnlocked`/`clearAchievement` here directly — same
+underlying calls, but through a platform-agnostic interface that stays the same if a future
+non-Steam platform (e.g. Google Play Games Services) is ever added. Everything else here
+(stats, DLC, overlay, store) is Steam-specific enough that there's no generic equivalent.
+
 ```ts
 import { steam } from "@drincs/roves-api/steam";
 

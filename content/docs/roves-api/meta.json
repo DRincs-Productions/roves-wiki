@@ -1,4 +1,4 @@
 {
   "title": "roves-api",
-  "pages": ["index", "core", "process", "steam", "cache", "saves"]
+  "pages": ["index", "core", "process", "steam", "achievements", "cache", "saves"]
 }

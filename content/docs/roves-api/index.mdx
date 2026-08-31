@@ -24,9 +24,11 @@ touch `fetch("roves:...")` directly.
 
 <Accordion title="What if my game also targets Tauri?" id="dual-target">
 
-Branch between this package and `@tauri-apps/api` per shell — see the parent
-`pixi-vn-react-template` project's `src/lib/steam.ts` for exactly that pattern. Both expose
-a similar shape by design, so the branch is usually thin.
+Branch between this package and `@tauri-apps/api` per shell, picking whichever's
+`isAvailable()`/runtime marker check succeeds. Both expose a similar shape by design (see
+"Why does this exist?" above), so the branch is usually thin — a `steam`/`achievements`
+module built on `@drincs/roves-api` mirrors a Tauri plugin closely enough that most of your
+game's own calling code doesn't need to change based on which shell it's running under.
 
 </Accordion>
 
@@ -38,6 +40,7 @@ a similar shape by design, so the branch is usually thin.
 import { invoke, isAvailable } from "@drincs/roves-api/core";
 import { exit } from "@drincs/roves-api/process";
 import { steam } from "@drincs/roves-api/steam";
+import { achievements } from "@drincs/roves-api/achievements";
 import { clearContentCache } from "@drincs/roves-api/cache";
 import { saves } from "@drincs/roves-api/saves";
 ```
@@ -50,7 +53,10 @@ import { saves } from "@drincs/roves-api/saves";
     `exit()` — close every window Roves opened.
   </Card>
   <Card title="steam" href="/docs/roves-api/steam">
-    Achievements, stats, DLC, overlay, store.
+    Stats, DLC, overlay, store — the full Steamworks wrapper.
+  </Card>
+  <Card title="achievements" href="/docs/roves-api/achievements">
+    A platform-agnostic achievements API, Steam-backed today.
   </Card>
   <Card title="cache" href="/docs/roves-api/cache">
     Wipe the packed-content extraction cache.

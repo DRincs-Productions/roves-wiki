@@ -1,0 +1,44 @@
+---
+title: achievements
+description: A platform-agnostic achievements API — Steam-backed today, without locking your game's code to Steam specifically.
+---
+
+A small wrapper over <DynamicLink href="/docs/roves-api/steam">`steam`</DynamicLink>'s own
+achievement methods, behind a platform-agnostic interface. Call this from your game instead
+of `steam.unlockAchievement(...)` directly, so your game's own code isn't tied to Steam
+specifically — if a future platform backend is added (e.g. Google Play Games Services), it
+plugs in behind this same interface and your existing calls keep working unchanged.
+
+```ts
+import { achievements } from "@drincs/roves-api/achievements";
+
+if (await achievements.isAvailable()) {
+  await achievements.unlock("ACH_COMPLETE_CH1");
+}
+```
+
+## API
+
+| Function | Returns | Notes |
+| --- | --- | --- |
+| `isAvailable()` | `boolean` | `true` when at least one achievements backend is available right now. |
+| `unlock(id)` | `boolean` | Unlocks an achievement and immediately persists it. |
+| `isUnlocked(id)` | `boolean` | Whether the player has already unlocked it. |
+| `clear(id)` | `boolean` | Resets it — development/testing only. |
+
+Achievement IDs are passed straight through to whichever backend is active — this module
+doesn't remap IDs between platforms, so use the ID scheme the active backend expects (e.g.
+Steam's own API Name from Steamworks Partner).
+
+<Accordion title="How backend selection works" id="backend-selection">
+
+Internally, `achievements` holds an ordered list of backends (Steam is the only one today)
+and, on every call, uses whichever one's own `isAvailable()` returns `true` first. Every
+function degrades to a harmless default (`false`) when no backend is available — same
+never-throws contract as `steam` itself, so you don't need defensive `try`/`catch` around
+calls to this module either.
+
+Adding a future platform is meant to mean adding one more backend to that list — the
+exported `achievements` object and every game-side call to it stay exactly the same.
+
+</Accordion>
