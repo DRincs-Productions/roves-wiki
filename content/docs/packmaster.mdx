@@ -58,6 +58,14 @@ alone can't tell the two apart).
   <DynamicLink href="/docs/integrations/steam">Steam integration</DynamicLink> for the full
   mechanics (the Steam-enabled shell variant, `steam_appid.txt`) — again, explained there,
   not repeated here.
+- **Icon** — a single PNG, auto-detected from your build output (`icon.png`, falling back to
+  `favicon.ico`) when present, or picked manually via a file dialog. It's applied everywhere
+  it's technically possible to apply it: Windows (the running window/taskbar icon, plus the
+  packaged `.exe`'s own icon via a generated multi-size `.ico`), Linux (the running
+  window/taskbar icon), macOS (the Dock/app icon, via a generated `.icns` written directly
+  into the packaged `.app`), and Android (the launcher icon, see below). Leave it unset and a
+  game whose bundler already emits its own `icon.png` — for a PWA manifest, say — gets that
+  icon for free with no extra step.
 
 <Accordions>
 
@@ -67,6 +75,25 @@ The **Installable** section produces a real `.msi`/`.dmg`/`.deb` per platform in
 portable zip, each with its own live host-OS-and-tool availability check (see the
 Prerequisites accordion above) — see <DynamicLink href="/docs/shell">the Shell section</DynamicLink>
 for what each installer format actually wraps.
+
+</Accordion>
+
+<Accordion title="Mobile (Android)" id="mobile">
+
+The **Mobile** section builds a real, installable Android `.apk` — no Android Studio, no
+Rust/Cargo, nothing to install by hand beyond what Packmaster downloads on first use (a JRE,
+the Android SDK command-line tools, and NDK r28c). This is early/experimental: it produces a
+debug `.apk` only (unsigned, not ready for a store listing), and it isn't available at all
+when Packmaster itself is running on **Windows** — Gradle's own NDK invocation has no `.cmd`
+fallback there yet, so the build step would fail. macOS and Linux are supported. Packmaster
+shows a real, live availability check per host OS rather than assuming.
+
+Advanced settings live inside this same card (shared with any future mobile platform): app
+name, screen orientation, and the icon described above (reused as the Android launcher icon).
+Left unset, the app name and orientation are auto-detected from your build output's own
+`manifest.webmanifest` (or `manifest.json`/`site.webmanifest`) — a game that already ships a
+PWA manifest needs no extra configuration to get a correctly-named, correctly-oriented Android
+app.
 
 </Accordion>
 
