@@ -30,6 +30,8 @@ Achievement IDs are passed straight through to whichever backend is active â€” t
 doesn't remap IDs between platforms, so use the ID scheme the active backend expects (e.g.
 Steam's own API Name from Steamworks Partner).
 
+<Accordions>
+
 <Accordion title="How backend selection works" id="backend-selection">
 
 Internally, `achievements` holds an ordered list of backends (Steam is the only one today)
@@ -42,3 +44,5 @@ Adding a future platform is meant to mean adding one more backend to that list â
 exported `achievements` object and every game-side call to it stay exactly the same.
 
 </Accordion>
+
+</Accordions>
