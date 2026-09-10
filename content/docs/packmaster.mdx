@@ -82,11 +82,24 @@ for what each installer format actually wraps.
 
 The **Mobile** section builds a real, installable Android `.apk` — no Android Studio, no
 Rust/Cargo, nothing to install by hand beyond what Packmaster downloads on first use (a JRE,
-the Android SDK command-line tools, and NDK r28c). This is early/experimental: it produces a
-debug `.apk` only (unsigned, not ready for a store listing), and it isn't available at all
-when Packmaster itself is running on **Windows** — Gradle's own NDK invocation has no `.cmd`
-fallback there yet, so the build step would fail. macOS and Linux are supported. Packmaster
-shows a real, live availability check per host OS rather than assuming.
+the Android SDK command-line tools, and NDK r28c). This is still early/experimental: by
+default it produces a debug-signed `.apk`, fine for testing on a device but not for a store
+listing or as an update to a previously-installed release. **Windows** is supported alongside
+macOS and Linux — this is new and comes with less real-world mileage than the other two
+platforms, since it hasn't yet been exercised on a real Windows machine with a real Android
+SDK/NDK install; if an Android build fails specifically on Windows, that's the first thing to
+suspect, not a surprise. Packmaster shows a real, live availability check per host OS rather
+than assuming.
+
+**Release signing:** the same Mobile card's advanced settings can generate a new signing
+keystore or import an existing one (path, alias, and both passwords), then build a properly
+signed release `.apk` instead of the debug default — needed before an update can be installed
+over a previous release, or before publishing anywhere. Keystore credentials are stored in
+plain JSON in Packmaster's own config folder, not an OS keychain — the same trust level as
+`~/.android/debug.keystore`, not encrypted at rest but never sent anywhere. Like the Windows
+support above, this hasn't yet been checked against a real signed install on a device — verify
+the resulting `.apk` yourself (`apksigner verify`, or just installing it) before relying on it
+for a real release.
 
 Advanced settings live inside this same card (shared with any future mobile platform): app
 name, screen orientation, and the icon described above (reused as the Android launcher icon).
