@@ -45,23 +45,45 @@ what a player expects from a real mobile game, not a browser tab.
 
 ## iOS
 
+macOS only (Xcode/XcodeGen are Apple-only tools), but otherwise the same command shape as
+Android — no separate staging step needed anymore:
+
+```sh
+./mach bundle --ios --content-dir /absolute/path/to/dist --output /absolute/path/to/ios-output --ios-app-name "My Game" --ios-bundle-id com.example.mygame
+```
+
+This needs Xcode and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed. Under the
+hood it stages a WKWebView Xcode project (via `support/ios/bundle.py`, still usable standalone
+if you'd rather poke around in Xcode directly — see below), then runs `xcodegen generate` +
+`xcodebuild` for you. By default this produces an **unsigned iOS Simulator build** — useful to
+confirm your game stages and builds, not something installable on a device.
+
+| Flag | Overrides |
+| --- | --- |
+| `--ios-app-name <name>` | Display name. Defaults to "Roves Game". |
+| `--ios-bundle-id <id>` | Bundle identifier (e.g. `com.example.mygame`). Defaults to `org.roves.game`. |
+| `--ios-release` | Archive and export a real, signed `.ipa` instead of an unsigned Simulator build. |
+
+`--ios-release` needs a real Apple Distribution identity, set via environment variables:
+
+| Variable | What it is |
+| --- | --- |
+| `IOS_SIGNING_CERTIFICATE_P12_PATH` / `_PASSWORD` | Your Apple Distribution certificate + private key, exported as a `.p12`. |
+| `IOS_SIGNING_PROVISIONING_PROFILE_PATH` | A `.mobileprovision` matching that certificate and your app's bundle ID. |
+| `IOS_SIGNING_TEAM_ID` | Your Apple Developer Program Team ID. |
+
+All three come from your own [Apple Developer Program](https://developer.apple.com) account —
+unlike an Android keystore (which you can generate yourself, see above), Apple must
+countersign the certificate, so there's no way to produce a real one without an enrolled
+account. Without all three set, `--ios-release` refuses outright rather than silently
+producing an unsigned build.
+
+Prefer working in Xcode directly? Stage the project standalone, then open it yourself:
+
 ```sh
 python3 support/ios/bundle.py --content-dir /absolute/path/to/dist --output /absolute/path/to/ios-project --app-name "My Game" --bundle-id com.example.mygame
+cd /absolute/path/to/ios-project && xcodegen generate --spec project.json && open RovesGame.xcodeproj
 ```
-
-This stages an Xcode project from any host (no macOS needed for this step). On macOS, with
-Xcode and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed, turn that staged
-project into a real, buildable one and open it:
-
-```sh
-xcodegen generate --spec project.json
-open RovesGame.xcodeproj
-```
-
-From there it's a normal Xcode project: pick your development team, add your app icons, and
-build for a simulator or a device. Archiving and exporting an installable `.ipa` needs your
-own Apple distribution signing configuration — this part isn't automated, unlike desktop's
-GitHub-Release-ready output.
 
 Like Android, the game runs at a real origin (`game://content/`, served by a small
 `WKURLSchemeHandler`) rather than `file://`, with the same missing-path-falls-back-to-
@@ -71,12 +93,17 @@ the home indicator both hidden).
 ## What CI actually verifies
 
 Both platforms have a GitHub Actions workflow in the engine repo (`android.yml`/`ios.yml`)
-that smoke-tests the real packaging path end to end — the same commands above, run against
-placeholder content — on every push. Android's produces a real, installable debug `.apk`;
-iOS's builds an unsigned Simulator app (no Apple signing identity exists in CI, so there's no
-device-installable output from CI alone). Neither replaces real device testing: things CI
-can't check for you include splash timing, storage persistence, video seeking, rotation, and
-how your specific game behaves on the platform's own WebView version.
+that smoke-tests the real packaging path end to end — the same `mach bundle` commands above,
+run against placeholder content — on every push. Android's produces a real, installable debug
+`.apk`; iOS's builds an unsigned Simulator app (no real Apple signing identity exists in CI).
+Android release signing is verified for real (a generated test keystore, `--android-release`,
+then `apksigner verify` on the result) since a keystore is self-signed by design; iOS release
+signing only has its keychain-import mechanics smoke-tested with a self-signed **test**
+certificate — a full signed `.ipa` export needs a real Apple-issued provisioning profile,
+which can't be verified without an actual Apple Developer Program account. Neither replaces
+real device testing: things CI can't check for you include splash timing, storage
+persistence, video seeking, rotation, and how your specific game behaves on the platform's
+own WebView version.
 
 ## Using `roves-action` instead of the CLI
 
@@ -87,7 +114,10 @@ raw Xcode project (for actually signing and shipping to a device) and an already
 unsigned Simulator `.app` in the same output, so you don't need Xcode installed just to take
 a first look at your game running.
 
-## Not yet available
+## Using Packmaster instead of the CLI
 
-- **Packmaster** doesn't have a mobile tab yet — Android/iOS packaging is currently CLI-only
-  (or through `roves-action`, above).
+<DynamicLink href="/docs/packmaster">Packmaster</DynamicLink> has two Mobile cards, Android and
+iOS, mirroring the CLI/`roves-action` capabilities above (including release signing for both)
+— see its own docs for the full detail. iOS packaging only works when Packmaster itself runs
+on macOS with Xcode and XcodeGen installed, the same restriction as everywhere else on this
+page.

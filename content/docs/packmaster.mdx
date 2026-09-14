@@ -81,15 +81,16 @@ for what each installer format actually wraps.
 <Accordion title="Mobile (Android)" id="mobile">
 
 The **Mobile** section builds a real, installable Android `.apk` — no Android Studio, no
-Rust/Cargo, nothing to install by hand beyond what Packmaster downloads on first use (a JRE,
-the Android SDK command-line tools, and NDK r28c). This is still early/experimental: by
-default it produces a debug-signed `.apk`, fine for testing on a device but not for a store
-listing or as an update to a previously-installed release. **Windows** is supported alongside
-macOS and Linux — this is new and comes with less real-world mileage than the other two
-platforms, since it hasn't yet been exercised on a real Windows machine with a real Android
-SDK/NDK install; if an Android build fails specifically on Windows, that's the first thing to
-suspect, not a surprise. Packmaster shows a real, live availability check per host OS rather
-than assuming.
+Rust/Cargo, nothing to install by hand beyond what Packmaster downloads on first use (a JRE
+and the Android SDK command-line tools). Your game runs on the system's own Android WebView,
+not Servo — no NDK, no native/Rust compilation involved at all. This is still
+early/experimental: by default it produces a debug-signed `.apk`, fine for testing on a device
+but not for a store listing or as an update to a previously-installed release. **Windows** is
+supported alongside macOS and Linux — this is new and comes with less real-world mileage than
+the other two platforms, since it hasn't yet been exercised on a real Windows machine with a
+real Android SDK install; if an Android build fails specifically on Windows, that's the first
+thing to suspect, not a surprise. Packmaster shows a real, live availability check per host OS
+rather than assuming.
 
 **Release signing:** the same Mobile card's advanced settings can generate a new signing
 keystore or import an existing one (path, alias, and both passwords), then build a properly
@@ -101,12 +102,43 @@ support above, this hasn't yet been checked against a real signed install on a d
 the resulting `.apk` yourself (`apksigner verify`, or just installing it) before relying on it
 for a real release.
 
-Advanced settings live inside this same card (shared with any future mobile platform): app
-name, screen orientation, and the icon described above (reused as the Android launcher icon).
-Left unset, the app name and orientation are auto-detected from your build output's own
-`manifest.webmanifest` (or `manifest.json`/`site.webmanifest`) — a game that already ships a
-PWA manifest needs no extra configuration to get a correctly-named, correctly-oriented Android
-app.
+Advanced settings live inside this same card: app name, screen orientation, and the icon
+described above (reused as the Android launcher icon). Left unset, the app name and
+orientation are auto-detected from your build output's own `manifest.webmanifest` (or
+`manifest.json`/`site.webmanifest`) — a game that already ships a PWA manifest needs no extra
+configuration to get a correctly-named, correctly-oriented Android app.
+
+</Accordion>
+
+<Accordion title="Mobile (iOS)" id="mobile-ios">
+
+A second Mobile card builds an iOS app — same "no toolchain to install by hand" philosophy as
+Android, except **this one genuinely requires running Packmaster on macOS with
+[Xcode](https://developer.apple.com/xcode/) and
+[XcodeGen](https://github.com/yonaskolb/XcodeGen) already installed**: unlike Android's own
+history (which used to need Linux/macOS specifically and no longer does), Apple's own build
+tools have no cross-platform equivalent, so this isn't something Packmaster can ever download
+its way around on Windows or Linux. The card shows a real, live availability check and
+explains exactly what's missing when it's disabled. Your game runs on Apple's own WKWebView,
+not Servo. By default this produces an unsigned build for the iOS Simulator — useful to
+confirm your game stages and builds, not something you can install on a real device or submit
+anywhere.
+
+**Release signing works differently here than on Android.** An Android keystore is
+self-signed by design — Packmaster generates a complete, real one for you with one click. An
+Apple Distribution certificate must be countersigned by Apple itself, so there's no
+"generate" option for iOS: the card only offers **import** — a certificate (`.p12` + its
+password), a provisioning profile (`.mobileprovision`) matching it and your app's bundle ID,
+and your Apple Developer Program Team ID, all of which you obtain yourself from
+[developer.apple.com](https://developer.apple.com). With those imported, Packmaster archives
+and exports a real, signed `.ipa` instead of the unsigned Simulator build. Credentials are
+stored the same way as Android's keystore (plain JSON in Packmaster's own config folder, not
+an OS keychain).
+
+Advanced settings inside this card: app name and bundle identifier (e.g. `com.example.mygame`)
+— unlike Android, these aren't yet auto-detected from your build output's own web app
+manifest. **This entire feature hasn't yet been exercised on a real macOS machine or a real
+device/simulator** — verify a build yourself before relying on it for a real release.
 
 </Accordion>
 
