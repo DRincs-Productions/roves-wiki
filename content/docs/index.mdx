@@ -11,6 +11,9 @@ You build your entire game however you already do (React, Vue, Vite.js, plain
 HTML/CSS/JS — anything that runs in a browser). Roves takes that built output and produces
 either a double-click-runnable portable executable or a real installer for Windows, macOS,
 and Linux — with your content either sitting next to it or packed straight into the bundle.
+Early, more experimental packaging for Android and iOS is also available, as a native
+WebView/WKWebView app rather than through the Servo engine itself — see
+<DynamicLink href="/docs/mobile">Mobile</DynamicLink>.
 
 <Cards>
   <Card title="Packmaster" href="/docs/packmaster">
@@ -24,6 +27,9 @@ and Linux — with your content either sitting next to it or packed straight int
   </Card>
   <Card title="Shell" href="/docs/shell">
     The raw engine: `mach build`/`mach bundle`, every flag. Least important for most users.
+  </Card>
+  <Card title="Mobile" href="/docs/mobile">
+    Android and iOS packaging — early and experimental, native WebView-based.
   </Card>
   <Card title="roves-api" href="/docs/roves-api">
     The JS/TS bridge your game's own code talks to Roves through.

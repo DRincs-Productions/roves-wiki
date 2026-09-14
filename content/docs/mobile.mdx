@@ -1,0 +1,84 @@
+---
+title: Mobile (Android & iOS)
+description: Package your game as a native Android WebView app or iOS WKWebView app.
+---
+
+## Early and experimental
+
+Mobile support is newer and less polished than the desktop path — expect rough edges.
+Unlike desktop, mobile games don't run on the Servo engine at all: Android uses the
+system's own **Android WebView**, and iOS uses Apple's own **WKWebView**. Neither container
+loads Servo, so mobile web-platform support tracks whatever browser engine is installed on
+the device, not this engine's own Servo fork.
+
+Nothing Servo-specific — including <DynamicLink href="/docs/roves-api">roves-api</DynamicLink>'s
+save/Steam/process APIs — is implemented on mobile yet. Use standard web APIs, or your own
+platform bridge, until that changes.
+
+## Android
+
+```sh
+./mach bundle --android --content-dir /absolute/path/to/dist --output /absolute/path/to/android-output
+```
+
+This needs Java 17 and the Android SDK (platform 37, build tools 36.0.0) with `ANDROID_HOME`
+set — no Rust cross-compilation, no NDK, and no `mach build --android` first. Under the hood
+it copies your content straight into a Gradle project's `assets/` folder and assembles a
+debug (or, with `--android-release`, a signed release) `.apk`. Your app name, screen
+orientation, status bar color and launcher icon come from your build's own
+`manifest.webmanifest`/`manifest.json` by default, or can be overridden directly:
+
+| Flag | Overrides |
+| --- | --- |
+| `--android-app-name <name>` | Launcher label. |
+| `--android-orientation <value>` | Locked screen orientation (`any`, `natural`, `portrait`, `landscape`, `portrait-primary`, `portrait-secondary`, `landscape-primary`, `landscape-secondary`). |
+| `--android-theme-color <color>` | Status bar color (e.g. `#ffffff`). |
+| `--android-release` | Build a signed release `.apk` instead of debug — needs `APK_SIGNING_KEY_STORE_PATH`/`_STORE_PASS`/`_ALIAS`/`_PASS` set in the environment. |
+
+The game runs at a real origin (`https://appassets.androidplatform.net/`), not a raw
+`file://` path, so root-relative asset URLs and a client-side router's root route both work
+correctly. A path with no matching file falls back to your `index.html` (so client-side
+routing works); only a genuinely missing `index.html` itself 404s. The app always runs
+**edge-to-edge** — the status bar and gesture/button navigation bar are hidden from the
+first frame, reappearing only for a temporary edge-swipe before auto-hiding again — matching
+what a player expects from a real mobile game, not a browser tab.
+
+## iOS
+
+```sh
+python3 support/ios/bundle.py --content-dir /absolute/path/to/dist --output /absolute/path/to/ios-project --app-name "My Game" --bundle-id com.example.mygame
+```
+
+This stages an Xcode project from any host (no macOS needed for this step). On macOS, with
+Xcode and [XcodeGen](https://github.com/yonaskolb/XcodeGen) installed, turn that staged
+project into a real, buildable one and open it:
+
+```sh
+xcodegen generate --spec project.json
+open RovesGame.xcodeproj
+```
+
+From there it's a normal Xcode project: pick your development team, add your app icons, and
+build for a simulator or a device. Archiving and exporting an installable `.ipa` needs your
+own Apple distribution signing configuration — this part isn't automated, unlike desktop's
+GitHub-Release-ready output.
+
+Like Android, the game runs at a real origin (`game://content/`, served by a small
+`WKURLSchemeHandler`) rather than `file://`, with the same missing-path-falls-back-to-
+`index.html` behavior, and the app runs edge-to-edge (status bar and, on Face ID devices,
+the home indicator both hidden).
+
+## What CI actually verifies
+
+Both platforms have a GitHub Actions workflow in the engine repo (`android.yml`/`ios.yml`)
+that smoke-tests the real packaging path end to end — the same commands above, run against
+placeholder content — on every push. Android's produces a real, installable debug `.apk`;
+iOS's builds an unsigned Simulator app (no Apple signing identity exists in CI, so there's no
+device-installable output from CI alone). Neither replaces real device testing: things CI
+can't check for you include splash timing, storage persistence, video seeking, rotation, and
+how your specific game behaves on the platform's own WebView version.
+
+## Not yet available
+
+- **Packmaster** doesn't have a mobile tab yet — Android/iOS packaging is currently CLI-only.
+- **`roves-action`** has an `android` input mirroring the CLI above, but no `ios` input yet.
