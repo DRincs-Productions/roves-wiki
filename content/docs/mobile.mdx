@@ -78,7 +78,16 @@ device-installable output from CI alone). Neither replaces real device testing: 
 can't check for you include splash timing, storage persistence, video seeking, rotation, and
 how your specific game behaves on the platform's own WebView version.
 
+## Using `roves-action` instead of the CLI
+
+<DynamicLink href="/docs/action">`roves-action`</DynamicLink> has `android`/`ios` inputs
+mirroring the CLI above (`advanced-mode: true` required for both, plus a macOS runner for
+`ios`) — see its own docs for the full input list. Its `ios: true` output includes both the
+raw Xcode project (for actually signing and shipping to a device) and an already-built,
+unsigned Simulator `.app` in the same output, so you don't need Xcode installed just to take
+a first look at your game running.
+
 ## Not yet available
 
-- **Packmaster** doesn't have a mobile tab yet — Android/iOS packaging is currently CLI-only.
-- **`roves-action`** has an `android` input mirroring the CLI above, but no `ios` input yet.
+- **Packmaster** doesn't have a mobile tab yet — Android/iOS packaging is currently CLI-only
+  (or through `roves-action`, above).
