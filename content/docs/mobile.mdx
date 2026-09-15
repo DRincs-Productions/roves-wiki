@@ -15,6 +15,19 @@ Nothing Servo-specific — including <DynamicLink href="/docs/roves-api">roves-a
 save/Steam/process APIs — is implemented on mobile yet. Use standard web APIs, or your own
 platform bridge, until that changes.
 
+Two standard web APIs are specifically intercepted so they behave correctly rather than just
+silently failing, even though nothing above is roves-api itself:
+
+- **Save export/import** (`<a download>` on a Blob, `<input type="file">`) works reliably on
+  both platforms — see <DynamicLink href="/docs/integrations/saves">Save-game storage → letting
+  a player export/import a save as a file</DynamicLink>. You don't need to detect mobile or do
+  anything platform-specific; the same code that works on desktop works here too.
+- **The Fullscreen API is intentionally a no-op.** Both apps always run fullscreen/edge-to-edge
+  already — there's no windowed mode to toggle into or out of — so `requestFullscreen()`/
+  `exitFullscreen()` are neutralized into a harmless resolved promise instead of doing
+  anything. Don't build a "toggle fullscreen" control for a mobile build; there's nothing for
+  it to do.
+
 ## Android
 
 ```sh

@@ -57,6 +57,38 @@ genuinely isn't writable (e.g. a zip extracted into `Program Files` without admi
 Roves falls back to the same cache-directory location an installed build would use, rather
 than failing outright.
 
+## Letting a player export/import a save as a file
+
+The `saves` API above is for your game's own in-app save slots. For a separate "download my
+save" / "load a save file I was sent" feature, use the standard web platform patterns you'd
+already reach for on a normal website — no `@drincs/roves-api` call needed at all:
+
+```ts
+// Export: a standard <a download> click on a Blob
+const blob = new Blob([JSON.stringify(gameState)], { type: "application/json" });
+const a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "my-save.json";
+a.click();
+
+// Import: a standard <input type="file">
+const input = document.createElement("input");
+input.type = "file";
+input.accept = "application/json";
+input.onchange = async (e) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (file) applySave(JSON.parse(await file.text()));
+};
+input.click();
+```
+
+Roves intercepts both transparently — on desktop, a save export pops a native "Save As" dialog
+(with a Downloads-folder default) and an import opens a native "Open" dialog there too; on
+Android and iOS, export writes straight into a player-visible folder (see
+<DynamicLink href="/docs/mobile">Mobile</DynamicLink>) and import opens each platform's own
+native document picker. You don't need to detect which platform you're on or branch your code
+— the same standard web code works everywhere.
+
 ## Steam Cloud sync
 
 Build with `--features steam` (see
