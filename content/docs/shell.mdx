@@ -131,8 +131,12 @@ resolves to on `PATH`, a real, easy-to-hit gap on Linux distros that still defau
 
 **Platform build dependencies** — run `./mach bootstrap` first; it installs the
 platform-specific system packages the build needs (a C/C++ toolchain, `libclang`, and a
-handful of media/graphics libraries). A `bindgen`/`libclang` error, or a linker error naming
-`-ludev`, means you skipped this (`gamepad`, on by default, links `libudev` on Linux).
+handful of media/graphics libraries). A `bindgen`/`libclang` error usually means you skipped
+this. Gamepad support (`gamepad`, on by default) is built on [SDL3](https://libsdl.org/),
+compiled from vendored source as part of the normal build (`cmake` + your C/C++ toolchain —
+no separate system SDL3 install needed); on Linux, missing X11/Wayland/ALSA/udev development
+headers can make that step skip individual SDL3 subsystems rather than fail outright, which is
+one reason to still run `./mach bootstrap` first rather than jump straight to `./mach build`.
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
