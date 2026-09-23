@@ -184,6 +184,22 @@ in-process, inside the engine binary itself, which already links that crate as a
 | `--diagnostic-script` | off | Ship a `diagnose.bat`/`diagnose.sh` next to the binary that launches the game from a console and prints its exit code plus `roves.log` inline. See <DynamicLink href="/docs/integrations/diagnostics">Diagnostics</DynamicLink>. |
 | *(trailing args)* | — | Anything else is forwarded verbatim to the running game as CLI args (written into `launch.json`). |
 
+### Performance diagnostics
+
+Builds from Roves `main` (and the next tagged Shell release containing this change) expose an
+opt-in counter stream for comparing idle and animated workloads without changing the game.
+Set `ROVES_PERF_LOG_INTERVAL_MS` to a positive reporting interval before launching the Shell:
+
+```bash
+ROVES_PERF_LOG_INTERVAL_MS=10000 ./play dist/index.html
+```
+
+The normal `roves.log` receives aggregate `[roves-perf]` lines with real SDL events versus
+wait timeouts, redraws queued or coalesced, dispatched redraws, WebView paints, and final window
+presents. The counters are disabled by default and create no sampling timer or background thread.
+For meaningful Roves/Chrome comparisons, keep the page, release build, window size, warm-up and
+sample duration identical; do not treat results from a debug build as representative.
+
 ### Custom game icon
 
 | Flag | Default | Description |
