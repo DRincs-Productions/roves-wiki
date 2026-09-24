@@ -195,10 +195,13 @@ ROVES_PERF_LOG_INTERVAL_MS=10000 ./play dist/index.html
 ```
 
 The normal `roves.log` receives aggregate `[roves-perf]` lines with real SDL events versus
-wait timeouts, redraws queued or coalesced, dispatched redraws, WebView paints, and final window
+wait timeouts, redraws queued or coalesced, dispatched redraws, WebView paints, egui
+runs/tessellations/paints, framebuffer blits, composed or direct presents, and final window
 presents. The counters are disabled by default and create no sampling timer or background thread.
-For meaningful Roves/Chrome comparisons, keep the page, release build, window size, warm-up and
-sample duration identical; do not treat results from a debug build as representative.
+The direct-present counter is currently preparatory and stays at zero until the opt-in rendering
+fast path is enabled in a later test build. For meaningful Roves/Chrome comparisons, keep the
+page, release build, window size, warm-up and sample duration identical; do not treat results
+from a debug build as representative.
 
 ### Custom game icon
 
