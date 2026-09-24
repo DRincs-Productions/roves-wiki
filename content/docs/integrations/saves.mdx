@@ -67,9 +67,11 @@ already reach for on a normal website — no `@drincs/roves-api` call needed at 
 // Export: a standard <a download> click on a Blob
 const blob = new Blob([JSON.stringify(gameState)], { type: "application/json" });
 const a = document.createElement("a");
-a.href = URL.createObjectURL(blob);
+const url = URL.createObjectURL(blob);
+a.href = url;
 a.download = "my-save.json";
 a.click();
+URL.revokeObjectURL(url);
 
 // Import: a standard <input type="file">
 const input = document.createElement("input");
@@ -87,7 +89,10 @@ Roves intercepts both transparently — on desktop, a save export pops a native 
 Android and iOS, export writes straight into a player-visible folder (see
 <DynamicLink href="/docs/mobile">Mobile</DynamicLink>) and import opens each platform's own
 native document picker. You don't need to detect which platform you're on or branch your code
-— the same standard web code works everywhere.
+— the same standard web code works everywhere. Programmatic `a.click()` is supported on
+desktop as well as real pointer clicks: Roves retains the original Blob before Servo can
+navigate to its opaque-origin `blob:` URL. Packaged-binary CI verifies the complete export
+path by writing a deterministic Blob to disk and comparing its bytes.
 
 ## Steam Cloud sync
 
