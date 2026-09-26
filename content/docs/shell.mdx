@@ -198,10 +198,31 @@ The normal `roves.log` receives aggregate `[roves-perf]` lines with real SDL eve
 wait timeouts, redraws queued or coalesced, dispatched redraws, WebView paints, egui
 runs/tessellations/paints, framebuffer blits, composed or direct presents, and final window
 presents. The counters are disabled by default and create no sampling timer or background thread.
-The direct-present counter is currently preparatory and stays at zero until the opt-in rendering
-fast path is enabled in a later test build. For meaningful Roves/Chrome comparisons, keep the
+For meaningful Roves/Chrome comparisons, keep the
 page, release build, window size, warm-up and sample duration identical; do not treat results
 from a debug build as representative.
+
+### Experimental direct presentation
+
+Desktop builds from `main` support fast path A, disabled by default:
+
+```bash
+ROVES_DIRECT_PRESENT=1 ROVES_PERF_LOG_INTERVAL_MS=1000 ./play dist/index.html
+```
+
+Only the exact value `1` enables it; unset or other values keep the composed renderer. Restart
+the Shell after changing the variable. It requires exactly one active WebView filling the
+physical window, no dialogs or status overlay, no egui focus, inactive AccessKit and no pending
+egui texture updates. Splash and loading errors always use the composed renderer. Any failed
+condition falls back in the same frame, including a dialog that closes during that update.
+
+Servo still renders off-screen. Egui still runs to process input, dialogs and accessibility;
+only tessellation and paint are skipped. Each direct frame increments `direct_presents`,
+`framebuffer_blits` and `window_presents`; fallback frames increment `composited_presents`.
+Desktop CI requires a real launch to report at least one positive `direct_presents` interval,
+without performance thresholds on shared runners. Hardware A/B measurements are still needed
+to quantify the gain. Fast path B, which would remove the off-screen buffer, is not implemented.
+This is a runtime experiment, with no new Packmaster or `mach bundle` setting.
 
 ### Custom game icon
 
