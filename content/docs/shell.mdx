@@ -138,9 +138,19 @@ no separate system SDL3 install needed); on Linux, missing X11/Wayland/ALSA/udev
 headers can make that step skip individual SDL3 subsystems rather than fail outright, which is
 one reason to still run `./mach bootstrap` first rather than jump straight to `./mach build`.
 CI creates an SDL3 virtual gamepad on macOS, Windows and Linux, then checks connection, axis and
-button input, and disconnection with a 90-second runtime limit. This exercises SDL without a
-physical controller; testing the Servo Web Gamepad API on a real Mac is still required before
-enabling macOS gamepad support in the shell.
+button input, and disconnection with a 90-second runtime limit. The desktop smoke tests also
+launch the real Shell with an SDL virtual gamepad and check that its button presses reach the
+page through the Web Gamepad API.
+
+On macOS, gamepad support stays **off by default**: SDL3's gamepad initialization once hung the
+Shell there. Builds from `main` (and the next tagged Shell release containing this change) let
+you opt in at runtime, without a special build, by launching with `ROVES_MACOS_GAMEPAD=1`. Only
+the exact value `1` enables it, and CI exercises that path on a macOS runner with a virtual
+controller. A physical controller on a real Mac has not been verified yet, so treat it as
+experimental and don't turn it on for players.
+
+`ROVES_TEST_VIRTUAL_GAMEPAD=1` is a CI-only switch that makes the Shell attach and keep pressing
+a virtual SDL gamepad for about a minute. Never set it in a shipped game.
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
