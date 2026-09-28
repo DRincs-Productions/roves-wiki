@@ -146,12 +146,11 @@ page through the Web Gamepad API.
 on every platform. The gamepad subsystem tried to open a second SDL event pump, which SDL
 doesn't allow, and button updates used SDL's device IDs instead of the page's
 `navigator.getGamepads()` index. A controller connected before the game's page finished loading
-was also never announced to that page. All three are fixed on `main`; use the next tagged Shell
-release.
+was also never announced to that page. All three are fixed in Shell `v0.5.2`.
 
 On macOS, gamepad support stays **off by default**: SDL3's gamepad initialization once hung the
-Shell there. Builds from `main` (and the next tagged Shell release containing this change) let
-you opt in at runtime, without a special build, by launching with `ROVES_MACOS_GAMEPAD=1`. Only
+Shell there. Since Shell `v0.5.2` you can opt in at runtime, without a special build, by
+launching with `ROVES_MACOS_GAMEPAD=1`. Only
 the exact value `1` enables it, and CI exercises that path on a macOS runner with a virtual
 controller. A physical controller on a real Mac has not been verified yet, so treat it as
 experimental and don't turn it on for players.
@@ -179,7 +178,7 @@ memory if you're constrained).
 Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
 bridge</DynamicLink> compiled in.
 
-`--features mimalloc` (on `main`, experimental) swaps the global memory allocator for
+`--features mimalloc` (since `v0.5.2`, experimental) swaps the global memory allocator for
 [mimalloc](https://github.com/microsoft/mimalloc). By default Windows uses the system allocator
 and macOS/Linux use jemalloc. It exists for allocator A/B measurements and has not been shown to
 be faster yet, so don't ship it in a game unless your own measurements say it helps. The
@@ -213,7 +212,7 @@ in-process, inside the engine binary itself, which already links that crate as a
 
 ### Performance diagnostics
 
-Builds from Roves `main` (and the next tagged Shell release containing this change) expose an
+Shell releases since `v0.5.1` expose an
 opt-in counter stream for comparing idle and animated workloads without changing the game.
 Set `ROVES_PERF_LOG_INTERVAL_MS` to a positive reporting interval before launching the Shell:
 
