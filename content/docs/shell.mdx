@@ -142,6 +142,10 @@ button input, and disconnection with a 90-second runtime limit. The desktop smok
 launch the real Shell with an SDL virtual gamepad and check that its button presses reach the
 page through the Web Gamepad API.
 
+**Known issue in Shell releases up to and including `v0.5.1`:** the SDL3 gamepad subsystem never
+initialized, so controllers were silently ignored on every platform. It tried to open a second
+SDL event pump, which SDL doesn't allow. Fixed on `main`; use the next tagged Shell release.
+
 On macOS, gamepad support stays **off by default**: SDL3's gamepad initialization once hung the
 Shell there. Builds from `main` (and the next tagged Shell release containing this change) let
 you opt in at runtime, without a special build, by launching with `ROVES_MACOS_GAMEPAD=1`. Only
