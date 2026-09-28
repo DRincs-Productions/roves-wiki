@@ -202,6 +202,16 @@ The normal `roves.log` receives aggregate `[roves-perf]` lines with real SDL eve
 wait timeouts, redraws queued or coalesced, dispatched redraws, WebView paints, egui
 runs/tessellations/paints, framebuffer blits, composed or direct presents, and final window
 presents. The counters are disabled by default and create no sampling timer or background thread.
+
+Each interval also emits one `[roves-perf-time]` line with the total and worst-case wall-clock
+time, in microseconds, of four shell phases: `webview_paint` (Servo/WebRender painting the
+page), `egui_run` (the egui update pass), `shell_paint` (the off-screen blit plus any egui
+painting) and `present` (the final window swap). Divide a total by the matching count from the
+`[roves-perf]` line for a per-frame average. GL work is asynchronous, so GPU cost usually shows
+up in whichever phase waits on it, typically `present` under VSync; the times are CPU-side and
+not a GPU profiler. Compare `ROVES_DIRECT_PRESENT=1` runs with default runs to see how much of
+the frame egui actually costs.
+
 For meaningful Roves/Chrome comparisons, keep the
 page, release build, window size, warm-up and sample duration identical; do not treat results
 from a debug build as representative.
