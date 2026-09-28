@@ -172,6 +172,12 @@ memory if you're constrained).
 Add `--features steam` if you need the <DynamicLink href="/docs/integrations/steam">Steam
 bridge</DynamicLink> compiled in.
 
+`--features mimalloc` (on `main`, experimental) swaps the global memory allocator for
+[mimalloc](https://github.com/microsoft/mimalloc). By default Windows uses the system allocator
+and macOS/Linux use jemalloc. It exists for allocator A/B measurements and has not been shown to
+be faster yet, so don't ship it in a game unless your own measurements say it helps. The
+`perf-ab` pre-release on the Roves repository publishes a Windows build of each for comparison.
+
 ```bash
 ./mach bundle --content-dir path/to/dist --output release
 ```
