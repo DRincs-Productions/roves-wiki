@@ -158,6 +158,11 @@ experimental and don't turn it on for players.
 `ROVES_TEST_VIRTUAL_GAMEPAD=1` is a CI-only switch that makes the Shell attach and keep pressing
 a virtual SDL gamepad for about a minute. Never set it in a shipped game.
 
+**JavaScript engine migration** - Current releases still use SpiderMonkey. Work toward V8
+is in progress in an isolated scripting crate, with normal and JIT-less tests; this does not
+yet switch the production DOM or game runtime. Engine contributors should read the shared
+[AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
+
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
 the Rust — budget real disk space for `target/`, and enough RAM that a fully parallel build
