@@ -159,13 +159,12 @@ experimental and don't turn it on for players.
 a virtual SDL gamepad for about a minute. Never set it in a shipped game.
 
 **JavaScript engine migration** - Current releases still use SpiderMonkey. Work toward V8
-is in progress in an isolated scripting crate. The opt-in WebIDL pilot now exercises
-numeric and string operation arguments, including nullable and optional forms (with missing
-arguments distinct from `null`), explicit boolean/numeric defaults including false, zero, finite floats and unrestricted infinities, and ByteString's 0–255 code-unit validation, UTF-16-preserving
-DOMString and scalar-valid USVString, with
-normal and JIT-less tests; production still uses SpiderMonkey
-and the DOM/game runtime has not switched. Engine contributors should read the shared
-[AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
+is in progress in an isolated scripting crate. The opt-in WebIDL pilot covers numeric and string
+operation arguments, nullable and optional values, ByteString conversion, explicit boolean/numeric
+defaults, and optional DOMString, USVString and ASCII ByteString string defaults. DOMString retains
+UTF-16 code units and USVString remains scalar-valid. Normal and JIT-less tests run; production
+still uses SpiderMonkey and the DOM/game runtime has not switched. Engine contributors should read
+the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
