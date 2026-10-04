@@ -161,7 +161,7 @@ a virtual SDL gamepad for about a minute. Never set it in a shipped game.
 **JavaScript engine migration** - Current releases still use SpiderMonkey. Work toward V8
 is in progress in an isolated scripting crate. The opt-in WebIDL pilot covers numeric and string
 operation arguments, nullable and optional values, ByteString conversion, explicit boolean/numeric
-defaults, and optional DOMString, USVString and ASCII ByteString string defaults. DOMString retains
+defaults, optional DOMString, USVString and ASCII ByteString defaults, and enum arguments with declared-value validation and enum defaults. DOMString retains
 UTF-16 code units and USVString remains scalar-valid. Nullable string defaults distinguish omission, null and supplied values. Normal and JIT-less tests run;
 production
 still uses SpiderMonkey and the DOM/game runtime has not switched. Engine contributors should read
