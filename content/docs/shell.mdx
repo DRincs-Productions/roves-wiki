@@ -165,7 +165,11 @@ defaults, optional DOMString, USVString and ASCII ByteString defaults, and enum 
 UTF-16 code units and USVString remains scalar-valid. Nullable string defaults distinguish omission, null and supplied values. Normal and JIT-less tests run;
 production
 still uses SpiderMonkey and the DOM/game runtime has not switched. The generated binding is also
-tested against Servo's actual `ValidityState` IDL for all eleven read-only validation attributes.
+tested against Servo's actual `ValidityState` IDL for all eleven read-only validation attributes;
+the latest migration checkpoint and cross-platform build matrix are green. Linking a runtime test
+from Servo's binding crate while SpiderMonkey and V8 coexist currently fails because both engines
+export duplicate C++ symbols. The pilot therefore remains isolated; the production cutover must
+remove SpiderMonkey from the linked binary before Servo can execute these bindings through V8.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
