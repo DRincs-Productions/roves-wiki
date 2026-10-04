@@ -167,7 +167,7 @@ production
 still uses SpiderMonkey and the DOM/game runtime has not switched. The generated binding is also
 tested against Servo's actual `ValidityState` IDL for all eleven read-only validation attributes;
 the CP32 cross-platform build matrix passed. CP33 adds isolated tests for weak wrapper identity
-reuse and finalization after GC; its CI is running. Linking a runtime test from Servo's binding
+reuse and finalization after GC; its cross-platform CI is pending. Linking a runtime test from Servo's binding
 crate while SpiderMonkey and V8 coexist currently fails because both engines
 export duplicate C++ symbols. The pilot therefore remains isolated; the production cutover must
 remove SpiderMonkey from the linked binary before Servo can execute these bindings through V8.
