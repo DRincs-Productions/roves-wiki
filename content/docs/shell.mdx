@@ -166,7 +166,7 @@ UTF-16 code units and USVString remains scalar-valid. Nullable string defaults d
 the isolated V8 runtime also validates weak wrapper reuse by native identity and reclamation after
 garbage collection. Servo DOM reflectors now have stable engine-neutral identity keys for a future
 wrapper cache. The generated WebIDL pilot can now pass the reflector identity to the weak cache and
-test wrapper reuse. Production still uses SpiderMonkey and the DOM/game runtime has not switched.
+test wrapper reuse. Reflector equality also uses that native ID before wrapper creation. Production still uses SpiderMonkey and the DOM/game runtime has not switched.
 The generated binding is also tested against Servo's actual `ValidityState` IDL for all eleven
 read-only validation attributes; the CP32 and CP33 cross-platform build matrices passed, including
 patch validation, SDL3, Steam, all six bundles, Linux layout/paint-api tests, and platform smoke
