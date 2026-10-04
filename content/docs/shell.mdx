@@ -164,7 +164,9 @@ operation arguments, nullable and optional values, ByteString conversion, explic
 defaults, optional DOMString, USVString and ASCII ByteString defaults, and enum arguments with declared-value validation and enum defaults. DOMString retains
 UTF-16 code units and USVString remains scalar-valid. Nullable string defaults distinguish omission, null and supplied values. Normal and JIT-less tests run;
 production
-still uses SpiderMonkey and the DOM/game runtime has not switched. Engine contributors should read
+still uses SpiderMonkey and the DOM/game runtime has not switched. The generated binding is also
+tested against Servo's actual `ValidityState` IDL for all eleven read-only validation attributes.
+Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
