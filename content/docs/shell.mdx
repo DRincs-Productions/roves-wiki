@@ -163,20 +163,19 @@ is in progress in an isolated scripting crate. The opt-in WebIDL pilot covers nu
 operation arguments, nullable and optional values, ByteString conversion, explicit boolean/numeric
 defaults, optional DOMString, USVString and ASCII ByteString defaults, and enum arguments with declared-value validation and enum defaults. DOMString retains
 UTF-16 code units and USVString remains scalar-valid. Nullable string defaults distinguish omission, null and supplied values. Normal and JIT-less tests run;
-the isolated V8 runtime also validates weak wrapper reuse by native identity and reclamation after
-garbage collection. Servo DOM reflectors now have stable engine-neutral identity keys for a future
-wrapper cache. The generated WebIDL pilot can now pass the reflector identity to the weak cache and
-test wrapper reuse. Reflector equality and generated `DomObject` equality now use that native ID
-before wrapper creation; `DomObject::native_object_id()` exposes the engine-neutral key without a
-JS handle. CP36 passed the V8, Servo (13 jobs), Android and iOS matrices. Production still uses
-SpiderMonkey and the DOM/game runtime has not switched.
-The generated binding is also tested against Servo's actual `ValidityState` IDL for all eleven
-read-only validation attributes; the CP32 and CP33 cross-platform build matrices passed, including
-patch validation, SDL3, Steam, all six bundles, Linux layout/paint-api tests, and platform smoke
-tests. Linking a runtime test from Servo's binding crate while SpiderMonkey and V8
-coexist currently fails because both engines export duplicate C++ symbols. The pilot therefore
-remains isolated; the production cutover must remove SpiderMonkey from the linked binary before
-Servo can execute these bindings through V8.
+production still uses SpiderMonkey and the DOM/game runtime has not switched. The isolated V8
+runtime validates weak wrapper reuse by native identity and reclamation after GC. Servo DOM
+reflectors now have stable engine-neutral identity keys; generated bindings pass those keys to the
+weak wrapper cache. Reflector and generated `DomObject` equality use native identity before wrapper
+creation, and `DomObject::native_object_id()` exposes that key without a JS handle. CP37 passed V8
+(6/6), Servo (13/13), Android and iOS CI matrices.
+
+CP38 extends the identity contract to `Dom<T>`/`DomRoot<T>` equality and hashing. Its focused local
+tests pass and cross-platform CI is running. This remains a prototype, not production integration.
+The generated binding is tested against Servo's actual `ValidityState` IDL for all eleven
+read-only validation attributes. Linking a runtime test from Servo's binding crate while
+SpiderMonkey and V8 coexist currently fails because both engines export duplicate C++ symbols. The
+pilot remains isolated until the production cutover removes SpiderMonkey from the linked binary.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
