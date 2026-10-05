@@ -170,8 +170,10 @@ weak wrapper cache. Reflector and generated `DomObject` equality use native iden
 creation, and `DomObject::native_object_id()` exposes that key without a JS handle. CP37 passed V8
 (6/6), Servo (13/13), Android and iOS CI matrices.
 
-CP38 extends the identity contract to `Dom<T>`/`DomRoot<T>` equality and hashing. Its focused local
-tests pass and cross-platform CI is running. This remains a prototype, not production integration.
+CP38 extends the identity contract to `Dom<T>`/`DomRoot<T>` equality and hashing. CP39 makes the
+node identity that layout hands back to script (hit testing, `elementFromPoint`, animations) the
+native node's address instead of a SpiderMonkey object address, so that path no longer depends on
+the JS engine. This remains a prototype, not production integration.
 The generated binding is tested against Servo's actual `ValidityState` IDL for all eleven
 read-only validation attributes. Linking a runtime test from Servo's binding crate while
 SpiderMonkey and V8 coexist currently fails because both engines export duplicate C++ symbols. The
