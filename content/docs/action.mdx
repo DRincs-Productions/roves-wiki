@@ -288,7 +288,7 @@ instead of silently ignoring it.
 | `jobs` | Limit how many build jobs run in parallel. |
 | `with-asan` / `with-tsan` | Build with AddressSanitizer / ThreadSanitizer, for tracking down memory or threading bugs. |
 | `with-debug-assertions` | Keep debug assertions even in an otherwise optimized build. |
-| `debug-mozjs` | Build the JavaScript engine with debug assertions. |
+| `debug-mozjs` | Deprecated: built the previous JavaScript engine (SpiderMonkey) with debug assertions. Shell `v0.7.0` and later use V8 and ignore it. |
 | `with-frame-pointer` | Keep frame pointers in the build (helps diagnose hangs). |
 | `use-crown` | Enable the engine's own memory-safety lint tool during the build. |
 | `coverage` | Build with code-coverage instrumentation. |

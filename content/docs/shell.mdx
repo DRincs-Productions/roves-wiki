@@ -158,26 +158,21 @@ experimental and don't turn it on for players.
 `ROVES_TEST_VIRTUAL_GAMEPAD=1` is a CI-only switch that makes the Shell attach and keep pressing
 a virtual SDL gamepad for about a minute. Never set it in a shipped game.
 
-**JavaScript engine migration** - Current releases still use SpiderMonkey. Work toward V8
-is in progress in an isolated scripting crate. The opt-in WebIDL pilot covers numeric and string
-operation arguments, nullable and optional values, ByteString conversion, explicit boolean/numeric
-defaults, optional DOMString, USVString and ASCII ByteString defaults, and enum arguments with declared-value validation and enum defaults. DOMString retains
-UTF-16 code units and USVString remains scalar-valid. Nullable string defaults distinguish omission, null and supplied values. Normal and JIT-less tests run;
-production still uses SpiderMonkey and the DOM/game runtime has not switched. The isolated V8
-runtime validates weak wrapper reuse by native identity and reclamation after GC. Servo DOM
-reflectors now have stable engine-neutral identity keys; generated bindings pass those keys to the
-weak wrapper cache. Reflector and generated `DomObject` equality use native identity before wrapper
-creation, and `DomObject::native_object_id()` exposes that key without a JS handle. CP37 passed V8
-(6/6), Servo (13/13), Android and iOS CI matrices.
+**JavaScript engine: V8** - Since Shell `v0.7.0`, games run on V8, the JavaScript engine of
+Chrome, instead of SpiderMonkey. Your game code needs no changes. PixiJS, Three.js, Phaser and
+similar libraries only depend on standard JavaScript and Web APIs, and they are checked on every
+engine change. A few things to know:
+- **WebAssembly** works, including `WebAssembly.instantiateStreaming` on a fetched `.wasm` file.
+- **JIT-less builds** (V8 without its just-in-time compiler, the mode meant for platforms that
+  forbid generating code at runtime) have **no WebAssembly**. Unity, Godot or Emscripten exports
+  need a regular build.
+- **Developer-tools JavaScript debugging** (breakpoints, stepping) is not available yet on V8.
+  `console` output works as before.
+- A page you leave by navigating is not freed until the game quits. Single-page games, which is
+  most of them, are not affected.
 
-CP38 extends the identity contract to `Dom<T>`/`DomRoot<T>` equality and hashing. CP39 makes the
-node identity that layout hands back to script (hit testing, `elementFromPoint`, animations) the
-native node's address instead of a SpiderMonkey object address, so that path no longer depends on
-the JS engine. This remains a prototype, not production integration.
-The generated binding is tested against Servo's actual `ValidityState` IDL for all eleven
-read-only validation attributes. Linking a runtime test from Servo's binding crate while
-SpiderMonkey and V8 coexist currently fails because both engines export duplicate C++ symbols. The
-pilot remains isolated until the production cutover removes SpiderMonkey from the linked binary.
+If something that worked on an earlier Shell behaves differently on `v0.7.0`, please report it
+with the smallest page that shows it.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 

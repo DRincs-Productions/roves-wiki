@@ -13,6 +13,11 @@ project rather than a rewrite. Reaching a new platform is mostly about the nativ
 integration layer around the engine — windowing, input, GPU surface setup — talking to that
 platform's own APIs, not about touching how pages render.
 
+The JavaScript engine is ready for this too. Consoles generally forbid generating executable
+code at runtime, and Roves's engine (V8) has a JIT-less mode built and checked for exactly that
+case. One limit carries over: a JIT-less build has no WebAssembly, so a console port of a
+WebAssembly game would need a V8 built with its WebAssembly interpreter.
+
 See the platform-specific pages in this section for what that actually looks like on each
 console:
 
