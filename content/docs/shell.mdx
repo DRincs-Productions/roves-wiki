@@ -263,6 +263,12 @@ Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
   the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
   point at a game that allocates a lot per frame.
 
+### Graphics card
+
+Since Shell `v0.7.5`, on Windows laptops with both an integrated and a dedicated GPU (NVIDIA
+Optimus, AMD switchable graphics), games run on the dedicated GPU by default. The driver control
+panel can still override this per game. WebXR (VR/AR) is not available in the Shell.
+
 ### Direct presentation
 
 Since Shell `v0.7.4`, when a game fills the window and no Shell dialog, status overlay or
