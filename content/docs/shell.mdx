@@ -249,34 +249,28 @@ page), `egui_run` (the egui update pass), `shell_paint` (the off-screen blit plu
 painting) and `present` (the final window swap). Divide a total by the matching count from the
 `[roves-perf]` line for a per-frame average. GL work is asynchronous, so GPU cost usually shows
 up in whichever phase waits on it, typically `present` under VSync; the times are CPU-side and
-not a GPU profiler. Compare `ROVES_DIRECT_PRESENT=1` runs with default runs to see how much of
-the frame egui actually costs.
+not a GPU profiler.
 
 For meaningful Roves/Chrome comparisons, keep the
 page, release build, window size, warm-up and sample duration identical; do not treat results
 from a debug build as representative.
 
-### Experimental direct presentation
+Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
+- **`ROVES_EXTRA_ARGS`** appends engine options to the launch of a bundled game, which otherwise
+  ignores the command line. For example, `ROVES_EXTRA_ARGS="-p 5"` prints the engine's own time
+  profile every 5 seconds, split into script, layout, painting and so on.
+- **`[roves-gc]` lines** appear in `roves.log` whenever a JavaScript garbage collection pauses
+  the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
+  point at a game that allocates a lot per frame.
 
-Desktop builds from `main` support fast path A, disabled by default:
+### Direct presentation
 
-```bash
-ROVES_DIRECT_PRESENT=1 ROVES_PERF_LOG_INTERVAL_MS=1000 ./play dist/index.html
-```
-
-Only the exact value `1` enables it; unset or other values keep the composed renderer. Restart
-the Shell after changing the variable. It requires exactly one active WebView filling the
-physical window, no dialogs or status overlay, no egui focus, inactive AccessKit and no pending
-egui texture updates. Splash and loading errors always use the composed renderer. Any failed
-condition falls back in the same frame, including a dialog that closes during that update.
-
-Servo still renders off-screen. Egui still runs to process input, dialogs and accessibility;
-only tessellation and paint are skipped. Each direct frame increments `direct_presents`,
-`framebuffer_blits` and `window_presents`; fallback frames increment `composited_presents`.
-Desktop CI requires a real launch to report at least one positive `direct_presents` interval,
-without performance thresholds on shared runners. Hardware A/B measurements are still needed
-to quantify the gain. Fast path B, which would remove the off-screen buffer, is not implemented.
-This is a runtime experiment, with no new Packmaster or `mach bundle` setting.
+Since Shell `v0.7.4`, when a game fills the window and no Shell dialog, status overlay or
+accessibility tool is active, the Shell copies the game's frame straight to the window instead
+of drawing it through its own interface layer. Anything else (a dialog, the boot splash, an
+error page) automatically uses the full path for that frame. Nothing needs to be configured:
+the earlier `ROVES_DIRECT_PRESENT` variable is no longer read. With the performance counters
+on, direct frames show up as `direct_presents` and the others as `composited_presents`.
 
 ### Custom game icon
 
