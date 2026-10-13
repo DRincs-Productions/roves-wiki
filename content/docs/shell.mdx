@@ -259,6 +259,8 @@ Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
 - **`ROVES_EXTRA_ARGS`** appends engine options to the launch of a bundled game, which otherwise
   ignores the command line. For example, `ROVES_EXTRA_ARGS="-p 5"` prints the engine's own time
   profile every 5 seconds, split into script, layout, painting and so on.
+- **`ROVES_V8_FLAGS`** passes extra options to the JavaScript engine, V8 (since Shell `v0.7.8`).
+  It is meant for diagnosing garbage-collection pauses together with the `[roves-gc]` lines.
 - **`[roves-gc]` lines** appear in `roves.log` whenever a JavaScript garbage collection pauses
   the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
   point at a game that allocates a lot per frame.
