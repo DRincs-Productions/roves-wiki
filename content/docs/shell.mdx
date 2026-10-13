@@ -263,6 +263,14 @@ Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
   the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
   point at a game that allocates a lot per frame.
 
+### Downloaded assets are cached on disk
+
+Since Shell `v0.7.7`, images, audio and other files your game downloads from the internet are
+saved in a disk cache in the game's own data folder. They are reused on later launches for as
+long as the server's caching headers (`Cache-Control`, `Expires`) allow, so set a sensible
+`max-age` on your asset host. Files are never cached when the request carries cookies or an
+`Authorization` header. Each game also has its own settings folder, next to its `roves.log`.
+
 ### Graphics card
 
 Since Shell `v0.7.5`, on Windows laptops with both an integrated and a dedicated GPU (NVIDIA
