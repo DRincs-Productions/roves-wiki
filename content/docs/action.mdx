@@ -163,7 +163,7 @@ a direct passthrough to the matching `mach bundle` flags (see
 | `content-compression-level` | zstd level for `content-compress: 'auto'` (default `1`). Low by default — speed over ratio. |
 | `content-max-pack-size` | Split archives so none exceeds this size (default `500M`). |
 | `content-exclude` | Globs (one per line for more than one). Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
-| `content-boot-include` | Globs (one per line for more than one). Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
+| `content-boot-include` | Globs (one per line for more than one). Extra files eagerly extracted at boot, beyond the html file, whatever it directly references and every JavaScript/CSS file (always extracted at boot since Shell `v0.7.6`). |
 
 ### Outputs
 

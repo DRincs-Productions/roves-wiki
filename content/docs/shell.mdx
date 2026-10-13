@@ -303,7 +303,7 @@ or disable it:
 | `--content-compression-level` | `1` | zstd level for `--content-compress=auto`. Low by default — speed over ratio. |
 | `--content-max-pack-size` | `500M` | Split archives so none exceeds this size. |
 | `--content-exclude <glob>` | — | Repeatable. Leave matching files as loose, uncompressed files (e.g. a save-data folder that shouldn't sit inside a read-only archive). |
-| `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file and whatever it directly references. |
+| `--content-boot-include <glob>` | — | Repeatable. Extra files eagerly extracted at boot, beyond the html file, whatever it directly references and every JavaScript/CSS file (always extracted at boot since Shell `v0.7.6`). |
 
 ### Distributing installers
 
