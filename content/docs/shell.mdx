@@ -263,6 +263,14 @@ Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
   the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
   point at a game that allocates a lot per frame.
 
+### Minimized or covered window
+
+Since Shell `v0.7.8`, the Shell behaves like Chrome when the game window is minimized, hidden or
+completely covered by other windows. `document.visibilityState` becomes `hidden` and a
+`visibilitychange` event fires, and timers and animations slow down to save CPU and GPU.
+Everything resumes when the window is visible again. Listen for `visibilitychange` to pause your
+music, as you would in a browser.
+
 ### Downloaded assets are cached on disk
 
 Since Shell `v0.7.7`, images, audio and other files your game downloads from the internet are
