@@ -263,6 +263,13 @@ Since Shell `v0.7.2`, two more aids work on a game you have already bundled:
   the game for 8 ms or more, with the JavaScript heap size at that moment. Frequent long pauses
   point at a game that allocates a lot per frame.
 
+### Shader cache
+
+Since Shell `v0.7.8`, the graphics shaders compiled for your game are saved in the game's
+settings folder and reused on the next launch, like Chrome's GPU shader cache. The first launch
+compiles them when they are first needed; later launches avoid those stalls. The cache is rebuilt
+automatically after a graphics driver update.
+
 ### Minimized or covered window
 
 Since Shell `v0.7.8`, the Shell behaves like Chrome when the game window is minimized, hidden or
