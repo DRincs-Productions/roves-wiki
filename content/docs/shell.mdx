@@ -312,6 +312,11 @@ The development analyser transport uses a bounded Crossbeam ArrayQueue to retain
 32768 samples and import them when JavaScript reads analysis data. It removes the per-block
 DOM tasks and their rooted DOM callback. Whole-game CPU savings remain to be measured;
 this change is not yet a versioned release. Audio graph processing and downmix still run.
+Commit `605d486b079` passed the ordered patch validation and all desktop, Windows, macOS,
+Linux, Android, and iOS CI jobs ([desktop workflow](https://github.com/DRincs-Productions/roves/actions/runs/38952244417)).
+Chrome DevTools MCP verified the transport fixture with eight analyzers both unread and read
+at about 60 Hz. Those are functional checks only; the post-change Roves runtime has not yet
+been verified, and no CPU comparison is claimed.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
