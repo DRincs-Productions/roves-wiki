@@ -296,6 +296,19 @@ panel can still override this per game. WebXR (VR/AR) is not available in the Sh
 
 ### Direct presentation
 
+The development tree caches actual WebGL drawing-buffer dimensions until the next canvas
+resize, avoiding repeated synchronous queries from JavaScript to the WebGL thread. This is
+not yet a released performance claim. Benchmark the same production page and dimensions in
+Roves and Chrome; GPU usage must be measured per process. Web Animations playback remains
+incomplete and disabled, and AudioWorklet is not implemented, so loading motion or Tone.js
+alone does not establish full compatibility. Current measurements are maintained in the
+engine repository's `ROVES_PERFORMANCE.md`.
+
+Web Audio frequency analysis in the development tree uses RealFFT/RustFFT instead of a
+quadratic direct transform. It preserves the Blackman window, Web Audio normalization and
+smoothing and reuses FFT buffers. This benefits `AnalyserNode` frequency reads; it does not
+add AudioWorklet support or imply that every Tone.js operation becomes faster.
+
 Since Shell `v0.7.4`, when a game fills the window and no Shell dialog, status overlay or
 accessibility tool is active, the Shell copies the game's frame straight to the window instead
 of drawing it through its own interface layer. Anything else (a dialog, the boot splash, an
