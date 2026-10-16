@@ -308,9 +308,13 @@ Web Audio frequency analysis in the development tree uses RealFFT/RustFFT instea
 quadratic direct transform. It preserves the Blackman window, Web Audio normalization and
 smoothing and reuses FFT buffers. This benefits `AnalyserNode` frequency reads; it does not
 add AudioWorklet support or imply that every Tone.js operation becomes faster.
-Analyser sample delivery still schedules a DOM task for every 128 audio frames, even without
-JavaScript spectrum reads. Its CPU and queue costs remain to be measured separately; no
-transport optimization or whole-game performance gain is claimed for this path.
+The development analyser transport uses a bounded Crossbeam ArrayQueue to retain the latest
+32768 samples and import them when JavaScript reads analysis data. It removes the per-block
+DOM tasks and their rooted DOM callback. Whole-game CPU savings remain to be measured;
+this change is not yet a versioned release. Audio graph processing and downmix still run.
+Animation comparison fixtures disable the background panels' FPS polling. The Three.js
+diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
+browser baselines with the same corrected page; fixture savings are not engine speedups.
 
 Optimized Windows builds from commit `20f899dcfbb` pass numerical CI checks and local WebGL
 resize/readback and audio spectrum checks. In matched headless API tests, spectrum reads at
