@@ -1,0 +1,41 @@
+---
+title: Roves architecture and code inventory
+description: Which parts come from Servo, what Roves implements, and where libraries do the work.
+---
+
+Roves is a customized, vendored copy of Servo. Most browser-engine functionality—DOM, CSS,
+layout, networking, WebGL and WebGPU—comes from Servo and its dependency libraries. Roves adds
+the application shell and the glue that turns the engine into a runtime for games.
+
+## Main Roves-owned areas
+
+- **JavaScript on V8:** `roves-js` adapts the JavaScript API Servo's script code expects to V8;
+  `roves-v8` integrates V8 with Servo's native objects and WebIDL bindings. This is the largest
+  Roves-owned code area and the hardest one to replace with a small standalone library.
+- **Desktop shell:** SDL3 supplies windowing and input events. Roves connects those events to
+  Servo, and builds the small shell UI with egui and AccessKit.
+- **Game-facing native APIs:** `roves:`, `saves:` and `steam:` URL schemes expose app commands,
+  save files, Steam Cloud and achievements to ordinary page JavaScript. Servo handles the
+  protocol machinery; Roves defines the commands and their behavior.
+- **Game content packaging:** tar and zstd libraries provide archive and compression
+  primitives. Roves defines the boot set, archive layout, manifest and on-demand extraction.
+- **Bundle creation:** Roves' `mach bundle` code assembles platform bundles and handles game
+  content, icons and Steam libraries. A packaging library may cover standard installers while
+  leaving some Roves-specific integration in place.
+
+Roves also integrates persistent HTTP and WebRender shader caches, uses the `keycode` crate for
+the DOM keyboard `code` table, and delegates mobile rendering to Android WebView and WKWebView.
+
+## Looking for code to simplify
+
+Potential areas to assess include standard desktop installer generation, the remaining egui
+shell UI, the custom game-content archive policy and SDL-to-DOM input conversion. These need
+different tradeoffs: an external library can cover standard packaging or a low-level primitive,
+while the Roves-specific API or policy may still need glue.
+
+The V8 adapter is large, but reducing it is an architectural migration rather than a local
+dependency swap. Some functionality has already been removed instead of replaced: the current
+shell no longer includes the former Servo devtools or WebDriver implementations.
+
+The maintainer inventory, with approximate line counts and additional detail, is in the
+[Roves source repository](https://github.com/DRincs-Productions/roves/blob/main/docs/INVENTARIO_CODICE_ROVES.md).
