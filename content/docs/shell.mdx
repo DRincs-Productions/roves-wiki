@@ -322,6 +322,10 @@ fell from 42.6% to 24.4% of one logical core, with median peak private memory in
 debug artifacts, at 44.1 kHz with Microsoft's software renderer, not an optimized rebuild A/B
 or a comparison with Chrome. Whole-game CPU, GPU, long-session memory and per-frame reads
 remain to be measured; see the engine performance notes for all individual runs and limits.
+Performance fixtures select their entry point before loading the normal diagnostic panels,
+using React.lazy and Vite module splitting. This avoids importing Tone.js and starting its
+module side effects during graphical comparisons. Rebaseline both browsers after this fixture
+correction; it is not an engine speedup.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
