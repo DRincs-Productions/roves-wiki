@@ -304,14 +304,14 @@ incomplete and disabled, and AudioWorklet is not implemented, so loading motion 
 alone does not establish full compatibility. Current measurements are maintained in the
 engine repository's [`docs/ROVES_PERFORMANCE.md`](https://github.com/DRincs-Productions/roves/blob/main/docs/ROVES_PERFORMANCE.md).
 
-Web Audio frequency analysis in the development tree uses RealFFT/RustFFT instead of a
+Roves v0.7.12 Web Audio frequency analysis uses RealFFT/RustFFT instead of a
 quadratic direct transform. It preserves the Blackman window, Web Audio normalization and
 smoothing and reuses FFT buffers. This benefits `AnalyserNode` frequency reads; it does not
 add AudioWorklet support or imply that every Tone.js operation becomes faster.
-The development analyser transport uses a bounded Crossbeam ArrayQueue to retain the latest
+Its analyser transport uses a bounded Crossbeam ArrayQueue to retain the latest
 32768 samples and import them when JavaScript reads analysis data. It removes the per-block
 DOM tasks and their rooted DOM callback. Whole-game CPU savings remain to be measured;
-this change is not yet a versioned release. Audio graph processing and downmix still run.
+this change ships in v0.7.12. Audio graph processing and downmix still run.
 Commit `605d486b079` passed the ordered patch validation and all desktop, Windows, macOS,
 Linux, Android, and iOS CI jobs ([desktop workflow](https://github.com/DRincs-Productions/roves/actions/runs/38952244417)).
 Chrome DevTools MCP verified the transport fixture with eight analyzers both unread and read
@@ -335,7 +335,7 @@ Visible CPU pilots still show substantial variation. Process CPU counters are co
 Windows separately from Chrome DevTools MCP page inspection; GPU counter runs are kept
 separate. The performance notes retain raw-run conditions and do not claim Chrome parity.
 
-The development worker shutdown fix wakes idle dedicated workers through their existing
+The v0.7.12 worker shutdown fix wakes idle dedicated workers through their existing
 Crossbeam channel after `terminate()`, and closes the scope when its event-loop channels
 disconnect. A pre-change optimized probe retained all four new worker thread IDs five seconds
 after termination. The final debug CI artifact (56957e15df8) releases all four in each of three
@@ -368,8 +368,24 @@ globals: V8 already provides the standard classes. This avoids installing a name
 interceptor on worker globals, while retaining Window's lazy DOM interface hooks. The
 fixed-work compute probe found a large pre-change difference between repeated Math.imul
 lookup and a captured function (8551/74 ms); Chrome MCP's direct case took 69 ms. These are
-single diagnostic runs, not a verified engine gain. All 74 generator tests pass; post-change
-runtime verification is pending a new CI artifact. This change is not part of v0.7.12.
+single diagnostic runs. All 74 generator tests,13 desktop and 10 V8 CI jobs pass on 1edef82.
+The verified downloaded debug artifact completes the same direct worker probe in 93.05 ms;
+FIFO/timer checks pass as well. The older 8551 ms artifact is optimized, so do not derive a
+matched-profile percentage or game CPU saving. This change is not part of v0.7.12.
+
+The subsequent Window optimization uses V8 native data properties for its enabled interface
+names, replacing the global lookup interceptor while keeping interface construction lazy.
+Registration runs after window.init_document because exposure checks can read the document URL.
+Existing JSPROP_RESOLVING handling prevents alias definitions from triggering nested getters.
+All 37 local engine-layer tests pass, covering lazy creation, aliases, assignment/deletion,
+prototype precedence, exceptions/retry, disabled interfaces and GC; browser validation is pending
+new CI artifacts. A main-thread diagnostic found about 1020 ms versus 7.8 ms with a captured
+Math.imul function, while Chrome MCP takes about 7.8 ms in both cases. This motivates the change;
+its post-change browser gain has not yet been measured. No new dependency or custom cache.
+
+Release v0.7.12 publishes six plain/Steam platform archives. Its Windows binary passes hash,
+embedded-source, FIFO/timer and worker-thread cleanup checks; roves-action and Packmaster now
+target v0.7.12. The later native-global lookup work remains development-only.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
