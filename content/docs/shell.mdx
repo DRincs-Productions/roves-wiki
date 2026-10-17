@@ -321,6 +321,15 @@ Animation comparison fixtures disable the background panels' FPS polling. The Th
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
 
+On October 17, Chrome DevTools MCP observed 1–120 native animations on the typewriter fixture
+over ten seconds, using opacity and transform (Chrome 155.0.8059.84, visible, 1024×740,
+DPR 1). Roves uses the JavaScript fallback while Web Animations playback is incomplete.
+This supports prioritizing the native animation path; it does not measure its potential CPU
+savings or explain every long frame.
+WebRender's dynamic property API is already used for caret colors; animated opacity and
+transform bindings remain to be integrated. Playback support and compositor integration
+both need verification before claiming that these animations avoid scene rebuilds.
+
 Optimized Windows builds from commit `20f899dcfbb` pass numerical CI checks and local WebGL
 resize/readback and audio spectrum checks. In matched headless API tests, spectrum reads at
 2048/8192 samples dropped from about 27/432 ms to 0.03/0.09 ms. These are individual API

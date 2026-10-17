@@ -27,6 +27,8 @@ The development panic handler records the message, thread and source location be
 hard-fail termination. Earlier versions can leave only `Panic hook called` on that path;
 that line confirms a Rust panic even when its cause is missing. This fix is not yet in a
 versioned release.
+The change passed all desktop CI jobs, including bundle launch checks, on commit
+`1e9c7dcfea2` ([workflow](https://github.com/DRincs-Productions/roves/actions/runs/39022147447)).
 
 <Callout title="Only one line in the log, then nothing?" type="warn">
 That's consistent with either a hang, or a native crash (a GPU/driver issue, or a missing
