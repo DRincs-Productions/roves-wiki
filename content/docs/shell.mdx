@@ -363,6 +363,13 @@ Chrome DevTools MCP passes both context types and red-pixel readback on the same
 Use workers for computations/data preparation with bounded concurrency; PixiJS/three.js
 rendering in workers requires further engine support. The existing DOM-thread OffscreenCanvas
 tests do not cover worker rendering or presentation into a transferred DOM canvas.
+Development after the v0.7.12 tag removes redundant standard-class hooks from non-Window
+globals: V8 already provides the standard classes. This avoids installing a named-property
+interceptor on worker globals, while retaining Window's lazy DOM interface hooks. The
+fixed-work compute probe found a large pre-change difference between repeated Math.imul
+lookup and a captured function (8551/74 ms); Chrome MCP's direct case took 69 ms. These are
+single diagnostic runs, not a verified engine gain. All 74 generator tests pass; post-change
+runtime verification is pending a new CI artifact. This change is not part of v0.7.12.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
