@@ -23,6 +23,11 @@ It captures the engine's own logging, your game's `console.log`/`warn`/`error` o
 any panic — all in one place, from the very first line of startup. `RUST_LOG=debug` (or
 `trace`) before launching raises the verbosity if the default level doesn't show enough.
 
+The development panic handler records the message, thread and source location before
+hard-fail termination. Earlier versions can leave only `Panic hook called` on that path;
+that line confirms a Rust panic even when its cause is missing. This fix is not yet in a
+versioned release.
+
 <Callout title="Only one line in the log, then nothing?" type="warn">
 That's consistent with either a hang, or a native crash (a GPU/driver issue, or a missing
 system DLL) that happens *before* the point your build actually reached — not a Rust panic,
