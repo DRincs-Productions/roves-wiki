@@ -377,11 +377,14 @@ The subsequent Window optimization uses V8 native data properties for its enable
 names, replacing the global lookup interceptor while keeping interface construction lazy.
 Registration runs after window.init_document because exposure checks can read the document URL.
 Existing JSPROP_RESOLVING handling prevents alias definitions from triggering nested getters.
-All 37 local engine-layer tests pass, covering lazy creation, aliases, assignment/deletion,
+All 38 local engine-layer tests pass, covering lazy creation, aliases, assignment/deletion,
 prototype precedence, exceptions/retry, disabled interfaces and GC; browser validation is pending
 new CI artifacts. A main-thread diagnostic found about 1020 ms versus 7.8 ms with a captured
 Math.imul function, while Chrome MCP takes about 7.8 ms in both cases. This motivates the change;
-its post-change browser gain has not yet been measured. No new dependency or custom cache.
+its post-change browser gain has not yet been measured. The follow-up enters the owning
+global's realm during resolution and restores the caller after errors as well as success;
+it also supplies ScriptThread's required DomObject import exposed by the first CI build.
+No new dependency or custom cache.
 
 Release v0.7.12 publishes six plain/Steam platform archives. Its Windows binary passes hash,
 embedded-source, FIFO/timer and worker-thread cleanup checks; roves-action and Packmaster now
