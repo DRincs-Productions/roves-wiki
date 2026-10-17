@@ -315,8 +315,13 @@ this change is not yet a versioned release. Audio graph processing and downmix s
 Commit `605d486b079` passed the ordered patch validation and all desktop, Windows, macOS,
 Linux, Android, and iOS CI jobs ([desktop workflow](https://github.com/DRincs-Productions/roves/actions/runs/38952244417)).
 Chrome DevTools MCP verified the transport fixture with eight analyzers both unread and read
-at about 60 Hz. Those are functional checks only; the post-change Roves runtime has not yet
-been verified, and no CPU comparison is claimed.
+at about 60 Hz. The post-change Roves runtime subsequently passed the authorized headless
+transport test. Across three runs per variant with eight unread analyzers, median process CPU
+fell from 42.6% to 24.4% of one logical core, with median peak private memory increasing from
+200.1 to 201.3 MiB. All twelve checks (zero/eight nodes, before/after) passed. These are retained
+debug artifacts, at 44.1 kHz with Microsoft's software renderer, not an optimized rebuild A/B
+or a comparison with Chrome. Whole-game CPU, GPU, long-session memory and per-frame reads
+remain to be measured; see the engine performance notes for all individual runs and limits.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
