@@ -334,6 +334,8 @@ The development worker shutdown fix wakes idle dedicated workers through their e
 Crossbeam channel after `terminate()`, and closes the scope when its event-loop channels
 disconnect. A pre-change optimized probe retained all four new worker thread IDs five seconds
 after termination; post-change CI and runtime verification are pending. The reproducible
+queue probe also covers message bursts, canceled timers and later messages: a normal empty
+wake-up must leave a live worker running.
 `support/perf/worker-lifecycle-bench.html` retains parent Worker objects deliberately so
 runtime cleanup cannot depend on parent garbage collection. No scheduler dependency is added.
 The structured-clone bridge now moves the serialized byte vector into/out of the DOM transport
@@ -344,6 +346,12 @@ DOM compilation and post-change runtime measurements are pending CI artifacts.
 The visible pre-change 4 MiB transfer benchmark gives a median of 5.77 ms per round-trip
 across three Roves processes, versus about 0.10 ms across three Chrome DevTools MCP runs.
 These are baseline API timings, not whole-game CPU gains or post-change results.
+Worker rendering has a separate functional gap: the optimized Roves probe exposes
+OffscreenCanvas but returns null for WebGL 1/2 contexts and has no worker requestAnimationFrame.
+Chrome DevTools MCP passes both context types and red-pixel readback on the same page.
+Use workers for computations/data preparation with bounded concurrency; PixiJS/three.js
+rendering in workers requires further engine support. The existing DOM-thread OffscreenCanvas
+tests do not cover worker rendering or presentation into a transferred DOM canvas.
 Animation comparison fixtures disable the background panels' FPS polling. The Three.js
 diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
 browser baselines with the same corrected page; fixture savings are not engine speedups.
