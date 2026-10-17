@@ -322,6 +322,11 @@ fell from 42.6% to 24.4% of one logical core, with median peak private memory in
 debug artifacts, at 44.1 kHz with Microsoft's software renderer, not an optimized rebuild A/B
 or a comparison with Chrome. Whole-game CPU, GPU, long-session memory and per-frame reads
 remain to be measured; see the engine performance notes for all individual runs and limits.
+A separate optimized mimalloc repetition also passes all twelve checks. With eight unread
+analyzers, median process CPU is 15.07% before and 10.68% after; median peak private memory
+is 194.78/195.63 MiB. One after trial has higher host load: excluding that entire trial pair
+changes the median reduction from 29.1% to about 22.5%. Windows Power saver was active when
+checked. These software-renderer component results do not establish whole-game or Chrome parity.
 Performance fixtures select their entry point before loading the normal diagnostic panels,
 using React.lazy and Vite module splitting. This avoids importing Tone.js and starting its
 module side effects during graphical comparisons. Rebaseline both browsers after this fixture
@@ -333,16 +338,22 @@ separate. The performance notes retain raw-run conditions and do not claim Chrom
 The development worker shutdown fix wakes idle dedicated workers through their existing
 Crossbeam channel after `terminate()`, and closes the scope when its event-loop channels
 disconnect. A pre-change optimized probe retained all four new worker thread IDs five seconds
-after termination; post-change CI and runtime verification are pending. The reproducible
+after termination. The final debug CI artifact (56957e15df8) releases all four in each of three
+cycles in the same parent; private memory after each cycle is 166.63/166.01/166.26 MiB,
+without progressive growth observed across those cycles. The reproducible
 queue probe also covers message bursts, canceled timers and later messages: a normal empty
-wake-up must leave a live worker running.
+wake-up must leave a live worker running. It passes on the final artifact as well.
 `support/perf/worker-lifecycle-bench.html` retains parent Worker objects deliberately so
-runtime cleanup cannot depend on parent garbage collection. No scheduler dependency is added.
+runtime cleanup cannot depend on parent garbage collection. Automatic mode hides the diagnostic
+DOM and logs only to console to avoid rendering-thread noise. No scheduler dependency is added.
 The structured-clone bridge now moves the serialized byte vector into/out of the DOM transport
 using Rust ownership, removing two intermediate stream copies and three raw copy helpers.
 V8 still handles serialization and the wire format is unchanged. The separate payload copies
 for transferred ArrayBuffers remain. Local engine-layer tests pass (33 passed, two ignored);
-DOM compilation and post-change runtime measurements are pending CI artifacts.
+all ten cross-platform V8 checks and both optimized allocator builds pass on 8db6eab.
+Six alternating before/after optimized runs pass: median 4 MiB clone round-trip is
+5.72/3.88 ms and transfer is 6.37/4.15 ms. These are API latencies, not game CPU savings.
+The optimized artifact predates the final wake-up guard, separately verified on 56957e1 debug.
 The visible pre-change 4 MiB transfer benchmark gives a median of 5.77 ms per round-trip
 across three Roves processes, versus about 0.10 ms across three Chrome DevTools MCP runs.
 These are baseline API timings, not whole-game CPU gains or post-change results.
