@@ -1,0 +1,76 @@
+---
+title: Performance
+description: How Roves performs against Chrome with the libraries games actually use, how we measure it, and what to expect.
+---
+
+Roves is built for games: low CPU and memory use, a steady frame rate, and the GPU doing the
+work it is meant for. This page explains how performance is tested, which libraries are in
+the test, and where Roves stands today next to Chrome. Numbers are published as measured,
+including the ones where Roves is behind.
+
+## What is tested
+
+The same page is loaded in Roves and in Chrome, in a 1024×740 window, and the test measures
+CPU use, private memory and frame pacing over a 20-second window taken after a one-minute
+warm-up. One scene exists per library, plus one with everything running together.
+
+| Scene | What it runs | Library |
+| --- | --- | --- |
+| 2D | an animated scene on a 2D canvas | [PixiJS](https://pixijs.com/) |
+| 3D | 400 lit, instanced cubes and a 4000-point particle cloud | [three.js](https://threejs.org/) |
+| UI animation | a moving box plus a dialogue written one letter at a time | [motion](https://motion.dev/) and [markdown-typewriter](https://www.npmjs.com/package/markdown-typewriter) |
+| Tween | one element animated by a timeline | [GSAP](https://gsap.com/) |
+| Audio | a looping score: synths, drums, delay and reverb | [Tone.js](https://tonejs.github.io/) |
+| Background work | a Web Worker computing in short slices | the browser Worker API |
+| Everything | all of the above at once, the way a visual novel with a 3D stage would run | all |
+
+An empty page is measured too, as the baseline every scene sits on.
+
+## How to read the numbers
+
+- **CPU** is a percentage of one core, summed over every process the program uses (Chrome
+  uses several; Roves uses one).
+- **Memory** is the peak private memory over the same window. Chrome's working set counts
+  shared pages several times, so it is not used for comparison.
+- **Frame pacing** counts frames that took longer than 33 ms (a visible stutter at 60 Hz) and
+  the 99th-percentile frame time. A smooth game has none of the first and about 17 ms for the
+  second.
+- Each cell is a single run on one machine (Windows 11, i7-8700, GTX 1050, power-saver plan).
+  Differences of a few percent are noise, not results.
+
+## Current results
+
+Roves v0.7.13 against Chrome 155, one run per cell:
+
+| Scene | Roves CPU | Chrome CPU | Roves memory | Chrome memory | Frames over 33 ms (Roves / Chrome) |
+| --- | --- | --- | --- | --- | --- |
+| Empty page | 12% | 10% | 453 MiB | 209 MiB | 4 / 0 |
+| 2D (PixiJS) | 61% | 38% | 500 MiB | 210 MiB | 1 / 0 |
+| 3D (three.js) | 79% | 46% | 521 MiB | 237 MiB | 0 / 0 |
+| UI animation (motion) | 50% | 28% | 546 MiB | 240 MiB | 2 / 0 |
+| Tween (GSAP) | 28% | 36% | 454 MiB | 213 MiB | 0 / 0 |
+| Background worker | 48% | 47% | 500 MiB | 234 MiB | 0 / 0 |
+
+What this says today: Roves matches Chrome for background computation and tweening, uses
+more CPU for 2D, 3D and DOM animation, and uses roughly twice the memory in every scene,
+even an empty page. Frame pacing is good in the graphics scenes (no stutter in the 3D scene).
+These gaps are the current work; this page is updated when they change.
+
+## Known limitations that affect games
+
+- Some Web Audio nodes are not available yet: reverb (`ConvolverNode`), delay (`DelayNode`),
+  compressor (`DynamicsCompressorNode`), distortion (`WaveShaperNode`), custom waveforms
+  (`PeriodicWave`) and audio worklets. Libraries that use them, including parts of Tone.js,
+  fail when they create those nodes. Wrap their creation in `try`/`catch` so the rest of the
+  game keeps running, and prefer plain oscillators, buffer playback, gain and filters.
+- Many scenes with an animated element per letter cost more here than in Chrome; animating
+  the line as a whole is cheaper.
+
+## Tips
+
+- Prefer GPU-driven animation (transforms and opacity, WebGL/canvas) over properties that
+  force layout.
+- Reuse a small pool of Workers instead of creating one per task.
+- Keep one `AudioContext` for the whole game (Tone.js already does).
+- Measure on the lowest-end machine you intend to support, with the power plan your players
+  use.
