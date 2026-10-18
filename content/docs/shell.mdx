@@ -384,7 +384,12 @@ Math.imul function, while Chrome MCP takes about 7.8 ms in both cases. This moti
 its post-change browser gain has not yet been measured. The follow-up enters the owning
 global's realm during resolution and restores the caller after errors as well as success;
 it also supplies ScriptThread's required DomObject import exposed by the first CI build.
-No new dependency or custom cache.
+No new dependency or custom cache. The verified development Windows binary passes the nine
+DOM checks and worker queue/compute probes; direct and captured intrinsic loops both take
+about 7.9 ms in debug. This does not quantify whole-game CPU savings. A subsequent foreground
+headless game smoke exposed an overflow when reporting a V8 exception without a source
+column. A follow-up uses checked Rust conversion and preserves zero for unknown locations;
+the original exception and final browser behavior still need the next CI artifact.
 
 Release v0.7.12 publishes six plain/Steam platform archives. Its Windows binary passes hash,
 embedded-source, FIFO/timer and worker-thread cleanup checks; roves-action and Packmaster now
