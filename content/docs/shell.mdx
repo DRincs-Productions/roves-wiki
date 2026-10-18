@@ -373,34 +373,29 @@ The verified downloaded debug artifact completes the same direct worker probe in
 FIFO/timer checks pass as well. The older 8551 ms artifact is optimized, so do not derive a
 matched-profile percentage or game CPU saving. This change is not part of v0.7.12.
 
-The subsequent Window optimization uses V8 native data properties for its enabled interface
-names, replacing the global lookup interceptor while keeping interface construction lazy.
-Registration runs after window.init_document because exposure checks can read the document URL.
-Existing JSPROP_RESOLVING handling prevents alias definitions from triggering nested getters.
-All 38 local engine-layer tests pass, covering lazy creation, aliases, assignment/deletion,
-prototype precedence, exceptions/retry, disabled interfaces and GC; browser validation is pending
-new CI artifacts. A main-thread diagnostic found about 1020 ms versus 7.8 ms with a captured
-Math.imul function, while Chrome MCP takes about 7.8 ms in both cases. This motivates the change;
-its post-change browser gain has not yet been measured. The follow-up enters the owning
-global's realm during resolution and restores the caller after errors as well as success;
-it also supplies ScriptThread's required DomObject import exposed by the first CI build.
-No new dependency or custom cache. The verified development Windows binary passes the nine
-DOM checks and worker queue/compute probes; direct and captured intrinsic loops both take
-about 7.9 ms in debug. This does not quantify whole-game CPU savings. A subsequent foreground
-headless game smoke exposed an overflow when reporting a V8 exception without a source
-column. A follow-up uses checked Rust conversion and preserves zero for unknown locations;
-the original exception and final browser behavior still need the next CI artifact.
+The v0.7.13 Window optimization uses V8 native data properties for enabled interfaces,
+preserving lazy construction, aliases and owning realms. All 39 local tests pass (two
+ignored); desktop 13/13, V8 10/10 and all six release builds pass. The published Windows
+binary passes nine DOM checks, queue/timer checks and the visible Pixi/typewriter probe.
+Direct and captured intrinsic loops both take about 7.9 ms. Checked Rust conversion
+also fixes the unknown V8 source-column overflow, verified on the debug CI artifact.
+No new dependency or custom cache.
 
-Release v0.7.12 publishes six plain/Steam platform archives. Its Windows binary passes hash,
-embedded-source, FIFO/timer and worker-thread cleanup checks; roves-action and Packmaster now
-target v0.7.12. The later native-global lookup work remains development-only.
-Consumer CI now passes all nine jobs after repairing the template's optional native
-npm lock entries. One refreshed visible typewriter/Pixi pair uses about 88/89 percent
-of one CPU core in Roves/Chrome155, with 661/400 MiB private peaks and 9/6 long frames.
-Host load and process state differ; these single runs do not establish performance parity.
-Animation comparison fixtures disable the background panels' FPS polling. The Three.js
-diagnostic panel disposes geometry/material and removes its canvas on unmount. Re-run both
-browser baselines with the same corrected page; fixture savings are not engine speedups.
+One updated visible Roves/Chrome155 pair uses 87.44/82.70 percent of one CPU core,
+626/335 MiB private memory, and 10/7 frames above33 ms. Different host load and single
+runs do not establish parity or a stable whole-game gain. Half-rate rendering is not
+evidence of CPU savings. Native Web Animations playback remains incomplete.
+
+The large integer worker probe takes about 8.4/4.2/2.1/1.1 seconds with 1/2/4/8 workers;
+total process CPU stays near11 core-seconds while sampled private memory rises174–250 MiB.
+Chrome arithmetic throughput is similar, but headless Roves versus visible Chrome does
+not establish UI or CPU parity. Prefer evaluating small reused pools and bounded batches
+in real games. ArrayBuffer payload copies and worker WebGL/rAF support remain open.
+
+roves-action v0.1.9 and its v0 alias select engine v0.7.13. Packmaster v0.1.9 reads one
+shared shell-version.txt from both TypeScript and Rust. This corrects an old production
+backend pin (v0.4.18) which test/latest builds masked; the former frontend-only v0.7.12
+pin did not update that backend. Consumer CI and published release assets are verified.
 
 On October 17, Chrome DevTools MCP observed 1–120 native animations on the typewriter fixture
 over ten seconds, using opacity and transform (Chrome 155.0.8059.84, visible, 1024×740,
