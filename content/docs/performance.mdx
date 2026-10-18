@@ -58,11 +58,12 @@ These gaps are the current work; this page is updated when they change.
 
 ## Known limitations that affect games
 
-- Some Web Audio nodes are not available yet: reverb (`ConvolverNode`), delay (`DelayNode`),
-  compressor (`DynamicsCompressorNode`), distortion (`WaveShaperNode`), custom waveforms
-  (`PeriodicWave`) and audio worklets. Libraries that use them, including parts of Tone.js,
-  fail when they create those nodes. Wrap their creation in `try`/`catch` so the rest of the
-  game keeps running, and prefer plain oscillators, buffer playback, gain and filters.
+- Web Audio nodes: in v0.7.13 and earlier reverb (`ConvolverNode`), delay (`DelayNode`), compressor
+  (`DynamicsCompressorNode`) and distortion (`WaveShaperNode`) are missing, so libraries that use them,
+  including parts of Tone.js, fail when they create those nodes. They are added in the next release
+  (along with fixes that stop audio-heavy pages from growing in memory). Custom waveforms
+  (`PeriodicWave`), `ScriptProcessorNode` and audio worklets are still missing. Wrap node creation in
+  `try`/`catch` so the rest of the game keeps running.
 - Many scenes with an animated element per letter cost more here than in Chrome; animating
   the line as a whole is cheaper.
 
