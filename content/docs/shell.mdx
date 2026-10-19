@@ -184,6 +184,8 @@ The browser smoke also verifies that `window` rejects prototype replacement whil
 ordinary properties.
 `eval(TrustedScript)` passes its original trusted object through Servo's Trusted Types and CSP
 checks; ordinary object arguments keep eval's identity-return behavior.
+The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
+bindings or shell runtime.
 Engine contributors can follow the migration status in
 [`docs/V8_MIGRATION.md`](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
 Engine contributors should read
