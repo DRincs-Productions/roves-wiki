@@ -178,6 +178,8 @@ The engine's V8 smoke CI checks normal and JIT-less builds, including DOM events
 navigation and graphics APIs. It fails on failed assertions, incomplete reports, unexpected
 skips and hung requests. When WebGPU has no usable adapter, `GPU.requestAdapter()` resolves to
 `null`, including for local `file://` smoke pages; a request that hangs remains a failure.
+Desktop bundle smoke waits for the required page results (including synthetic input and the
+save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
 Engine contributors can follow the migration status in
 [`docs/V8_MIGRATION.md`](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
 Engine contributors should read
