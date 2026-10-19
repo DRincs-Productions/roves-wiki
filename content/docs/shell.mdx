@@ -186,8 +186,8 @@ ordinary properties.
 WindowProxy prototype access now follows Servo’s origin checks: the strict browser smoke checks
 same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
 the prototype.
-`eval(TrustedScript)` passes its original trusted object through Servo's Trusted Types and CSP
-checks; ordinary object arguments keep eval's identity-return behavior.
+`eval(TrustedScript)` passes its original trusted object and source body through Servo's Trusted
+Types and CSP checks; ordinary object arguments keep eval's identity-return behavior.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
