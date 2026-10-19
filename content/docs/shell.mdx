@@ -164,7 +164,8 @@ similar libraries only depend on standard JavaScript and Web APIs, and they are 
 engine change. A few things to know:
 - **WebAssembly** works, including `WebAssembly.instantiateStreaming` on a fetched `.wasm` file.
 - **JIT-less builds** (V8 without its just-in-time compiler, the mode meant for platforms that
-  forbid generating code at runtime) have **no WebAssembly**. Unity, Godot or Emscripten exports
+  forbid generating code at runtime) have **no WebAssembly**. The engine preference
+  `js_disable_jit` selects JIT-less mode at process startup. Unity, Godot or Emscripten exports
   need a regular build.
 - **Developer-tools JavaScript debugging** (breakpoints, stepping) is not available yet on V8.
   `console` output works as before.
