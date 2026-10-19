@@ -183,11 +183,14 @@ Desktop bundle smoke waits for the required page results (including synthetic in
 save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
 The browser smoke also verifies that `window` rejects prototype replacement while still allowing
 ordinary properties.
-WindowProxy prototype access now follows Servo’s origin checks: the strict browser smoke checks
+WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
 same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
-the prototype.
-`eval(TrustedScript)` passes its original trusted object and source body through Servo's Trusted
-Types and CSP checks; ordinary object arguments keep eval's identity-return behavior.
+the prototype. CI exposed a missing immutable-prototype check in the V8 proxy dispatcher; a fix
+and regression case are pending browser CI confirmation.
+`eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
+body. The V8 smoke run exposed a missing source-body mapping, now corrected in the engine;
+browser CI confirmation is pending. Ordinary object arguments keep eval's identity-return
+behavior.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
