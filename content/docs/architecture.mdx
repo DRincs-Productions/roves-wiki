@@ -39,3 +39,16 @@ shell no longer includes the former Servo devtools or WebDriver implementations.
 
 The maintainer inventory, with approximate line counts and additional detail, is in the
 [Roves source repository](https://github.com/DRincs-Productions/roves/blob/main/docs/INVENTARIO_CODICE_ROVES.md).
+
+## V8 validation
+
+The V8 workflow validates smoke results as well as building the engine. Failed assertions,
+incomplete or inconsistent totals, unexpected skips, crashes, and missing Window identity,
+CSP or navigation checks fail the job. A browser that stays open after completing all checks
+may be stopped by the runner timeout; a timeout before the results are complete fails.
+
+Normal mode requires the Wasm checks to run. JIT-less mode explicitly skips them because the
+current prebuilt V8 has no Wasm interpreter. Headless CI may additionally allow the named
+audio-output and unavailable-GPU checks to skip; a GPU adapter request that hangs is a failure.
+Local runs reject device skips unless `V8_SMOKE_ALLOW_MISSING_DEVICES=1` is set. Select the
+engine mode with `V8_SMOKE_MODE=normal` or `V8_SMOKE_MODE=jitless`.
