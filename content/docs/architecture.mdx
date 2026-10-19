@@ -52,3 +52,6 @@ current prebuilt V8 has no Wasm interpreter. Headless CI may additionally allow 
 audio-output and unavailable-GPU checks to skip; a GPU adapter request that hangs is a failure.
 Local runs reject device skips unless `V8_SMOKE_ALLOW_MISSING_DEVICES=1` is set. Select the
 engine mode with `V8_SMOKE_MODE=normal` or `V8_SMOKE_MODE=jitless`.
+
+The current migration status and open browser-proxy checks are tracked in the engine
+[migration plan](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).

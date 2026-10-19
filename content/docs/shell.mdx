@@ -185,12 +185,14 @@ The browser smoke also verifies that `window` rejects prototype replacement whil
 ordinary properties.
 WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
 same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
-the prototype. CI exposed a missing immutable-prototype check in the V8 proxy dispatcher; a fix
-and regression case are pending browser CI confirmation.
+the prototype. The latest browser CI run still did not confirm the immutable Window or cross-origin
+markers. The smoke now reports Window operation results independently and includes a bounded
+iframe timeout marker, so the next run can distinguish a global-proxy semantic gap from a frame
+loading issue. This behavior remains under investigation.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
-body. The V8 smoke run exposed a missing source-body mapping, now corrected in the engine;
-browser CI confirmation is pending. Ordinary object arguments keep eval's identity-return
-behavior.
+body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
+result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
+Ordinary object arguments keep eval's identity-return behavior.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
