@@ -187,12 +187,12 @@ The browser smoke also verifies that `window` rejects prototype replacement whil
 ordinary properties.
 WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
 same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
-the prototype. The latest browser CI run still did not confirm the immutable Window or cross-origin
-markers. The smoke now reports Window operation results independently and includes a bounded
-iframe timeout marker. Servo does not complete the smoke's `data:` iframe navigation, so the
-fixture now serves a separate cross-origin page over loopback HTTP and keeps the top-level page
-on `file://`. The next run can distinguish a global-proxy semantic gap from a frame loading
-issue. This behavior remains under investigation.
+the prototype. In CI 394803 the Window global accepted a replacement prototype and no iframe event
+was reported. The smoke now reports Window operation results independently and keeps HTTP server
+logs on failures. Its main Window fixture loads from `http://127.0.0.1:18765`; the iframe uses
+`http://127.0.0.1:18766`, so the page and frame have distinct HTTP origins. Roves now marks the
+native V8 global template for Servo's `Window` class as immutable; the next CI run must verify the
+production behavior.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
 body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
 result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
@@ -201,7 +201,9 @@ Trusted Types `Function` constructor case from WPT, with every parameter and the
 `TrustedScript`, and WebAssembly compilation without `wasm-unsafe-eval`. Chrome DevTools MCP on
 Chrome `155.0.0.0` blocked the TrustedScript Function case with `EvalError`, which differs from
 WPT's current expectation; the V8 migration follows WPT and tracks the browser discrepancy
-explicitly.
+explicitly. In CI 394803 both Linux modes still fail this case. V8's string-compilation callback
+receives the composed Function source rather than the original branded arguments, so accepting
+that source alone would weaken Trusted Types enforcement; this remains an open integration gap.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
