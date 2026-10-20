@@ -183,16 +183,13 @@ skips and hung requests. When WebGPU has no usable adapter, `GPU.requestAdapter(
 `null`, including for local `file://` smoke pages; a request that hangs remains a failure.
 Desktop bundle smoke waits for the required page results (including synthetic input and the
 save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
-The browser smoke also verifies that `window` rejects prototype replacement while still allowing
-ordinary properties.
+The browser smoke checks ordinary JavaScript prototype mutation. Window prototype immutability
+remains an open integration issue; making the V8 template immutable caused Servo's generated
+`WindowBinding` to abort while installing the initial prototype, so that experiment was reverted.
 WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
-same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
-the prototype. In CI 394803 the Window global accepted a replacement prototype and no iframe event
-was reported. The smoke now reports Window operation results independently and keeps HTTP server
-logs on failures. Its main Window fixture loads from `http://127.0.0.1:18765`; the iframe uses
-`http://127.0.0.1:18766`, so the page and frame have distinct HTTP origins. Roves now marks the
-native V8 global template for Servo's `Window` class as immutable; the next CI run must verify the
-production behavior.
+same-origin and a cross-origin iframe. The fixture serves the top-level page and iframe over
+separate loopback HTTP ports so the frame has a distinct origin; CI still needs to confirm its
+load and prototype markers independently.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
 body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
 result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
