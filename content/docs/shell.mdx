@@ -187,8 +187,10 @@ WindowProxy prototype access now follows Servo’s origin checks. The strict bro
 same-origin and an opaque-origin iframe, where cross-origin callers see `null` and cannot replace
 the prototype. The latest browser CI run still did not confirm the immutable Window or cross-origin
 markers. The smoke now reports Window operation results independently and includes a bounded
-iframe timeout marker, so the next run can distinguish a global-proxy semantic gap from a frame
-loading issue. This behavior remains under investigation.
+iframe timeout marker. Servo does not complete the smoke's `data:` iframe navigation, so the
+fixture now serves a separate cross-origin page over loopback HTTP and keeps the top-level page
+on `file://`. The next run can distinguish a global-proxy semantic gap from a frame loading
+issue. This behavior remains under investigation.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
 body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
 result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
