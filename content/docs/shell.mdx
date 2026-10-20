@@ -167,6 +167,8 @@ engine change. A few things to know:
   forbid generating code at runtime) have **no WebAssembly**. The engine preference
   `js_disable_jit` selects JIT-less mode at process startup. Unity, Godot or Emscripten exports
   need a regular build.
+- SpiderMonkey's Baseline/Ion, asm.js and per-tier Wasm tuning preferences have been removed:
+  V8 ignored these settings. Use `js_disable_jit` for the supported startup JIT switch.
 - **Developer-tools JavaScript debugging** (breakpoints, stepping) is not available yet on V8.
   `console` output works as before.
 - A page you leave by navigating is not freed until the game quits. Single-page games, which is
@@ -194,7 +196,12 @@ issue. This behavior remains under investigation.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
 body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
 result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
-Ordinary object arguments keep eval's identity-return behavior.
+Ordinary object arguments keep eval's identity-return behavior. The CSP smoke also checks the
+Trusted Types `Function` constructor case from WPT, with every parameter and the body supplied as
+`TrustedScript`, and WebAssembly compilation without `wasm-unsafe-eval`. Chrome DevTools MCP on
+Chrome `155.0.0.0` blocked the TrustedScript Function case with `EvalError`, which differs from
+WPT's current expectation; the V8 migration follows WPT and tracks the browser discrepancy
+explicitly.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
