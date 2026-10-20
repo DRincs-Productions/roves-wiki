@@ -206,6 +206,8 @@ The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of th
 bindings or shell runtime.
 Engine contributors can follow the migration status in
 [`docs/V8_MIGRATION.md`](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
+The current browser smoke also checks whether `new Function` accepts an all-`TrustedScript`
+argument list; that case is still failing in the integration and is tracked in the migration plan.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
