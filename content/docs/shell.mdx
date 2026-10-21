@@ -206,9 +206,13 @@ Trusted Types `Function` constructor case from WPT, with every parameter and the
 `TrustedScript`, and WebAssembly compilation without `wasm-unsafe-eval`. Chrome DevTools MCP on
 Chrome `155.0.0.0` blocked the TrustedScript Function case with `EvalError`, which differs from
 WPT's current expectation; the V8 migration follows WPT and tracks the browser discrepancy
-explicitly. In CI 394803 both Linux modes still fail this case. V8's string-compilation callback
-receives the composed Function source rather than the original branded arguments, so accepting
-that source alone would weaken Trusted Types enforcement; this remains an open integration gap.
+explicitly. Per-realm V8 Proxy adapters preserve original arguments for all four dynamic Function
+constructors and pass their individual UTF-16 strings to Servo's CSP checker. TrustedScript
+data is extracted by the existing host callback, so forged `toString` methods are never called;
+plain strings and counterfeit objects remain untrusted. V8's original constructor still parses
+parameters/body and handles subclasses. A temporary authorization applies only to the exact
+checked source during the native constructor call. Browser CI confirmation, intrinsic identity
+checks and dynamic-import WPT coverage remain open; browser performance is not yet measured.
 The V8 caller adapter checks whether a JavaScript frame is active before supplying the caller
 global. With no script running, Servo can use its callback settings stack; empty V8 stack traces
 are handled without indexing a missing frame. Activation overrides and cross-realm callback
