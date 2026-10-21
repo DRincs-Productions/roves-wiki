@@ -221,6 +221,9 @@ global. With no script running, Servo can use its callback settings stack; empty
 are handled without indexing a missing frame. Activation overrides and cross-realm callback
 semantics remain under migration audit. Per-object realm lookup uses V8 creation contexts
 and wrapper owners; unused optional persistent-context bookkeeping has been removed.
+GC during proxy construction preserves reserved slots and private values, while native
+trace hooks wait until their JSAPI object cell is initialized. This does not close the
+remaining realm/script/module retention audit.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
