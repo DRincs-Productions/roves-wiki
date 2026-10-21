@@ -188,7 +188,10 @@ The browser smoke checks ordinary prototype mutation and actual Window immutabil
 Window now uses V8's template-created canonical prototype, which Servo initializes without
 replacing it. This allows V8 to reject later prototype replacement while keeping global properties
 writable; the binding initialization path still awaits browser CI confirmation.
-WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
+Remote WindowProxy representatives now use a real V8 Proxy so Servo’s cross-origin handlers
+run. Their synthetic realm has cloned creator principals, so the remote prototype getter returns
+null directly; the existing immutable setter accepts null and rejects replacement. The local
+Window keeps V8's native global identity. These paths still require browser CI confirmation. The strict browser smoke checks
 same-origin and a cross-origin iframe. The fixture serves the top-level page and iframe over
 separate loopback HTTP ports so the frame has a distinct origin; CI still needs to confirm its
 load and prototype markers independently. Failed runs retain browser log tails and distinguish
