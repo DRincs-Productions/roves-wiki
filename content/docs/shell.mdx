@@ -189,7 +189,10 @@ remains an open integration issue; making the V8 template immutable caused Servo
 WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
 same-origin and a cross-origin iframe. The fixture serves the top-level page and iframe over
 separate loopback HTTP ports so the frame has a distinct origin; CI still needs to confirm its
-load and prototype markers independently.
+load and prototype markers independently. Failed runs retain browser log tails and distinguish
+iframe append, load and contentWindow access. CI 394914 builds servoshell on all desktop platforms,
+but its Linux normal/JIT-less smoke still fails on the iframe and trusted Function cases;
+Windows/macOS browser smoke is skipped, so those green jobs confirm compilation only.
 `eval(TrustedScript)` is handled by Servo's Trusted Types and CSP checks, including its source
 body. Browser CI confirms that eval is allowed, but the smoke previously discarded its numeric
 result and printed `allowed` where it expected `42`; the fixture now checks the actual value.
