@@ -214,8 +214,9 @@ constructors and pass their individual UTF-16 strings to Servo's CSP checker. Tr
 data is extracted by the existing host callback, so forged `toString` methods are never called;
 plain strings and counterfeit objects remain untrusted. V8's original constructor still parses
 parameters/body and handles subclasses. A temporary authorization applies only to the exact
-checked source during the native constructor call. Browser CI confirmation, intrinsic identity
-checks and dynamic-import WPT coverage remain open; browser performance is not yet measured.
+checked source during the native constructor call. Linux normal/JIT-less browser CI confirms
+trusted Function and prototype checks. Intrinsic identity checks and dynamic-import WPT coverage
+remain open; browser performance is not yet measured.
 The V8 caller adapter checks whether a JavaScript frame is active before supplying the caller
 global. With no script running, Servo can use its callback settings stack; empty V8 stack traces
 are handled without indexing a missing frame. Activation overrides and cross-realm callback
@@ -224,6 +225,13 @@ and wrapper owners; unused optional persistent-context bookkeeping has been remo
 GC during proxy construction preserves reserved slots and private values, while native
 trace hooks wait until their JSAPI object cell is initialized. This does not close the
 remaining realm/script/module retention audit.
+WindowProxy property traps reuse Servo origin checks and the cross-origin members generated
+from Window WebIDL annotations. Reads, descriptors, membership, writes, definition, deletion
+and key enumeration are checked according to the caller's origin. Property holders are cached
+per receiving realm in a V8 WeakMap, preserving accessor identity without retaining dead keys.
+The new property smoke checks eight denied operations and allowed Window members; browser CI
+confirmation remains pending. Remote-window completeness, navigation identity and broader WPT
+coverage remain migration work.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
