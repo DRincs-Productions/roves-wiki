@@ -243,6 +243,9 @@ does not replace the WPT requirement used by the Roves checks. Online Roves resu
 The cross-origin HTTP and Wasm CSP fixture pages are included in the engine patch set.
 Maintainers verified reconstruction of all 146 tracked custom runtime, smoke and V8-tool files;
 this checks source consistency, separately from browser behavior and build results.
+Runtime CSP regressions also try to reuse the exact authorized function text in eval from
+a newTarget prototype getter, across all four dynamic constructors. Normal/JIT-less local
+suites pass; this supports the scoped authorization boundary, without claiming full CSP WPT coverage.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
