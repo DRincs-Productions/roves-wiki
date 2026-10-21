@@ -246,6 +246,13 @@ this checks source consistency, separately from browser behavior and build resul
 Runtime CSP regressions also try to reuse the exact authorized function text in eval from
 a newTarget prototype getter, across all four dynamic constructors. Normal/JIT-less local
 suites pass; this supports the scoped authorization boundary, without claiming full CSP WPT coverage.
+Script and module metadata now use the same private reference hooks. Assignments retain the
+engine's reference, replacements release the old one, and runtime shutdown releases all
+remaining references before the context and isolate disappear. The Servo call sites lend an
+Rc pointer while retaining their Rust owner until assignment finishes. Local regressions cover
+classic scripts, source modules, JSON modules and replacing a value when only the engine owns it.
+This fixes ownership accounting and shutdown leaks; metadata collection during a live runtime
+and navigation still requires migration work.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
