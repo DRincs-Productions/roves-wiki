@@ -219,7 +219,8 @@ checks and dynamic-import WPT coverage remain open; browser performance is not y
 The V8 caller adapter checks whether a JavaScript frame is active before supplying the caller
 global. With no script running, Servo can use its callback settings stack; empty V8 stack traces
 are handled without indexing a missing frame. Activation overrides and cross-realm callback
-semantics remain under migration audit.
+semantics remain under migration audit. Per-object realm lookup uses V8 creation contexts
+and wrapper owners; unused optional persistent-context bookkeeping has been removed.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
