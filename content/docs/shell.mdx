@@ -165,8 +165,9 @@ engine change. A few things to know:
 - **WebAssembly** works, including `WebAssembly.instantiateStreaming` on a fetched `.wasm` file.
 - **JIT-less builds** (V8 without its just-in-time compiler, the mode meant for platforms that
   forbid generating code at runtime) have **no WebAssembly**. The engine preference
-  `js_disable_jit` selects JIT-less mode at process startup. Unity, Godot or Emscripten exports
-  need a regular build.
+  `js_disable_jit` selects JIT-less mode at process startup, for example with
+  `--pref js_disable_jit=true`; it cannot be changed while the game is running. Unity, Godot or
+  Emscripten exports need a regular build.
 - SpiderMonkey's Baseline/Ion, asm.js and per-tier Wasm tuning preferences have been removed:
   V8 ignored these settings. Use `js_disable_jit` for the supported startup JIT switch.
 - **Developer-tools JavaScript debugging** (breakpoints, stepping) is not available yet on V8.
