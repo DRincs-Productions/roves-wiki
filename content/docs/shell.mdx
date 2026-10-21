@@ -179,7 +179,8 @@ with the smallest page that shows it.
 
 The engine's V8 smoke CI checks normal and JIT-less builds, including DOM events, promises, CSP,
 navigation and graphics APIs. It fails on failed assertions, incomplete reports, unexpected
-skips and hung requests. When WebGPU has no usable adapter, `GPU.requestAdapter()` resolves to
+skips and hung requests. Completed suites stop their browser once the total is reported and
+still undergo full result validation, avoiding idle waits until each deadline. When WebGPU has no usable adapter, `GPU.requestAdapter()` resolves to
 `null`, including for local `file://` smoke pages; a request that hangs remains a failure.
 Desktop bundle smoke waits for the required page results (including synthetic input and the
 save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
