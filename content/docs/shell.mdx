@@ -262,7 +262,10 @@ unreachable JS/function/private cycles can release it. Pending dynamic imports k
 token on the Promise until it resolves/rejects or is collected. Shutdown clears any remaining
 native references before the runtime disappears. Local normal/JIT-less tests cover GC,
 separate metadata for identical compilations, execution in another realm, poisoned intrinsics
-and pending/settled imports; browser CI of this new lifecycle change is pending.
+and pending/settled imports. Linux normal/JIT-less browser smoke passes in
+[run 39636431164](https://github.com/DRincs-Productions/roves/actions/runs/39636431164).
+Eight jobs pass; macOS JIT-less runtime and macOS build are cancelled. Browser GC stress
+and repeated-navigation collection remain unverified.
 This adds token/holder bookkeeping and can affect compilation-cache reuse; startup CPU and
 browser memory have not been measured. Realm and module record ownership remain migration work.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
@@ -270,7 +273,8 @@ bindings or shell runtime.
 Engine contributors can follow the migration status in
 [`docs/V8_MIGRATION.md`](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
 The current browser smoke also checks whether `new Function` accepts an all-`TrustedScript`
-argument list; that case is still failing in the integration and is tracked in the migration plan.
+argument list; the four-constructor matrix now passes on Linux normal/JIT-less, including
+mixed and forged arguments. Broader WPT coverage remains tracked in the migration plan.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
