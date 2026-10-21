@@ -204,6 +204,10 @@ WPT's current expectation; the V8 migration follows WPT and tracks the browser d
 explicitly. In CI 394803 both Linux modes still fail this case. V8's string-compilation callback
 receives the composed Function source rather than the original branded arguments, so accepting
 that source alone would weaken Trusted Types enforcement; this remains an open integration gap.
+The V8 caller adapter checks whether a JavaScript frame is active before supplying the caller
+global. With no script running, Servo can use its callback settings stack; empty V8 stack traces
+are handled without indexing a missing frame. Activation overrides and cross-realm callback
+semantics remain under migration audit.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
