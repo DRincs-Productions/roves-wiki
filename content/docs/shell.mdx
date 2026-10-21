@@ -234,6 +234,12 @@ per receiving realm in a V8 WeakMap, preserving accessor identity without retain
 The new property smoke checks eight denied operations and allowed Window members; browser CI
 confirmation remains pending. Remote-window completeness, navigation identity and broader WPT
 coverage remain migration work.
+The CSP fixture additionally checks all 60 mixed trusted/plain combinations across Function,
+GeneratorFunction, AsyncFunction and AsyncGeneratorFunction, four all-trusted executions and
+four forged argument conversions. This is selected coverage derived from the current
+[Trusted Types WPT](https://github.com/web-platform-tests/wpt/blob/master/trusted-types/eval-function-constructor.html),
+not a full WPT run. Chrome 155 still rejects the all-trusted constructor case; that behavior
+does not replace the WPT requirement used by the Roves checks. Online Roves results are pending.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
