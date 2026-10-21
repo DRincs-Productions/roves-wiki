@@ -215,8 +215,11 @@ data is extracted by the existing host callback, so forged `toString` methods ar
 plain strings and counterfeit objects remain untrusted. V8's original constructor still parses
 parameters/body and handles subclasses. A temporary authorization applies only to the exact
 checked source during the native constructor call. Linux normal/JIT-less browser CI confirms
-trusted Function and prototype checks. Intrinsic identity checks and dynamic-import WPT coverage
-remain open; browser performance is not yet measured.
+trusted Function and prototype checks. GeneratorFunction, AsyncFunction and
+AsyncGeneratorFunction inherit from the same `Function` scripts see, matching the language
+specification and Chrome, and keep that link after `Object.preventExtensions` or `Object.freeze`.
+Their source text is `function () { [native code] }`, without the constructor name Chrome
+prints. Dynamic-import WPT coverage remains open; browser performance is not yet measured.
 The V8 caller adapter checks whether a JavaScript frame is active before supplying the caller
 global. With no script running, Servo can use its callback settings stack; empty V8 stack traces
 are handled without indexing a missing frame. Activation overrides and cross-realm callback
