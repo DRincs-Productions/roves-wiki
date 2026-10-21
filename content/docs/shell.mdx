@@ -240,6 +240,9 @@ four forged argument conversions. This is selected coverage derived from the cur
 [Trusted Types WPT](https://github.com/web-platform-tests/wpt/blob/master/trusted-types/eval-function-constructor.html),
 not a full WPT run. Chrome 155 still rejects the all-trusted constructor case; that behavior
 does not replace the WPT requirement used by the Roves checks. Online Roves results are pending.
+The cross-origin HTTP and Wasm CSP fixture pages are included in the engine patch set.
+Maintainers verified reconstruction of all 146 tracked custom runtime, smoke and V8-tool files;
+this checks source consistency, separately from browser behavior and build results.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
