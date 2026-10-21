@@ -253,6 +253,8 @@ Rc pointer while retaining their Rust owner until assignment finishes. Local reg
 classic scripts, source modules, JSON modules and replacing a value when only the engine owns it.
 This fixes ownership accounting and shutdown leaks; metadata collection during a live runtime
 and navigation still requires migration work.
+The native retain/release callbacks use Rust's standard Rc count APIs directly, replacing
+temporary Rc reconstruction and manual forgetting without changing ownership semantics.
 The WebIDL V8 pilot is a generator-only evaluation utility; it is not part of the production DOM
 bindings or shell runtime.
 Engine contributors can follow the migration status in
