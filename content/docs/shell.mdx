@@ -184,9 +184,10 @@ still undergo full result validation, avoiding idle waits until each deadline. W
 `null`, including for local `file://` smoke pages; a request that hangs remains a failure.
 Desktop bundle smoke waits for the required page results (including synthetic input and the
 save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
-The browser smoke checks ordinary JavaScript prototype mutation. Window prototype immutability
-remains an open integration issue; making the V8 template immutable caused Servo's generated
-`WindowBinding` to abort while installing the initial prototype, so that experiment was reverted.
+The browser smoke checks ordinary prototype mutation and actual Window immutability separately.
+Window now uses V8's template-created canonical prototype, which Servo initializes without
+replacing it. This allows V8 to reject later prototype replacement while keeping global properties
+writable; the binding initialization path still awaits browser CI confirmation.
 WindowProxy prototype access now follows Servo’s origin checks. The strict browser smoke checks
 same-origin and a cross-origin iframe. The fixture serves the top-level page and iframe over
 separate loopback HTTP ports so the frame has a distinct origin; CI still needs to confirm its
