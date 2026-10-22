@@ -279,6 +279,19 @@ Engine contributors can follow the migration status in
 The current browser smoke also checks whether `new Function` accepts an all-`TrustedScript`
 argument list; the four-constructor matrix now passes on Linux normal/JIT-less, including
 mixed and forged arguments. Broader WPT coverage remains tracked in the migration plan.
+Browser garbage collection now has an opt-in engine check. The engine preference
+`dom_testutils_enabled` (off by default, for engine testing only, not for games) exposes the
+standard [`TestUtils.gc()`](https://testutils.spec.whatwg.org/) API, reusing Servo's existing
+implementation: no new dependency, no changed default and only a small always-compiled binding;
+the cost of a full collection is paid only when the preference is enabled and the API is called.
+Without the preference `TestUtils` stays undefined, which the smoke also checks. A separate
+smoke process enables it to verify that retained DOM nodes keep their expandos and listener
+closures across repeated collections, that unreachable DOM nodes and object cycles are actually
+collected (observed through `WeakRef`), and that a function compiled by a removed classic script
+can still `import()` a module after collection and is itself collected once dropped. This
+observes reachability from script only: it does not count native finalizers and does not show
+realm, module-map or navigation retention fixed. Browser results are pending CI; there are no
+performance measurements.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
