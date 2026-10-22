@@ -608,3 +608,15 @@ naming/shaping the *installer*. Anything else on the command line is written int
 bundle's `launch.json` and handed to the running game at launch as real CLI args — the two
 are validated against each other so one can't accidentally leak into the other.
 </Callout>
+
+
+### Realm ownership in the V8 prototype
+
+The backend no longer keeps every JavaScript context alive for the whole runtime. A context
+and its native realm data are traced together; a weak registry records them without owning
+them. Objects, functions, queued jobs, the current realm and saved nested realm entries keep
+the contexts they need. Realm principals are released exactly once, on collection or shutdown.
+The initial runtime context remains alive for shared intrinsics. This is tested in the isolated
+runtime, including foreign Window wrappers; full integration is checked by CI. Servo still
+holds page globals and module maps, and linked JSON modules awaiting evaluation remain rooted.
+This does not establish page collection or any measured CPU/RAM improvement.
