@@ -637,9 +637,11 @@ embedder still requires the normal foreground/shutdown ordering. No performance 
 improvement has been measured from this change.
 
 
-Foreground tasks already handed to the event loop now carry a weak reference to their
-original runtime owner. They execute only in that live runtime; shutdown retires the owner
-and prevents new pending insertions. Native tasks whose isolate is already gone are not
-executed or destroyed through another runtime. This preserves the existing conservative
-abandonment policy; it is not a claim that all task allocations are reclaimed. Embedders
-must still keep their dispatch callback data valid during in-flight callbacks.
+Foreground tasks already handed to the event loop carry a weak reference to their original
+runtime owner and execute only in that runtime. The runtime also owns their native work
+until execution or shutdown: it destroys unexecuted work before disposing the isolate,
+leaving any late event-loop payload empty. This also covers rejected event-loop delivery.
+Completed slot metadata is pruned amortized. Work that was never accepted after closure,
+unregistered platform tasks and pending timer tasks retain the earlier conservative policies;
+this is not a proof that every task allocation is reclaimed. Embedders must still keep their
+dispatch callback data valid during in-flight callbacks.
