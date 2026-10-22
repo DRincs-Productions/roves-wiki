@@ -620,3 +620,11 @@ The initial runtime context remains alive for shared intrinsics. This is tested 
 runtime, including foreign Window wrappers; full integration is checked by CI. Servo still
 holds page globals and module maps, and linked JSON modules awaiting evaluation remain rooted.
 This does not establish page collection or any measured CPU/RAM improvement.
+
+
+### Restarting a JavaScript runtime
+
+A pending promise-job drain belongs to its runtime. Closing that runtime before the queued
+drain runs no longer prevents a new runtime on the same thread from scheduling its own
+promise checkpoint. This is covered by normal and JITless backend tests; it does not establish
+complete worker shutdown or navigation correctness.
