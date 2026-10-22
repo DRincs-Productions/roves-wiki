@@ -292,6 +292,11 @@ can still `import()` a module after collection and is itself collected once drop
 observes reachability from script only: it does not count native finalizers and does not show
 realm, module-map or navigation retention fixed. Browser results are pending CI; there are no
 performance measurements.
+The same check loads one module URL in two same-origin frames and requires each copy's
+dynamic `import()` to stay owned by its own frame, before and after a collection. The engine
+now keeps a separate identity for every module source, even when code and URL are identical,
+so a module's imports and timers resolve against the page that loaded it. This may reduce
+script-cache reuse for identical modules; it has not been measured.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
