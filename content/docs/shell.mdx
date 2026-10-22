@@ -628,3 +628,10 @@ A pending promise-job drain belongs to its runtime. Closing that runtime before 
 drain runs no longer prevents a new runtime on the same thread from scheduling its own
 promise checkpoint. This is covered by normal and JITless backend tests; it does not establish
 complete worker shutdown or navigation correctness.
+
+
+Delayed V8 work is also tied to its original runtime registration, rather than looking up a
+possibly reused isolate address when the timer expires. Removing or replacing that
+registration prevents later delivery of its queued timer work. Work already handed to the
+embedder still requires the normal foreground/shutdown ordering. No performance or memory
+improvement has been measured from this change.
