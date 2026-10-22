@@ -645,3 +645,7 @@ Completed slot metadata is pruned amortized. Work that was never accepted after 
 unregistered platform tasks and pending timer tasks retain the earlier conservative policies;
 this is not a proof that every task allocation is reclaimed. Embedders must still keep their
 dispatch callback data valid during in-flight callbacks.
+
+Removing or replacing a V8 foreground handler releases captured embedder data after
+unlocking the registry. This prevents deadlocks from destructors that reenter registration;
+normal and JITless backend regressions cover both paths.
