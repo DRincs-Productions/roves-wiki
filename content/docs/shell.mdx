@@ -185,6 +185,9 @@ still undergo full result validation, avoiding idle waits until each deadline. W
 `null`, including for local `file://` smoke pages; a request that hangs remains a failure.
 Desktop bundle smoke waits for the required page results (including synthetic input and the
 save-file check) with a bounded timeout, so a slow cold start does not cut off later assertions.
+On Linux the virtual-display check waits up to 60 seconds for the Shell's own visible window,
+never uses another application's window, and must finish its pointer, keyboard and resize cycle
+before the test stops the Shell.
 The browser smoke checks ordinary prototype mutation and actual Window immutability separately.
 Window now uses V8's template-created canonical prototype, which Servo initializes without
 replacing it. This allows V8 to reject later prototype replacement while keeping global properties
