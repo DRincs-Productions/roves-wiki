@@ -301,6 +301,10 @@ script-cache reuse for identical modules; it has not been measured.
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
 `new Function(...)` does not yet inherit its caller's module or script for `import()`; prefer a
 regular function or `eval` there.
+A module's link to the page that loaded it is now an ordinary reference the garbage collector
+follows, instead of a permanent hold that kept that page alive for as long as the module's data
+existed. This is groundwork only: pages and their modules are still kept by other engine tables
+for the page's lifetime, so it brings no memory saving yet and has not been measured.
 Engine contributors should read
 the shared [AGENTS.md instructions](https://github.com/DRincs-Productions/roves/blob/main/AGENTS.md).
 
