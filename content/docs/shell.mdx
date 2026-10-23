@@ -688,5 +688,5 @@ take it back, so Roves reloads pages on back/forward navigation instead of resum
 memory: `pageshow` reports `persisted` as `false`, and page state not saved in storage is
 reinitialized. The `session_history_max_length` preference defaults to 0 for this reason.
 Navigations to a page handled by another script thread (another origin) get a separate window,
-as before. A page's `unload` handlers run after its successor took over, so `window` inside them
-already refers to the new page.
+as before. A page's `pagehide` and `unload` handlers run before its successor takes over, so
+`window` inside them still refers to the page being left.
