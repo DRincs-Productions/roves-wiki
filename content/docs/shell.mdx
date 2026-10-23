@@ -696,8 +696,11 @@ as before. A page's `pagehide` and `unload` handlers run before its successor ta
 WindowProxy reuse and cross-realm navigation coverage have landed, alongside native dynamic
 constructors and incumbent-context support. General build CI is green at8e4fb2e6cf4, but
 both Linux V8 smoke variants fail because the GC page calls a missing main entry point.
-The correction is pending verification; removed-frame collection remains diagnostic and
-must not be presented as proof that complete pages are reclaimed.
+The page's full collection sequence has been restored, together with the cleanup-callback
+check and the more detailed removed-frame report. A lightweight check now fails when the page
+loses its entry point; it does not replace the browser run, so the fix is pending CI.
+Removed-frame collection remains diagnostic and must not be presented as proof that complete
+pages are reclaimed.
 
 The development workflow permits one deferred retry five hours after a confirmed Claude
 session limit, without intermediate polling. Explicit user schedules take precedence;
