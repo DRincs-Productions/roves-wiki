@@ -701,6 +701,12 @@ reinitialized. The `session_history_max_length` preference defaults to 0 for thi
 Navigations to a page handled by another script thread (another origin) get a separate window,
 as before. A page's `pagehide` and `unload` handlers run before its successor takes over, so
 `window` inside them still refers to the page being left.
+The engine's smoke tests now also cover an iframe whose page changes origin and back: a
+same-origin page, then a sandboxed page with its own opaque origin, then a same-origin page again.
+The held `contentWindow` must stay the same object and stay the sender of the frame's messages;
+while the page is sandboxed, reading its document must fail with a `SecurityError` while
+`postMessage`, `closed` and the other cross-origin members keep working, and access must return
+with the last page. The result of this check on Roves is pending CI.
 
 ### Migration review checkpoint — 23 October 2026
 
