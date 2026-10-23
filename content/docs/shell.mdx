@@ -677,3 +677,16 @@ instead of stopping the page's scripts.
 Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
 throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
 silently or with a generic error.
+
+### Window identity across navigations
+
+When a window navigates (an iframe whose `src` or `srcdoc` changes, a page following a link), a
+reference other code already holds to it, such as `iframe.contentWindow`, `window.opener` or the
+result of `window.open`, keeps pointing at that window and reaches the new page, as in browsers.
+V8 keeps one global proxy per browsing context, and a page that gave it to its successor cannot
+take it back, so Roves reloads pages on back/forward navigation instead of resuming them from
+memory: `pageshow` reports `persisted` as `false`, and page state not saved in storage is
+reinitialized. The `session_history_max_length` preference defaults to 0 for this reason.
+Navigations to a page handled by another script thread (another origin) get a separate window,
+as before. A page's `unload` handlers run after its successor took over, so `window` inside them
+already refers to the new page.
