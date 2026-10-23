@@ -306,6 +306,11 @@ dynamic `import()` to stay owned by its own frame, before and after a collection
 now keeps a separate identity for every module source, even when code and URL are identical,
 so a module's imports and timers resolve against the page that loaded it. This may reduce
 script-cache reuse for identical modules; it has not been measured.
+After that check, two more frames that never use modules (a blank page and one that only runs a
+classic script) are loaded and removed. For each group, module and module-free, the check
+reports how many removed frame elements, documents and globals were released. This only tells
+the two cases apart: release is not required yet. Removed module frames are currently still
+kept; the module-free result is pending browser CI, and no memory saving is claimed.
 `import()` written inside direct `eval` code also resolves against the module or script that
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
 `new Function(...)` (or the generator and async function constructors) resolves `import()`
