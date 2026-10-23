@@ -251,6 +251,12 @@ CI 39630711476 passes all three matrix markers.
 The cross-origin HTTP and Wasm CSP fixture pages are included in the engine patch set.
 Maintainers verified reconstruction of all 146 tracked custom runtime, smoke and V8-tool files;
 this checks source consistency, separately from browser behavior and build results.
+The engine patch set now also records the Android and iOS container changes (save export
+interception and the Fullscreen API no-op) and the content packer's rule that every script and
+stylesheet joins the boot set. These were already in shipped builds; a shell rebuilt from
+pristine Servo plus the patch set now gets the same behavior. Three repository files are
+intentionally not reproduced byte for byte: the lockfile, which the build regenerates, the
+project README and a test-only gamepad probe that is not part of the shell.
 Runtime CSP regressions also try to reuse the exact authorized function text in eval from
 a newTarget prototype getter, across all four dynamic constructors. Normal/JIT-less local
 suites pass; this supports the scoped authorization boundary, without claiming full CSP WPT coverage.
