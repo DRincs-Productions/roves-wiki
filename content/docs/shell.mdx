@@ -668,3 +668,7 @@ same-origin iframe is attributed to the iframe, as in browsers. Event, timer and
 callbacks hide the code that scheduled them, so the browser's own callback bookkeeping decides
 instead. This uses V8's incumbent tracking directly; normal and JITless runtime tests cover it,
 browser smoke tests run in CI.
+
+`FinalizationRegistry` cleanup callbacks run with their page as the entry window, so APIs that
+depend on it (for example `drawImage` with an image, or setting `location`) work inside them
+instead of stopping the page's scripts.
