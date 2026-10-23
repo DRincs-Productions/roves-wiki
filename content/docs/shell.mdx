@@ -698,3 +698,7 @@ constructors and incumbent-context support. General build CI is green at8e4fb2e6
 both Linux V8 smoke variants fail because the GC page calls a missing main entry point.
 The correction is pending verification; removed-frame collection remains diagnostic and
 must not be presented as proof that complete pages are reclaimed.
+
+The development workflow permits one deferred retry five hours after a confirmed Claude
+session limit, without intermediate polling. Explicit user schedules take precedence;
+a still-blocked attempt stops instead of creating another retry for the same block.
