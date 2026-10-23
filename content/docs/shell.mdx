@@ -690,3 +690,11 @@ reinitialized. The `session_history_max_length` preference defaults to 0 for thi
 Navigations to a page handled by another script thread (another origin) get a separate window,
 as before. A page's `pagehide` and `unload` handlers run before its successor takes over, so
 `window` inside them still refers to the page being left.
+
+### Migration review checkpoint — 23 October 2026
+
+WindowProxy reuse and cross-realm navigation coverage have landed, alongside native dynamic
+constructors and incumbent-context support. General build CI is green at8e4fb2e6cf4, but
+both Linux V8 smoke variants fail because the GC page calls a missing main entry point.
+The correction is pending verification; removed-frame collection remains diagnostic and
+must not be presented as proof that complete pages are reclaimed.
