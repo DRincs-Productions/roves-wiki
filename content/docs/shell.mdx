@@ -708,6 +708,12 @@ while the page is sandboxed, reading its document must fail with a `SecurityErro
 `postMessage`, `closed` and the other cross-origin members keep working, and access must return
 with the last page. The result of this check on Roves is pending CI.
 
+The scheduling smoke check no longer expects a `setTimeout(..., 0)` callback to run before the
+next `requestAnimationFrame` callback: browsers may run either one first (Chrome runs the frame
+first in a visible page). It now waits for both and still requires the promise and
+`queueMicrotask` callbacks to run first, in the order they were queued; a callback that never
+arrives fails the check on its timeout. The result of this check on Roves is pending CI.
+
 ### Migration review checkpoint — 23 October 2026
 
 WindowProxy reuse and cross-realm navigation coverage have landed, alongside native dynamic
