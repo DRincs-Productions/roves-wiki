@@ -10,7 +10,8 @@ the application shell and the glue that turns the engine into a runtime for game
 ## Main Roves-owned areas
 
 - **JavaScript on V8:** `roves-js` adapts the JavaScript API Servo's script code expects to V8;
-  `roves-v8` integrates V8 with Servo's native objects and WebIDL bindings. This is the largest
+  `roves-v8` holds the process-wide V8 setup (platform, foreground tasks, a few V8 APIs the
+  Rust bindings lack). Servo's WebIDL bindings run unchanged on top of `roves-js`. This is the largest
   Roves-owned code area and the hardest one to replace with a small standalone library.
 - **Desktop shell:** SDL3 supplies windowing and input events. Roves connects those events to
   Servo, and builds the small shell UI with egui and AccessKit.
