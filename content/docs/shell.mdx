@@ -302,8 +302,13 @@ so a module's imports and timers resolve against the page that loaded it. This m
 script-cache reuse for identical modules; it has not been measured.
 `import()` written inside direct `eval` code also resolves against the module or script that
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
-`new Function(...)` does not yet inherit its caller's module or script for `import()`; prefer a
-regular function or `eval` there.
+`new Function(...)` (or the generator and async function constructors) resolves `import()`
+against the module or script that called the constructor. One V8 detail carries over: building
+a function with exactly the same parameters and body again reuses the first compilation, so its
+`import()` keeps the first caller's location. This matches V8's own constructor; Chrome should behave the
+same with DevTools closed (an attached debugger disables that cache), though that was not
+measured directly. Give each module its own body, or
+use a regular function, when the location matters.
 A module's link to the page that loaded it is now an ordinary reference the garbage collector
 follows, instead of a permanent hold that kept that page alive for as long as the module's data
 existed. This is groundwork only: pages and their modules are still kept by other engine tables
