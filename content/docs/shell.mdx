@@ -672,3 +672,7 @@ browser smoke tests run in CI.
 `FinalizationRegistry` cleanup callbacks run with their page as the entry window, so APIs that
 depend on it (for example `drawImage` with an image, or setting `location`) work inside them
 instead of stopping the page's scripts.
+
+Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
+throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
+silently or with a generic error.
