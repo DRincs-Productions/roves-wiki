@@ -714,7 +714,12 @@ same-origin page, then a sandboxed page with its own opaque origin, then a same-
 The held `contentWindow` must stay the same object and stay the sender of the frame's messages;
 while the page is sandboxed, reading its document must fail with a `SecurityError` while
 `postMessage`, `closed` and the other cross-origin members keep working, and access must return
-with the last page. The result of this check on Roves is pending CI.
+with the last page. The first run of this check on Roves failed: while the page was sandboxed,
+the parent got a new `contentWindow` object and a different message sender. Roves now keeps one
+object per frame for each page that holds it, through every origin change and back, without
+keeping the replaced pages alive, and each new page in the frame gets its own cross-origin
+members (such as `postMessage`) instead of the previous page's; the browser result of the fix
+is pending CI.
 
 The scheduling smoke check no longer expects a `setTimeout(..., 0)` callback to run before the
 next `requestAnimationFrame` callback: browsers may run either one first (Chrome runs the frame
