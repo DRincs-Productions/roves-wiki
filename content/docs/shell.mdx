@@ -311,6 +311,14 @@ classic script) are loaded and removed. For each group, module and module-free, 
 reports how many removed frame elements, documents and globals were released. This only tells
 the two cases apart: release is not required yet. Removed module frames are currently still
 kept; the module-free result is pending browser CI, and no memory saving is claimed.
+To find what keeps a removed frame alive, debug engine builds (not release builds, and not
+anything a game can trigger) can write one native V8 heap snapshot, in the format Chrome
+DevTools' Memory panel opens, at a chosen explicit `TestUtils.gc()` collection. The engine's
+Linux CI uses it in one extra smoke process: a single blank same-origin frame is loaded,
+removed and followed by eight collections, and the snapshot of the last one is kept for three
+days. These are Roves' own V8 snapshots, not Chrome measurements (Chrome DevTools' snapshot
+tool was not available to maintainers); whether the frame is released is reported as a
+diagnostic only, no fix is implied and no memory saving is claimed.
 `import()` written inside direct `eval` code also resolves against the module or script that
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
 `new Function(...)` (or the generator and async function constructors) resolves `import()`
