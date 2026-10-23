@@ -309,6 +309,8 @@ a function with exactly the same parameters and body again reuses the first comp
 same with DevTools closed (an attached debugger disables that cache), though that was not
 measured directly. Give each module its own body, or
 use a regular function, when the location matters.
+These constructors also print like V8's built-in ones (`String(Function)` is
+`function Function() { [native code] }`), even though Roves wraps them for Trusted Types/CSP.
 A module's link to the page that loaded it is now an ordinary reference the garbage collector
 follows, instead of a permanent hold that kept that page alive for as long as the module's data
 existed. This is groundwork only: pages and their modules are still kept by other engine tables
