@@ -697,6 +697,13 @@ Linux browser smoke test confirms the `postMessage` case.
 depend on it (for example `drawImage` with an image, or setting `location`) work inside them
 instead of stopping the page's scripts.
 
+Creating a `WeakRef` or reading it with `deref()` keeps its object alive until the current task
+and its microtasks have finished, as the JavaScript and HTML specifications require. Roves used
+to release those objects only after a promise callback had run, so a page that created or read
+`WeakRef`s without using promises could keep their objects alive indefinitely. They are now
+released at the end of every microtask checkpoint, and the garbage collector can reclaim any that
+nothing else holds; objects still referenced elsewhere are unaffected.
+
 Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
 throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
 silently or with a generic error.
