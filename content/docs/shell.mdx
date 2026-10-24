@@ -318,7 +318,9 @@ Linux CI uses it in one extra smoke process: a single blank same-origin frame is
 removed and followed by eight collections, and the snapshot of the last one is kept for three
 days. These are Roves' own V8 snapshots, not Chrome measurements (Chrome DevTools' snapshot
 tool was not available to maintainers); whether the frame is released is reported as a
-diagnostic only, no fix is implied and no memory saving is claimed.
+diagnostic only, no fix is implied and no memory saving is claimed. Native objects in the
+snapshot are named after their web API class (for example `HTMLIFrameElement` or `Window`), and
+the extra object other pages use to reach a window is listed apart as `RovesJsWindowWrapper`.
 `import()` written inside direct `eval` code also resolves against the module or script that
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
 `new Function(...)` (or the generator and async function constructors) resolves `import()`
