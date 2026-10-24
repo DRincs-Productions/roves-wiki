@@ -720,8 +720,13 @@ with the last page. The first run of this check on Roves failed: while the page 
 the parent got a new `contentWindow` object and a different message sender. Roves now keeps one
 object per frame for each page that holds it, through every origin change and back, without
 keeping the replaced pages alive, and each new page in the frame gets its own cross-origin
-members (such as `postMessage`) instead of the previous page's; the browser result of the fix
-is pending CI.
+members (such as `postMessage`) instead of the previous page's; the engine's smoke tests
+confirmed the fix. The check now goes through two sandboxed pages in a row before returning, and
+repeats that round twice: the frame keeps the same `contentWindow`, each sandboxed page must
+really replace the previous one, a page's `postMessage` stays the same callable function while
+that page is shown, and messages sent through it reach the page currently shown (browsers may
+hand the next page the same function, so that is not checked). The browser result of this
+longer check is pending CI.
 
 The scheduling smoke check no longer expects a `setTimeout(..., 0)` callback to run before the
 next `requestAnimationFrame` callback: browsers may run either one first (Chrome runs the frame
