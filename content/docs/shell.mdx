@@ -323,6 +323,9 @@ snapshot are named after their web API class (for example `HTMLIFrameElement` or
 the extra object other pages use to reach a window is listed apart as `RovesJsWindowWrapper`.
 When reading with MemLab, note that native names beginning with `Window` are treated as roots
 by a heuristic: a trace starting there is not proof of a real GC root or of a leak fix.
+For maintainers, `support/roves_js/gen_wrappers2.py --check <mozjs-src> <roves-js-src> <out.rs>`
+checks the generated adapter wrappers without rewriting them. It preserves Roves-specific
+entries missing from the pinned mozjs lists; the hermetic regression runs in V8 CI.
 `import()` written inside direct `eval` code also resolves against the module or script that
 contains the `eval`, as in browsers, and the check covers that case too. Code built with
 `new Function(...)` (or the generator and async function constructors) resolves `import()`
