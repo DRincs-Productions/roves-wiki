@@ -760,3 +760,11 @@ pages are reclaimed.
 The development workflow permits one deferred retry five hours after a confirmed Claude
 session limit, without intermediate polling. Explicit user schedules take precedence;
 a still-blocked attempt stops instead of creating another retry for the same block.
+
+
+### V8 migration: remaining microtask ordering gap
+
+Nested Promise callbacks can currently run before an earlier `queueMicrotask` callback
+(`p1,p2,q` instead of the browser order `p1,q,p2`). A common V8 FIFO implementation is under
+review and is not shipped in this checkpoint. The separate WeakRef checkpoint cleanup and
+wrapper-generator checks above are complete; removed-frame retention remains unresolved.
