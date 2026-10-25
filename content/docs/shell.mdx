@@ -713,7 +713,9 @@ queued by those callbacks, before the next `queueMicrotask` callback: with
 `Promise.resolve().then(() => { log("p1"); Promise.resolve().then(() => log("p2")); })` followed
 by `queueMicrotask(() => log("q"))`, Roves logged `p1, p2, q` where browsers log `p1, q, p2`.
 Code that mixes the two, such as libraries that schedule work with `queueMicrotask`, now sees
-the browser order.
+the browser order. The old Servo Promise-enqueue callback and its internal WebIDL
+adapter are removed: V8 owns the Promise jobs, while HTML callbacks retain their usual
+WebIDL invocation and exception reporting.
 
 Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
 throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
