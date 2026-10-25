@@ -815,3 +815,5 @@ page, including the worker FIFO check. The POSIX fixture regression is covered b
 runner suite; real-browser checks remain mandatory and are not replaced by simulated output.
 
 The focused prototype-pollution descriptor check also exposes a Chrome155 DOM divergence: collection indices/names and dataset observe inherited descriptor fields, while ordinary expandos do not. This comparison is a correctness diagnostic, not a performance result; Roves browser validation runs in CI.
+
+The latest removed-frame snapshot still contains the frame. Identified native root paths include FontFaceSet promises, an injected document listener and Performance ownership consistent with a task parked for a closed pipeline. Task-queue cleanup is the next scoped fix; overall frame retention remains unresolved.
