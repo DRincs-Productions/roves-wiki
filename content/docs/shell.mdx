@@ -785,3 +785,8 @@ logs the browser order `p1,q,p2` (see the microtask section above). If a script 
 while microtasks are pending, the `queueMicrotask` callbacks still queued run at the same
 checkpoint, followed in order by the promise callbacks they queue. Removed-frame retention
 remains unresolved.
+
+
+The CI runner's simulated browser derives its required check names from the validator for every
+page, including the worker FIFO check. The POSIX fixture regression is covered by the full WSL
+runner suite; real-browser checks remain mandatory and are not replaced by simulated output.
