@@ -701,6 +701,14 @@ and a descriptor with only `get` or only `set` keeps the other accessor. Previou
 Normal and JITless engine tests cover it; a small browser smoke check covers a real
 `HTMLCollection` and `window`.
 
+Reading the descriptor of a property of these DOM objects (`Object.getOwnPropertyDescriptor`,
+and operations built on it such as `Object.keys` or spreading) also ignores `get`, `set`,
+`value` and the other descriptor fields added to `Object.prototype` by page code: no such
+getter or setter runs and the read no longer throws "Invalid property descriptor". The
+returned descriptor is an ordinary object, as in other browsers. Descriptors that page code
+passes to `Object.defineProperty`, and results of its own `Proxy` traps, still follow the
+language rules and see inherited fields.
+
 The "incumbent" window (the caller the browser reports to APIs such as `postMessage`'s
 `source`) follows the innermost running code: a parent page calling a function defined in a
 same-origin iframe is attributed to the iframe, as in browsers. Event, timer and animation-frame
@@ -799,3 +807,5 @@ remains unresolved.
 The CI runner's simulated browser derives its required check names from the validator for every
 page, including the worker FIFO check. The POSIX fixture regression is covered by the full WSL
 runner suite; real-browser checks remain mandatory and are not replaced by simulated output.
+
+The focused prototype-pollution descriptor check also exposes a Chrome155 DOM divergence: collection indices/names and dataset observe inherited descriptor fields, while ordinary expandos do not. This comparison is a correctness diagnostic, not a performance result; Roves browser validation runs in CI.
