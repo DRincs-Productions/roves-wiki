@@ -819,3 +819,5 @@ The focused prototype-pollution descriptor check also exposes a Chrome155 DOM di
 The latest removed-frame snapshot still contains the frame. Identified native root paths include FontFaceSet promises, an injected document listener and Performance ownership consistent with a task parked for a closed pipeline. Task-queue cleanup is the next scoped fix; overall frame retention remains unresolved.
 
 Task queues now discard ready, throttled and inactive tasks when their pipeline exits, and reject late tasks for that pipeline. This releases canceled native captures on the script thread while retaining other pipelines and worker tasks. FontFaceSet/callback roots remain separate follow-ups; release of the frame itself still needs CI confirmation.
+
+FontFaceSet now retains its cached `ready` promise through a traced DOM edge, rather than a permanent native promise root. Repeated getters keep the same JS promise, and native callers still receive rooted wrappers. This removes the unconditional ownership cycle without clearing externally retained promises; callback roots and overall removed-frame collection still require verification.
