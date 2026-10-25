@@ -692,6 +692,15 @@ delivering to the runtime, so they too are destroyed on the runtime's thread bef
 goes away. Tasks V8 posts after unregistration, when no runtime owns the isolate anymore, are
 still leaked rather than destroyed, because their isolate may already be gone.
 
+`Object.defineProperty` with a partial descriptor on DOM objects that have named properties
+(such as an `HTMLCollection`) and on `window` changes only the fields it gives, as in other
+browsers: `{ writable: false }` makes an existing property read-only while keeping its value,
+and a descriptor with only `get` or only `set` keeps the other accessor. Previously
+`writable` alone was ignored and the missing accessor was cleared. Page code that replaces
+`Reflect.defineProperty` or adds `get`/`value` to `Object.prototype` does not affect this.
+Normal and JITless engine tests cover it; a small browser smoke check covers a real
+`HTMLCollection` and `window`.
+
 The "incumbent" window (the caller the browser reports to APIs such as `postMessage`'s
 `source`) follows the innermost running code: a parent page calling a function defined in a
 same-origin iframe is attributed to the iframe, as in browsers. Event, timer and animation-frame
