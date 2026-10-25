@@ -707,6 +707,14 @@ to release those objects only after a promise callback had run, so a page that c
 released at the end of every microtask checkpoint, and the garbage collector can reclaim any that
 nothing else holds; objects still referenced elsewhere are unaffected.
 
+Promise callbacks and `queueMicrotask` callbacks share one queue and run in the order they were
+queued, as in browsers. Previously Roves ran every pending promise callback, including ones
+queued by those callbacks, before the next `queueMicrotask` callback: with
+`Promise.resolve().then(() => { log("p1"); Promise.resolve().then(() => log("p2")); })` followed
+by `queueMicrotask(() => log("q"))`, Roves logged `p1, p2, q` where browsers log `p1, q, p2`.
+Code that mixes the two, such as libraries that schedule work with `queueMicrotask`, now sees
+the browser order.
+
 Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
 throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
 silently or with a generic error.
@@ -762,9 +770,10 @@ session limit, without intermediate polling. Explicit user schedules take preced
 a still-blocked attempt stops instead of creating another retry for the same block.
 
 
-### V8 migration: remaining microtask ordering gap
+### V8 migration: microtask ordering
 
-Nested Promise callbacks can currently run before an earlier `queueMicrotask` callback
-(`p1,p2,q` instead of the browser order `p1,q,p2`). A common V8 FIFO implementation is under
-review and is not shipped in this checkpoint. The separate WeakRef checkpoint cleanup and
-wrapper-generator checks above are complete; removed-frame retention remains unresolved.
+Nested Promise callbacks no longer run before an earlier `queueMicrotask` callback: Roves now
+logs the browser order `p1,q,p2` (see the microtask section above). If a script is stopped
+while microtasks are pending, the `queueMicrotask` callbacks still queued run at the same
+checkpoint, followed in order by the promise callbacks they queue. Removed-frame retention
+remains unresolved.
