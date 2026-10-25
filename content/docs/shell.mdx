@@ -796,8 +796,16 @@ loses its entry point; it does not replace the browser run, so the fix is pendin
 Removed-frame collection remains diagnostic and must not be presented as proof that complete
 pages are reclaimed.
 
-The development workflow permits one deferred retry five hours after a confirmed Claude
-session limit, without intermediate polling. Explicit user schedules take precedence;
+Development follows a continuous implementation, verification, review and CI loop.
+Completed changes can be committed locally while the previous CI batch runs; publication
+waits for that batch to finish successfully, including fixes for any failures. After a
+completed task or push, agents continue the next authorized task without routine confirmation.
+Explicit stops, actual quotas, unresolved blockers or no useful remaining work end the loop;
+continuous polling and publication of incomplete changes remain excluded.
+
+After a confirmed Claude session limit, the development workflow checks `/usage` in the
+CLI and schedules one retry at the reported reset plus two minutes, respecting its date
+and timezone. Missing or ambiguous reset times are not guessed. There is no intermediate polling. Explicit user schedules take precedence;
 a still-blocked attempt stops instead of creating another retry for the same block.
 
 
@@ -825,3 +833,5 @@ FontFaceSet now retains its cached `ready` promise through a traced DOM edge, ra
 Native DOM callbacks entered from Promise reactions now synchronize the embedder realm with the actual V8 execution context and restore the previous realm afterwards. This fixes an origin-check crash exposed by the font-ready GC test; origin checks remain enforced. The complete browser regression is verified in CI.
 
 Native regression coverage also checks successful and throwing calls between two realms with distinct principals, including exact caller restoration and exception propagation. These are runtime contracts; complete browser smoke validation remains in CI.
+
+A window reference returned by a native call made in another realm is converted back to the calling page. For example, `window`, `self` and `parent` read through a held `WindowProxy` of a cross-origin iframe return the page's own references again, so identity checks such as `held.window === held` keep working while cross-origin access stays restricted. Browser validation of this case is pending.
