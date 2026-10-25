@@ -335,6 +335,12 @@ a function with exactly the same parameters and body again reuses the first comp
 same with DevTools closed (an attached debugger disables that cache), though that was not
 measured directly. Give each module its own body, or
 use a regular function, when the location matters.
+Replacing `Promise.prototype.then` in page code cannot change when or with what an `import()`
+completes: the engine waits for the imported module to finish running (including top-level
+`await`) using the built-in promise machinery, then delivers its module object. A module that
+exports a function named `then` is still treated as a thenable, as the language requires.
+Pages loaded by Roves already behaved this way; the fix covers the engine's lower-level
+embedding interface.
 These constructors also print like V8's built-in ones (`String(Function)` is
 `function Function() { [native code] }`), even though Roves wraps them for Trusted Types/CSP.
 A module's link to the page that loaded it is now an ordinary reference the garbage collector
