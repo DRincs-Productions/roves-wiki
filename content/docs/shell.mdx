@@ -715,7 +715,9 @@ by `queueMicrotask(() => log("q"))`, Roves logged `p1, p2, q` where browsers log
 Code that mixes the two, such as libraries that schedule work with `queueMicrotask`, now sees
 the browser order. The old Servo Promise-enqueue callback and its internal WebIDL
 adapter are removed: V8 owns the Promise jobs, while HTML callbacks retain their usual
-WebIDL invocation and exception reporting.
+WebIDL invocation and exception reporting. The remaining unused hooks inherited from Servo's
+old JavaScript engine are gone too, along with a small allocation every page or worker made
+for them and never freed; script behavior is unchanged.
 
 Sending a `SharedArrayBuffer` or a `WebAssembly.Module` with `postMessage` or `structuredClone`
 throws a `DataCloneError` (Roves pages are not cross-origin isolated), instead of failing
