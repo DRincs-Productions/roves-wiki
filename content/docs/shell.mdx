@@ -821,3 +821,5 @@ The latest removed-frame snapshot still contains the frame. Identified native ro
 Task queues now discard ready, throttled and inactive tasks when their pipeline exits, and reject late tasks for that pipeline. This releases canceled native captures on the script thread while retaining other pipelines and worker tasks. FontFaceSet/callback roots remain separate follow-ups; release of the frame itself still needs CI confirmation.
 
 FontFaceSet now retains its cached `ready` promise through a traced DOM edge, rather than a permanent native promise root. Repeated getters keep the same JS promise, and native callers still receive rooted wrappers. This removes the unconditional ownership cycle without clearing externally retained promises; callback roots and overall removed-frame collection still require verification.
+
+Native DOM callbacks entered from Promise reactions now synchronize the embedder realm with the actual V8 execution context and restore the previous realm afterwards. This fixes an origin-check crash exposed by the font-ready GC test; origin checks remain enforced. The complete browser regression is verified in CI.
