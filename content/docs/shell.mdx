@@ -823,3 +823,5 @@ Task queues now discard ready, throttled and inactive tasks when their pipeline 
 FontFaceSet now retains its cached `ready` promise through a traced DOM edge, rather than a permanent native promise root. Repeated getters keep the same JS promise, and native callers still receive rooted wrappers. This removes the unconditional ownership cycle without clearing externally retained promises; callback roots and overall removed-frame collection still require verification.
 
 Native DOM callbacks entered from Promise reactions now synchronize the embedder realm with the actual V8 execution context and restore the previous realm afterwards. This fixes an origin-check crash exposed by the font-ready GC test; origin checks remain enforced. The complete browser regression is verified in CI.
+
+Native regression coverage also checks successful and throwing calls between two realms with distinct principals, including exact caller restoration and exception propagation. These are runtime contracts; complete browser smoke validation remains in CI.
