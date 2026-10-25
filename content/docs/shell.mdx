@@ -685,9 +685,12 @@ normal and JITless backend regressions cover both paths.
 
 Unregistering a runtime also destroys its delayed V8 tasks still waiting in the timer (for
 example a pending `Atomics.waitAsync` timeout) while the isolate is alive, instead of leaking
-them when they fall due. Replacing a handler, or a task the timer is already delivering at
-that moment, keeps the conservative policy. Tasks V8 posts while the runtime is shutting down
-are also destroyed before its isolate goes away, instead of being leaked.
+them when they fall due. Replacing a handler keeps the conservative policy. Tasks V8 posts
+while the runtime is shutting down are also destroyed before its isolate goes away, instead of
+being leaked. Unregistering waits for tasks another thread (including the timer) is already
+delivering to the runtime, so they too are destroyed on the runtime's thread before its isolate
+goes away. Tasks V8 posts after unregistration, when no runtime owns the isolate anymore, are
+still leaked rather than destroyed, because their isolate may already be gone.
 
 The "incumbent" window (the caller the browser reports to APIs such as `postMessage`'s
 `source`) follows the innermost running code: a parent page calling a function defined in a
