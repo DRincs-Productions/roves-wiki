@@ -943,3 +943,24 @@ modules during gameplay, with local/cold/warm/slow-network loads, input/timers/f
 errors and closing must be measured and reviewed. No latency threshold or benefit is proved.
 
 Current implementation status: [migration handoff](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
+
+### Provisional inline module URLs
+
+For the pending deno_core integration, inline modules may expose a distinct
+`#roves-inline-module-N` fragment in `import.meta.url`. This accepted provisional
+behavior distinguishes inline script records; relative asset URLs retain their base,
+and external module URLs must remain unchanged. Native tests and the browser module
+scheduling fixture cover the contract; production browser verification is still pending.
+
+### Resuming the incomplete production cutover
+
+The authoritative migration handoff now separates published code, uncommitted source,
+actual checks and ordered remaining tasks. The current isolated Windows suite passes
+108 normal tests and 107 tests with the compiled JITless feature (2 benchmarks excluded,
+plus Wasm in JITless). Setting V8_TEST_MODE alone does not enable the Cargo feature.
+A reproduced Function-constructor dynamic-import referrer bug is guarded with V8's
+public --no-compilation-cache flag. Deno's module cache remains enabled; startup and
+compilation costs are unmeasured. Browser/DOM integration, external-link handoff and
+native snapshot replacement still need verification; overall retention is unresolved.
+Claude is not to be used before the user's October30,2026 17:30 Europe/Rome reminder;
+that time does not itself prove that subscription quota has reset.
