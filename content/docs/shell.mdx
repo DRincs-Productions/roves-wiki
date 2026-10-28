@@ -944,23 +944,34 @@ errors and closing must be measured and reviewed. No latency threshold or benefi
 
 Current implementation status: [migration handoff](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
 
-### Provisional inline module URLs
+### Current single-document Deno integration candidate
 
-For the pending deno_core integration, inline modules may expose a distinct
-`#roves-inline-module-N` fragment in `import.meta.url`. This accepted provisional
-behavior distinguishes inline script records; relative asset URLs retain their base,
-and external module URLs must remain unchanged. Native tests and the browser module
-scheduling fixture cover the contract; production browser verification is still pending.
+The source candidate uses deno_core with Servo DOM/layout/rendering and the existing shell.
+The previous standalone probe is not evidence of completed browser integration. Native
+Windows tests pass110normal/109compiled-feature-JITless (2benchmarks excluded, plus Wasm
+in JITless); Linux/Windows browser checks, notice rendering and real-click OS handoff
+still require integration verification. Overall retention is unresolved.
 
-### Resuming the incomplete production cutover
+History/hash routes remain supported in one document. Full document navigation, reload,
+iframe documents and extra windows are blocked before replacing game state, with bounded
+logs and a development-only non-modal notice. Trusted HTTP(S) anchor/area activations use
+the system URL handler; automatic and synthetic requests cannot authorize that handoff.
 
-The authoritative migration handoff now separates published code, uncommitted source,
-actual checks and ordered remaining tasks. The current isolated Windows suite passes
-108 normal tests and 107 tests with the compiled JITless feature (2 benchmarks excluded,
-plus Wasm in JITless). Setting V8_TEST_MODE alone does not enable the Cargo feature.
-A reproduced Function-constructor dynamic-import referrer bug is guarded with V8's
-public --no-compilation-cache flag. Deno's module cache remains enabled; startup and
-compilation costs are unmeasured. Browser/DOM integration, external-link handoff and
-native snapshot replacement still need verification; overall retention is unresolved.
-Claude is not to be used before the user's October30,2026 17:30 Europe/Rome reminder;
-that time does not itself prove that subscription quota has reset.
+Accepted provisional differences: static graph fetch/instantiation may pause input/timers;
+static evaluation errors use unhandledrejection; inline import.meta.url values have distinct
+#roves-inline-module-N fragments. Relative asset bases and external URLs remain unchanged.
+Cold/warm/slow runtime insertion diagnostics are prepared but no browser pause measurement
+or acceptable threshold is claimed. Dynamic imports remain asynchronous.
+
+JSON modulepreload is temporarily unavailable: a bounded warning and asynchronous link
+error replace the old false-success behavior. Typed JSON imports remain supported and
+untyped imports must reject. Restoring preload is an explicit optimization backlog item;
+measure unused-data bandwidth/memory costs as well as first-use latency before recommending it.
+
+The adapter preserves module referrers, worker root clients and classic source fetch options;
+internal Deno/Node module namespaces are denied. V8's public no-compilation-cache guard fixes
+a reproduced Function import-referrer cache issue; Deno's module cache remains enabled.
+Its startup/compilation cost is unmeasured. Consult the engine migration handoff for current
+CI, source patch replay and remaining checks. Claude stays deferred until October30,2026
+17:30 Europe/Rome; Codex continues directly and uses one verified-reset retry if its own
+five-hour quota is near exhaustion, without periodic polling or chained retries.
