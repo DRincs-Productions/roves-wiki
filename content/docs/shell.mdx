@@ -986,3 +986,6 @@ These isolated-cache CI scenes do not replace cold/warm/slow-network and frame/i
 The first compiled browser integration exposed a startup ordering panic when the module
 loader requested Document-owned task sources before attachment. Installation is moved
 after attachment, before interfaces and game scripts; runtime browser proof remains pending.
+
+The contributor V8 smoke runner uses Servo hard-fail mode for disposable processes: native
+thread panics fail the process promptly. Packaged game crash behavior is unchanged.
