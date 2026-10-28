@@ -996,3 +996,8 @@ Roves comparison remains pending successful startup CI, not a proved performance
 
 Static invalid import attributes preserve TypeError while parse failures retain SyntaxError.
 The native module suite verifies both modes; browser confirmation remains pending CI.
+
+Static graph errors retain Deno source filenames, line/column and formatted stacks in
+Servo reports. Metadata stays on the error object through V8 private properties, without
+a registry or extra roots. Native suites pass112 normal/111 JITless; browser verification
+and the separate inline HTML line offset remain pending.
