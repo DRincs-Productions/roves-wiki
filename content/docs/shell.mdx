@@ -982,3 +982,7 @@ is not yet a completed browser migration or a retention fix.
 
 Per-process runtime logs preserve static-load pause observations across fresh smoke launches.
 These isolated-cache CI scenes do not replace cold/warm/slow-network and frame/input testing.
+
+The first compiled browser integration exposed a startup ordering panic when the module
+loader requested Document-owned task sources before attachment. Installation is moved
+after attachment, before interfaces and game scripts; runtime browser proof remains pending.
