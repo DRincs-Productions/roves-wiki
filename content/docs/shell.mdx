@@ -1001,3 +1001,6 @@ Static graph errors retain Deno source filenames, line/column and formatted stac
 Servo reports. Metadata stays on the error object through V8 private properties, without
 a registry or extra roots. Native suites pass112 normal/111 JITless; browser verification
 and the separate inline HTML line offset remain pending.
+
+SRI module bodies arriving before metadata are preserved until final fetch/security checks.
+The corrected browser path still requires CI confirmation.
