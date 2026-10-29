@@ -1025,3 +1025,10 @@ This does not reject Deno integration or every source-mapping alternative.
 Windows V8 CI now shares mach build ANGLE DLL staging before browser execution; missing
 EGL/GLES dependencies fail preparation. This fixes startup coverage without changing
 action inputs or bundle outputs. Positive Windows module results await the corrected CI.
+
+Inline diagnostic mapping now uses the public Deno loader callback and two distinct
+source-map anchors per line, preserving columns where the earlier single-anchor probe
+failed. Existing embedded maps keep priority; module/import identities are unchanged.
+Full native suites pass115 normal/114 JITless, including a meaningful negative regression.
+The new21st browser check still requires CI. This supersedes the open-offset status above
+at source level, without claiming browser verification or resolved overall retention.
