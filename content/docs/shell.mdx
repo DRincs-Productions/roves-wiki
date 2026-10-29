@@ -1032,3 +1032,8 @@ failed. Existing embedded maps keep priority; module/import identities are uncha
 Full native suites pass115 normal/114 JITless, including a meaningful negative regression.
 The new21st browser check still requires CI. This supersedes the open-offset status above
 at source level, without claiming browser verification or resolved overall retention.
+
+The Windows browser jobs now start correctly. Smoke fixture JavaScript/JSON MIME types are
+explicitly defined through Python's standard server extension map, preventing host registry
+associations from serving .mjs as text/plain. The deliberate wrong-MIME rejection remains.
+The actual browser result still awaits corrected CI; Linux and native checks are green.
