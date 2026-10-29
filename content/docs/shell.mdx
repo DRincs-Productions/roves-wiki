@@ -1021,3 +1021,7 @@ still requires its own CI execution.
 Inline HTML diagnostic offsets remain open. The tested range-map encoding candidate loses
 later-line columns and was rejected without adding a production dependency or fork.
 This does not reject Deno integration or every source-mapping alternative.
+
+Windows V8 CI now shares mach build ANGLE DLL staging before browser execution; missing
+EGL/GLES dependencies fail preparation. This fixes startup coverage without changing
+action inputs or bundle outputs. Positive Windows module results await the corrected CI.
