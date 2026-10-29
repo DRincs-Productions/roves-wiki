@@ -1013,3 +1013,7 @@ new Windows runtime verification remains pending its own CI.
 Native lifecycle coverage checks pending dynamic network imports and late responses after
 runtime destruction in both modes. Graceful window shutdown during static fetching remains
 a separate verification requirement.
+
+Repeated cached imports preserve namespace identity with a single fetch/evaluation in the
+native normal/JITless tests. The new browser check brings module-order coverage to20 and
+still requires its own CI execution.
