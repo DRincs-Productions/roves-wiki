@@ -359,7 +359,9 @@ already ready from cache, but compilation of one source and final graph linking 
 The static-load pause is provisional; normal/JITless Rust tests, browser smoke and real-game
 responsiveness still require verification. The latest CI checkpoint exposed a stale smoke fixture
 and missing roves-js files in the clean Servo patch replay; both are corrected locally, pending a
-new CI run. This is not yet a verified release change.
+new CI run. The next V8 run exposed an overstrict Rust assertion about a one-time wake when
+new network fetches are registered; a test-only correction now checks that further polls stay
+quiet until the response. It also awaits CI. This is not yet a verified release change.
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
