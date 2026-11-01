@@ -57,6 +57,10 @@ engine mode with `V8_SMOKE_MODE=normal` or `V8_SMOKE_MODE=jitless`.
 Static module loading is being updated to return control while external sources are pending
 and between cached sources. The change is still under Rust and browser CI; compiling a source
 and linking the full module graph remain synchronous, so it is not a responsiveness guarantee.
+The headless single-document smoke is being updated to require one diagnostic log entry for
+blocked full navigation, reload and iframe operations; the browser CI has not yet run this
+assertion. A real trusted click opening the system browser and the development notice still
+require desktop verification.
 
 The current migration status and open browser-proxy checks are tracked in the engine
 [migration plan](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
