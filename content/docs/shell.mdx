@@ -892,10 +892,11 @@ Named-property visibility now reuses V8-backed descriptor traversal rather than 
 normal/JITless tests and required browser fixtures passed in the0eb CI batch. This is a bounded
 correction, not complete WebIDL conformance.
 
-Roves keeps its Servo shell while evaluating maintained libraries to replace internal
-services and remove duplicate implementation. rusty_v8 is already used; deno_core remains
-an isolated evaluation, not an adopted production runtime. DOM/layout/rendering stay in
-Servo initially. No separate Chromium or Deno installation is planned.
+Roves keeps its Servo shell while replacing internal services with maintained libraries
+where that removes duplicate implementation. rusty_v8 is already used; the local production
+source now wires deno_core into Servo's single-document module loader, pending required
+normal/JITless Rust and browser CI. DOM/layout/rendering stay in Servo initially. No separate
+Chromium or Deno installation is planned.
 
 The product direction is one Servo-shell window and one game document, with internal
 routes such as TanStack Router using the History API and fragments. Additional tabs/windows
@@ -906,13 +907,15 @@ blocking alert. Repeated attempts must not flood logs. The confirmed behavior is
 non-modal notice in development and logs only in distributed games. External links may open
 the system browser only after a real user click; automatic attempts are blocked and logged,
 without navigating inside Roves. Initial shell loading/shutdown remain lifecycle requirements.
-First evaluate deno_core for this scope, then implement the policy with the selected runtime.
+The isolated deno_core evaluation has been followed by a local source integration; cross-
+platform CI and real-scene checks remain necessary before calling it adopted or verified.
 
-The complete navigation policy is pending; auxiliary-window refusal is described below. deno_core is to
-be re-evaluated for the single-document scope: the previous multi-frame/WindowProxy NO-GO
-does not decide it. DOM/events, security, HTML microtasks, module loading, GC and JITless
-still require proof. No Deno production dependency or runtime/performance benefit is claimed;
-replaced Servo services may be removed instead of kept alongside a second implementation.
+The single-document policy is implemented in source and its browser smoke checks are awaiting
+the current CI batch; actual system-browser handoff and notice rendering still need user/UI
+verification. The previous multi-frame/WindowProxy NO-GO does not decide the single-document
+scope. DOM/events, security, HTML microtasks, module loading, GC and JITless remain migration
+checks. No separate Deno installation or runtime/performance benefit is claimed; replaced
+Servo services may be removed instead of kept alongside a second implementation.
 
 The macOS gamepad probe runs independently from the required Windows/Linux probe matrix,
 so its cancellation/failure no longer skips their packaging and Steam checks. Apple checks
@@ -928,40 +931,41 @@ application and shows a dismissible non-modal notice in CLI development launches
 games keep logs only. Required Linux/Windows build and packaging checks pass. Visual notice
 behavior, full navigation/reload refusal and trusted-click external links still need work.
 
-The production Deno cutover is drafted but incomplete and kept outside publishable sources.
-Direct Codex corrections pass the isolated Windows native suite:107tests normal,106JITless
-(two benchmarks excluded, plus one Wasm test in JITless). The revised navigation gate and
-full Servo/browser integration still need verification. The current shipped backend remains active. No partial
-runtime dependency change is published.
+The production Deno integration now exists in the local working tree, replacing Roves' old
+module graph with Deno's loader on the existing V8 and Servo DOM. It is not yet verified or
+released: required normal/JITless compile/tests and Linux/Windows browser integration must
+pass. Do not use an unverified source checkpoint as a release artifact.
 
-Two tradeoffs are accepted for that integration: static module loading may temporarily
-pause game input/timers (dynamic imports remain asynchronous), and static module evaluation
-errors may arrive as unhandledrejection instead of error/window.onerror. Onerror-only crash
-overlays may miss them; classic errors and fetch/parse/link/dynamic-import contracts remain
-separate. The pause is PROVISIONAL: its duration and impact at startup and when adding
-modules during gameplay, with local/cold/warm/slow-network loads, input/timers/frame behavior,
-errors and closing must be measured and reviewed. No latency threshold or benefit is proved.
+Static module fetching now advances in steps and releases the runtime between network
+responses, so other script, timers and input can run while a response is pending. Compilation,
+resolution and final linking remain synchronous and may pause the thread; dynamic imports
+remain asynchronous. Static evaluation errors may arrive as unhandledrejection instead of
+error/window.onerror. Onerror-only crash overlays may miss them; classic errors and
+fetch/parse/link/dynamic-import contracts remain separate. The new server-probe smoke has not
+yet run in CI, and real-scene impact of synchronous work remains unmeasured. No latency
+threshold or performance benefit is proved.
 
 Current implementation status: [migration handoff](https://github.com/DRincs-Productions/roves/blob/main/docs/V8_MIGRATION.md).
 
-### Current single-document Deno integration candidate
+### Current single-document Deno integration status
 
-The source candidate uses deno_core with Servo DOM/layout/rendering and the existing shell.
-The previous standalone probe is not evidence of completed browser integration. Native
-Windows tests pass110normal/109compiled-feature-JITless (2benchmarks excluded, plus Wasm
-in JITless); Linux/Windows browser checks, notice rendering and real-click OS handoff
-still require integration verification. Overall retention is unresolved.
+The local implementation uses deno_core with Servo DOM/layout/rendering and the existing
+shell. The previous standalone probe is not evidence of completed browser integration.
+Linux/Windows normal/JITless CI, notice rendering and real-click OS handoff still require
+verification. Overall retention is unresolved.
 
 History/hash routes remain supported in one document. Full document navigation, reload,
 iframe documents and extra windows are blocked before replacing game state, with bounded
 logs and a development-only non-modal notice. Trusted HTTP(S) anchor/area activations use
 the system URL handler; automatic and synthetic requests cannot authorize that handoff.
 
-Accepted provisional differences: static graph fetch/instantiation may pause input/timers;
-static evaluation errors use unhandledrejection; inline import.meta.url values have distinct
-#roves-inline-module-N fragments. Relative asset bases and external URLs remain unchanged.
-Cold/warm/slow runtime insertion diagnostics are prepared but no browser pause measurement
-or acceptable threshold is claimed. Dynamic imports remain asynchronous.
+Tracked provisional differences: network fetch waits now yield between polls, but source
+compilation, resolution and final linking remain synchronous; static evaluation errors use
+unhandledrejection; inline import.meta.url values have distinct #roves-inline-module-N
+fragments. Relative asset bases and external URLs remain unchanged. A new timer-issued probe
+records whether the document progresses during a deliberately held response; it still needs
+browser CI and real-scene follow-up. No acceptable latency threshold is claimed. Dynamic
+imports remain asynchronous.
 
 JSON modulepreload is temporarily unavailable: a bounded warning and asynchronous link
 error replace the old false-success behavior. Typed JSON imports remain supported and
