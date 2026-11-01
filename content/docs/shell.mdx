@@ -363,8 +363,12 @@ further polls stay quiet until the response. The correction was published in
 [`6e2f741`](https://github.com/DRincs-Productions/roves/commit/6e2f741cbc1462f42d33ce103617d8bdecab03dd).
 V8 CI `41347412162` has completed 11/11 green, including
 Linux/Windows normal and JITless runtime tests, shell builds and smoke checks. The general
-workflow is 11/13 green; only the Linux bundle tests and Windows MSI assembly remain active.
-Real-game responsiveness still needs verification. This is not yet a verified release change.
+workflow `41347412130` also completed 13/13 green. A single-document heap snapshot from the
+V8 run follows 16 rounds and 32 explicit collections; diagnostics report that all 128 detached
+elements and 128 probes were released while a live control remained. The snapshot passes the
+structural/marker check, but its retainers were not analyzed. This controlled scene does not
+establish general memory retention or prove the absence of leaks. Real-game responsiveness
+still needs verification; this is not yet a verified release change.
 
 **Disk space and RAM** — Servo bundles SpiderMonkey (the JS engine, compiled from C++) and
 ANGLE (GL-over-native graphics translation). A clean build compiles a lot of C++ on top of
